@@ -80,7 +80,8 @@ section { scroll-margin-top: 16px; }
 .quiz-sec { padding-block: clamp(40px, 6vw, 80px); }
 .quiz-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); gap: clamp(20px, 3vw, 40px); align-items: start; }
 .stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); }
-.stage .scene { aspect-ratio: 600 / 360; max-width: 100%; }
+.stage .scene { position: relative; aspect-ratio: 600 / 360; max-width: 100%; }
+.stage .scene img, .pick .scene img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .stage .scene svg { width: 100%; height: 100%; display: block; }
 .stage-cap { display: flex; justify-content: space-between; align-items: end; gap: 16px; padding: 18px 22px 20px; border-top: 1px solid var(--line); }
 .stage-cap .n { font: 700 20px/1.15 var(--font-display); font-stretch: 105%; margin-top: 6px; }
@@ -195,9 +196,7 @@ section { scroll-margin-top: 16px; }
 .alt .mini { aspect-ratio: 600 / 300; }
 .alt .mini svg { width: 100%; height: 100%; display: block; }
 .alt .mini img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.pick .photo { display: block; position: relative; max-width: 720px; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); }
-.pick .photo img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-.pick .photo span { position: absolute; right: 10px; bottom: 10px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); color: var(--ink); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+.scene .credit { position: absolute; left: 12px; top: 12px; z-index: 2; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); color: var(--ink); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
 .alt .t { font: 700 17px/1.2 var(--font-display); font-stretch: 105%; padding: 14px 16px 0; }
 .alt .s { font-size: 13px; color: var(--mist); padding: 4px 16px 0; }
 .alt .row { display: flex; justify-content: space-between; gap: 10px; padding: 12px 16px 15px; font-size: 13px; font-variant-numeric: tabular-nums; }
@@ -357,6 +356,7 @@ footer p { max-width: 80ch; margin: 0; }
   const ROOF = { gable: 'dvokapna', flat: 'ravna', mono: 'enokapna', hip: 'štirikapna', multi: 'večkapna' };
   const cap = s => s[0].toUpperCase() + s.slice(1);
   const plural = (n, one, two, few, many) => n === 1 ? one : n === 2 ? two : n <= 4 ? few : many;
+  const photo = (m, sizes) => `<img src="${esc(m.image)}" srcset="${esc(m.image)} 720w, ${esc(m.image.replace('img/', 'img/large/'))} 1400w" sizes="${sizes}" alt="${esc(m.name)}, ${esc(m.provider)}">`;
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   // ---------- Blue-hour scene: sky, Julian Alps ridge, spruces, and the house with lit windows ----------
@@ -565,7 +565,7 @@ footer p { max-width: 80ch; margin: 0; }
     $('stage-name').textContent = top.name;
     $('stage-prov').textContent = `${top.provider} · ${floorLabel(top.floors)} · ${Math.round(top.area_m2)} m²`;
     $('stage-pct').textContent = top.s.pct + ' %';
-    if (top.id !== lastStageId) { $('stage-scene').innerHTML = scene(top, { h: 360 }); lastStageId = top.id; }
+    if (top.id !== lastStageId) { $('stage-scene').innerHTML = top.image ? photo(top, '(min-width: 900px) 45vw, 100vw') + `<span class="credit">Foto: ${esc(top.provider)}</span>` : scene(top, { h: 360 }); lastStageId = top.id; }
   }
   function renderResult(lightsOn) {
     try { const { selected, ...s } = state; localStorage.setItem('hise-quiz-3', JSON.stringify(s)); } catch (e) {}
@@ -582,7 +582,7 @@ footer p { max-width: 80ch; margin: 0; }
     $('reveal-title').textContent = isBest ? (state.done ? 'Ta hiša vam pristaja' : 'Najboljše ujemanje') : 'Izbrana hiša';
     $('result').innerHTML = `
       <article class="pick">
-        <div class="scene${lightsOn ? ' off' : ''}" id="pick-scene">${scene(top, { h: 300 })}</div>
+        <div class="scene${lightsOn ? ' off' : ''}" id="pick-scene">${top.image ? `<a href="${esc(top.url)}" target="_blank" rel="noopener">${photo(top, '(min-width: 1200px) 1100px, 100vw')}<span class="credit">Foto: ${esc(top.provider)} ↗</span></a>` : scene(top, { h: 300 })}</div>
         <div class="ring" style="--p:${top.s.pct}"><div><b>${top.s.pct}</b><span>% ujemanje</span></div></div>
         <div class="pick-body">
           <div class="pick-title">
@@ -590,7 +590,6 @@ footer p { max-width: 80ch; margin: 0; }
             <div class="price"><b>${top.price_eur != null ? fmtEur(top.price_eur) : 'Na povpraševanje'}</b><span>${top.price_eur != null ? esc(top.price_stage || 'faza gradnje ni navedena') : 'Proizvajalec cene ne objavlja.'}</span></div>
           </div>
           <dl class="specs">${cell('Etaže', floorLabel(top.floors))}${cell('Površina', top.area_m2 ? Math.round(top.area_m2) + ' m²' : '—')}${cell('Spalnice', top.bedrooms ?? '—')}${cell('Kopalnice', top.bathrooms ?? '—')}${cell('Streha', top.roof ? ROOF[top.roof] : '—')}</dl>
-          ${top.image ? `<a class="photo" href="${esc(top.url)}" target="_blank" rel="noopener"><img src="${esc(top.image)}" alt="${esc(top.name)}, ${esc(top.provider)}" loading="lazy"><span>Foto: ${esc(top.provider)} ↗</span></a>` : ''}
           <div class="two">
             <div><div class="eyebrow">Zakaj ta hiša</div><ul class="why">${top.s.reasons.map(([c, t]) => `<li class="${c === 'ok' ? '' : c}">${esc(t)}</li>`).join('')}</ul></div>
             <div class="edge"><div class="eyebrow">Prednost proizvajalca ${esc(top.provider)}</div>${esc(prov.edge || '')}${facts.length ? `<ul class="facts">${facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}</div>
@@ -619,9 +618,12 @@ footer p { max-width: 80ch; margin: 0; }
     renderResult();
     // tiles move on by themselves, so the quiz feels like tapping through
     if (t.type === 'radio' && STEPS[state.step].auto && state.step < STEPS.length - 1) {
-      clearTimeout(autoTimer); autoTimer = setTimeout(() => { state.step++; renderStep(true); focusFirst(); }, 380);
+      autoNext();
     }
   });
+  function autoNext() { clearTimeout(autoTimer); autoTimer = setTimeout(() => { state.step++; renderStep(true); focusFirst(); }, 380); }
+  // a click on the tile that is already selected fires no input event, so move on here (click comes before input)
+  form.addEventListener('click', e => { const t = e.target; if (t.type === 'radio' && state[t.name] === t.value && STEPS[state.step].auto && state.step < STEPS.length - 1) autoNext(); });
   form.addEventListener('submit', e => e.preventDefault());
   function focusFirst() { const c = $('q-body').querySelector('input:checked') || $('q-body').querySelector('input'); if (c && document.activeElement && form.contains(document.activeElement)) c.focus({ preventScroll: true }); }
   function next() {
