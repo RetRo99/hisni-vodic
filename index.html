@@ -232,9 +232,6 @@ td a:hover { color: var(--glow); }
 .bars i b { width: 100%; height: 5px; border-radius: 3px; background: var(--line); }
 .bars i b.f { background: var(--glow); }
 
-.brochures { margin-top: 46px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 30px; align-items: start; }
-.brochures h3 { font: 800 28px/1.05 var(--font-display); font-stretch: 112%; margin: 10px 0 12px; }
-.brochures p { color: var(--mist); margin: 0; font-size: 14px; max-width: 42ch; }
 
 footer { padding-block: 30px 50px; border-top: 1px solid var(--line); color: var(--mist); font-size: 13px; }
 footer p { max-width: 80ch; margin: 0; }
@@ -248,7 +245,7 @@ footer p { max-width: 80ch; margin: 0; }
   .quiz-grid { grid-template-columns: minmax(0, 1fr); }
   .stage { position: relative; top: 0; }
   .stage .scene { aspect-ratio: 600 / 250; }
-  .two, .brochures { grid-template-columns: minmax(0, 1fr); }
+  .two { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
   .bar nav { display: none; }
@@ -277,7 +274,7 @@ footer p { max-width: 80ch; margin: 0; }
 
 <div class="bar"><div class="wrap">
   <div class="mark"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 15 16 5l12 10" stroke="#eef2f9" stroke-width="2.4" stroke-linejoin="round"/><rect x="8" y="15" width="16" height="12" stroke="#eef2f9" stroke-width="2.4"/><rect x="13" y="19" width="6" height="8" fill="#ffc477"/></svg>Hišni vodič</div>
-  <nav><a href="#kviz">Kviz</a><a href="#hisa">Vaša hiša</a><a href="#katalog">Katalog</a></nav>
+  <nav><a href="#kviz">Kviz</a><a href="#hisa" hidden>Vaša hiša</a><a href="#katalog">Katalog</a></nav>
 </div></div>
 
 <header class="hero">
@@ -319,7 +316,7 @@ footer p { max-width: 80ch; margin: 0; }
     </div>
   </section>
 
-  <section class="reveal" id="hisa">
+  <section class="reveal" id="hisa" hidden>
     <div class="wrap">
       <div class="reveal-head">
         <div><div class="eyebrow" id="reveal-eyebrow">Vaša hiša</div><h2 class="display" id="reveal-title" style="margin-top:10px">Najboljše ujemanje</h2></div>
@@ -336,30 +333,6 @@ footer p { max-width: 80ch; margin: 0; }
       </div>
       <div class="table-wrap"><table id="tbl"></table></div>
       <div class="makers" id="makers"></div>
-      <div class="brochures" id="brosure">
-        <div><div class="eyebrow">Marles · ponudbene brošure</div><h3>Cene iz brošur</h3><p>Cene Marles so iz teh brošur: paket Essential na ključ, z DDV, brez temeljne plošče. Ponudba velja 30 dni, zato jo pred odločitvijo preverite.</p></div>
-        <div class="table-wrap"><table>
-          <thead><tr><th>Hiša</th><th>Brošura</th><th class="num">Essential</th><th class="num">Elite</th></tr></thead>
-          <tbody><tr><td>Lumniya Haven 124</td><td><a href="https://web.marles.com/hubfs/Lumniya%20Haven%20124%20nova-1.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">202.596 €</td><td class="num">218.501 €</td></tr>
-        <tr><td>Lumniya Haven 135</td><td><a href="https://web.marles.com/hubfs/Lumniya%20Haven%20135%20nova-2.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">206.337 €</td><td class="num">222.647 €</td></tr>
-        <tr><td>Lumniya Haven 146</td><td><a href="https://web.marles.com/hubfs/Lumniya%20Haven%20146%20nova-1.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">220.781 €</td><td class="num">237.685 €</td></tr>
-        <tr><td>Lumniya Lux 149</td><td><a href="https://web.marles.com/hubfs/Lumniya%20Lux%20149%20nova-1.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">234.179 €</td><td class="num">255.488 €</td></tr>
-        <tr><td>Lumniya Villa 149</td><td><a href="https://web.marles.com/hubfs/Lumniya%20Villa%20149%20nova-1.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">243.382 €</td><td class="num">264.745 €</td></tr>
-        <tr><td>StarLight 134</td><td><a href="https://web.marles.com/hubfs/StarLight%20134%20nova-1.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">236.673 €</td><td class="num">262.627 €</td></tr>
-        <tr><td>Pulse Scape 126</td><td><a href="https://web.marles.com/hubfs/Pulse%20Scape%20126%20nova.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">201.366 €</td><td class="num">220.137 €</td></tr>
-        <tr><td>Lumniya Lux 125</td><td><a href="https://web.marles.com/hubfs/Lumniya%20Lux%20125%20nova-1.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">205.182 €</td><td class="num">224.546 €</td></tr>
-        <tr><td>Lumniya Villa 125</td><td><a href="https://web.marles.com/hubfs/Lumniya%20Villa%20125%20nova-1.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">212.853 €</td><td class="num">232.294 €</td></tr>
-        <tr><td>Vista Lux 113</td><td><a href="https://web.marles.com/hubfs/Vista%20Lux%20113%20nova-1.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">195.840 €</td><td class="num">215.020 €</td></tr>
-        <tr><td>Pixel 48</td><td><a href="https://web.marles.com/hubfs/Pixel%2048%20nova-1.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">113.846 €</td><td class="num">125.283 €</td></tr>
-        <tr><td>Joy 91</td><td><a href="https://web.marles.com/hubfs/Joy%2091%20nova.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">150.582 €</td><td class="num">163.639 €</td></tr>
-        <tr><td>Sky Lux 95</td><td><a href="https://web.marles.com/hubfs/Sky%20Lux%2095%20nova.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">163.244 €</td><td class="num">177.482 €</td></tr>
-        <tr><td>Serenity 136</td><td><a href="https://web.marles.com/hubfs/Serenity%20136%20nova.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">217.397 €</td><td class="num">238.738 €</td></tr>
-        <tr><td>SkyGlow 147</td><td><a href="https://web.marles.com/hubfs/SkyGlow%20147%20nova.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">234.645 €</td><td class="num">257.012 €</td></tr>
-        <tr><td>SeaBreeze 179</td><td><a href="https://web.marles.com/hubfs/SeaBreeze%20179%20nova.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">290.414 €</td><td class="num">316.418 €</td></tr>
-        <tr><td>WaterFall 265</td><td><a href="https://web.marles.com/hubfs/WaterFall%20265%20nova.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">341.873 €</td><td class="num">374.088 €</td></tr>
-        <tr><td>SunShine 333</td><td><a href="https://web.marles.com/hubfs/SunShine%20333%20nova.pdf" target="_blank" rel="noopener">PDF</a></td><td class="num">444.015 €</td><td class="num">503.547 €</td></tr></tbody>
-        </table></div>
-      </div>
     </div>
   </section>
 </main>
@@ -593,6 +566,8 @@ footer p { max-width: 80ch; margin: 0; }
     try { const { selected, ...s } = state; localStorage.setItem('hise-quiz-3', JSON.stringify(s)); } catch (e) {}
     const ranked = rank();
     renderStage(ranked[0]);
+    // the result and its nav link stay hidden until the quiz is finished
+    $('hisa').hidden = document.querySelector('nav a[href="#hisa"]').hidden = !state.done;
     const top = (state.selected && ranked.find(r => r.id === state.selected)) || ranked[0];
     const isBest = top === ranked[0];
     const prov = PROVIDERS.find(p => p.id === top.providerId) || {};
@@ -694,7 +669,7 @@ footer p { max-width: 80ch; margin: 0; }
 (function () {
   function track(name, data) { try { if (window.umami) window.umami.track(name, data); } catch (e) {} }
   function txt(id) { var el = document.getElementById(id); return el ? el.textContent.trim() : ''; }
-  function where(el) { return el.closest('#hisa') ? 'result' : el.closest('#brosure') ? 'brochure' : el.closest('#makers') ? 'maker' : el.closest('#katalog') ? 'catalog' : 'other'; }
+  function where(el) { return el.closest('#hisa') ? 'result' : el.closest('#makers') ? 'maker' : el.closest('#katalog') ? 'catalog' : 'other'; }
   document.addEventListener('click', function (e) {
     var t = e.target;
     if (!(t instanceof Element)) return;
