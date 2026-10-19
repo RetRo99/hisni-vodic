@@ -112,6 +112,22 @@ def head(title, og_title, desc, url, image, ld):
 {HEAD_END}</head>'''
 
 
+def figure(img, alt, maker):
+    big = img.replace('img/', 'img/large/') if img else ''
+    return (f'<figure class="photo"><img src="../{esc(img)}" srcset="../{esc(img)} 720w, ../{esc(big)} 1400w" '
+            f'sizes="(min-width: 1240px) 1208px, 100vw" alt="{esc(alt)}"><figcaption>Foto: {esc(maker)}</figcaption></figure>') if img else ''
+
+
+def maker_bits(p):
+    """The maker's website link and its facts list, shared by house and maker pages."""
+    facts = [f for f in [p.get('construction') and 'Konstrukcija: ' + p['construction'], p.get('energy_class') and 'Energija: ' + p['energy_class'],
+                         p.get('build_time') and 'Gradnja: ' + p['build_time'],
+                         p.get('warranty_years') and f"Garancija na konstrukcijo: {p['warranty_years']} let"] if f]
+    site = re.sub(r'^https?://(www\.)?', '', p.get('website', '')).rstrip('/')
+    return (f'<p><a href="{esc(p["website"])}" target="_blank" rel="noopener">{esc(site)} ↗</a></p>' if site else '',
+            '<ul class="facts">' + ''.join(f'<li>{esc(f)}</li>' for f in facts) + '</ul>' if facts else '')
+
+
 def page(p, m):
     name = f"{p['name']} {m['name']}"
     url = SITE + m['slug'] + '/'
@@ -138,16 +154,9 @@ def page(p, m):
     if price:
         ld['offers'] = {'@type': 'Offer', 'price': m['price_eur'], 'priceCurrency': 'EUR', 'url': url}
     cell = lambda k, v: f'<div><dt>{k}</dt><dd>{v}</dd></div>'
-    facts = [f for f in [p.get('construction') and 'Konstrukcija: ' + p['construction'], p.get('energy_class') and 'Energija: ' + p['energy_class'],
-                         p.get('build_time') and 'Gradnja: ' + p['build_time'],
-                         p.get('warranty_years') and f"Garancija na konstrukcijo: {p['warranty_years']} let"] if f]
     siblings = [o for o in p['models'] if o is not m]
-    site = re.sub(r'^https?://(www\.)?', '', p.get('website', '')).rstrip('/')
-    big =img.replace('img/', 'img/large/') if img else ''
-    photo = (f'<figure class="photo"><img src="../{esc(img)}" srcset="../{esc(img)} 720w, ../{esc(big)} 1400w" '
-             f'sizes="(min-width: 1240px) 1208px, 100vw" alt="{esc(name)}"><figcaption>Foto: {esc(p["name"])}</figcaption></figure>') if img else ''
-    maker_link = f'<p><a href="{esc(p["website"])}" target="_blank" rel="noopener">{esc(site)} ↗</a></p>' if site else ''
-    facts_html = '<ul class="facts">' + ''.join(f'<li>{esc(f)}</li>' for f in facts) + '</ul>' if facts else ''
+    photo = figure(img, name, p['name'])
+    maker_link, facts_html = maker_bits(p)
     sib_html = (f'<section><h2>Druge hiše proizvajalca {esc(p["name"])}</h2><ul class="siblings">' +
                 ''.join(f'<li><a href="../{o["slug"]}/">{esc(o["name"])}</a></li>' for o in siblings) + '</ul></section>') if siblings else ''
     note = ' Opomba: ' + esc(', '.join(m['flags'])) + '.' if m['flags'] else ''
@@ -158,7 +167,7 @@ def page(p, m):
 {BAR}
 <main class="wrap page">
   <div>
-    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../#katalog">Katalog</a> / {esc(p['name'])}</div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../#katalog">Katalog</a> / <a href="../{p['id']}/">{esc(p['name'])}</a></div>
     <div class="head">
       <div><h1 class="display">{esc(name)}</h1><div class="prov">Montažna hiša · {esc(p['name'])}</div></div>
       <div class="price"><b>{price or 'Na povpraševanje'}</b><span>{stage}</span></div>
@@ -183,7 +192,7 @@ def page(p, m):
 '''
 
 
-GUIDE_CSS = '''
+TABLE_CSS = '''
 .page > * { min-width: 0; }
 .scroll { overflow-x: auto; border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); }
 .tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
@@ -193,6 +202,7 @@ GUIDE_CSS = '''
 .tbl tbody th { font-weight: 600; white-space: nowrap; }
 .tbl .n { font-family: var(--font-data); font-size: 14px; white-space: nowrap; }
 .tbl .stage { color: var(--mist); font-size: 13px; min-width: 260px; }
+.tbl td:first-child { min-width: 170px; }
 .tbl a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
 .tbl a:hover { color: var(--glow); }
 .points { margin: 0; padding-left: 20px; color: #c9d3e6; display: grid; gap: 10px; max-width: 48em; }
@@ -200,12 +210,18 @@ GUIDE_CSS = '''
 '''
 
 
+def thead(*cols):
+    return '<thead><tr>' + ''.join(f'<th scope="col">{c}</th>' for c in cols) + '</tr></thead>'
+
+
+YEAR = re.search(r'\d{4}', data['collected']).group(0)
+
+
 def and_join(names):
     return ', '.join(names[:-1]) + ' in ' + names[-1] if len(names) > 1 else names[0]
 
 
 def guide():
-    year = re.search(r'\d{4}', data['collected']).group(0)
     url = SITE + GUIDE + '/'
     per_m2 = lambda m: m['price_eur'] / m['area_m2']
     priced = [(p, m) for p, m in models if m['price_eur'] and m['area_m2']]
@@ -221,12 +237,12 @@ def guide():
         count = n(f"{len(ms)} / {len(p['models'])}")
         if not ms:
             unpublished.append(p['name'])
-            rows.append(f'<tr><th scope="row">{esc(p["name"])}</th>{count}<td colspan="3">—</td>'
+            rows.append(f'<tr><th scope="row"><a href="../{p["id"]}/">{esc(p["name"])}</a></th>{count}<td colspan="3">—</td>'
                         '<td class="stage">Cen ne objavlja, ponudba na povpraševanje.</td></tr>')
             continue
         stage = collections.Counter(m['price_stage'] for m in ms).most_common(1)[0][0]
         stages[p['name']] = stage.lower()
-        rows.append(f'<tr><th scope="row">{esc(p["name"])}</th>{count}'
+        rows.append(f'<tr><th scope="row"><a href="../{p["id"]}/">{esc(p["name"])}</a></th>{count}'
                     f'{n(eur(min(m["price_eur"] for m in ms)))}{n(eur(max(m["price_eur"] for m in ms)))}'
                     f'{n(eur(round(statistics.median(per_m2(m) for m in ms))) + "/m²")}<td class="stage">{esc(stage)}</td></tr>')
 
@@ -258,14 +274,13 @@ def guide():
         points.append(f'<li><b>Brez objavljenih cen.</b> {and_join(unpublished)} {verb(unpublished, "cen tipskih hiš ne objavlja", "cen tipskih hiš ne objavljata", "cen tipskih hiš ne objavljajo")}; '
                       'ponudbo dobite na povpraševanje.</li>')
 
-    h1 = f'Koliko stane montažna hiša v {year}?'
+    h1 = f'Koliko stane montažna hiša v {YEAR}?'
     desc = (f'Cene {len(priced)} tipskih montažnih hiš slovenskih proizvajalcev: od {eur(lo[1]["price_eur"])} do {eur(hi[1]["price_eur"])}, '
             f'mediana {med_m2}. Primerjava po proizvajalcih in velikosti ter kaj cena vključuje.')
     ld = {'@context': 'https://schema.org', '@type': 'Article', 'headline': h1, 'description': desc, 'inLanguage': 'sl', 'url': url,
           'dateModified': datetime.date.today().isoformat(), 'image': SITE + 'img/large/riko-mila.jpg',
           'author': {'@type': 'Organization', 'name': 'Hišni vodič', 'url': SITE}}
-    thead = lambda *cols: '<thead><tr>' + ''.join(f'<th scope="col">{c}</th>' for c in cols) + '</tr></thead>'
-    return f'''{head(f'Cena montažne hiše {year}: primerjava proizvajalcev · Hišni vodič', h1, desc, url, ld['image'], ld).replace('</head>', '<style>' + GUIDE_CSS + '</style></head>')}
+    return f'''{head(f'Cena montažne hiše {YEAR}: primerjava proizvajalcev · Hišni vodič', h1, desc, url, ld['image'], ld).replace('</head>', '<style>' + TABLE_CSS + '</style></head>')}
 <body>
 {BAR}
 <main class="wrap page">
@@ -291,22 +306,93 @@ def guide():
 '''
 
 
+def maker(p):
+    name, ms = p['name'], p['models']
+    url = SITE + p['id'] + '/'
+    priced = [m for m in ms if m['price_eur'] and m['area_m2']]
+    stage = collections.Counter(m['price_stage'] for m in priced).most_common(1)[0][0] if priced else None
+    lo, hi = (min(m['price_eur'] for m in priced), max(m['price_eur'] for m in priced)) if priced else (None, None)
+    count = f"{len(ms)} {plural(len(ms), 'tipska montažna hiša', 'tipski montažni hiši', 'tipske montažne hiše', 'tipskih montažnih hiš')}"
+    img = next((m['image'] for m in ms if m.get('image')), None)
+    n = lambda v: f'<td class="n">{v}</td>'
+    rows = []
+    for m in sorted(ms, key=lambda m: (m['area_m2'] or 10 ** 4, m['name'])):
+        area = f"{round(m['area_m2'])} m²" if m['area_m2'] else '—'
+        price = eur(m['price_eur']) if m['price_eur'] else 'na povpraševanje'
+        m2 = eur(round(m['price_eur'] / m['area_m2'])) + '/m²' if m['price_eur'] and m['area_m2'] else '—'
+        rows.append(f'<tr><td><a href="../{m["slug"]}/">{esc(m["name"])}</a></td>{n(area)}{n(m["bedrooms"] or "—")}'
+                    f'<td>{ROOF.get(m["roof"], "—")}</td>{n(price)}{n(m2)}</tr>')
+    others = ''.join(f'<li><a href="../{o["id"]}/">{esc(o["name"])}</a></li>' for o in data['providers'] if o is not p)
+    maker_link, facts_html = maker_bits(p)
+    desc = (f'{name}: {count}' + (f', cene od {eur(lo)} do {eur(hi)}' if priced else ', cene na povpraševanje') +
+            '. Kaj cena vključuje, konstrukcija, energijski razred, čas gradnje in garancija.')
+    image_abs = SITE + (img.replace('img/', 'img/large/') if img else 'img/large/riko-mila.jpg')
+    ld = {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': f'{name}: montažne hiše', 'url': url, 'description': desc,
+          'inLanguage': 'sl', 'image': image_abs, 'about': {'@type': 'Organization', 'name': name, 'url': p.get('website')}}
+    price_box = f'<b>od {eur(lo)}</b><span>{esc(stage)}</span>' if priced else '<b>Na povpraševanje</b><span>Proizvajalec cen ne objavlja.</span>'
+    includes = f'Kaj vključuje cena: {esc(stage)}.' if priced else 'Cen tipskih hiš ne objavlja; ponudbo dobite na povpraševanje.'
+    return f'''{head(f'{name}: montažne hiše, cene in modeli {YEAR} · Hišni vodič', f'{name}: montažne hiše, cene in modeli', desc, url, image_abs, ld).replace('</head>', '<style>' + TABLE_CSS + '</style></head>')}
+<body>
+{BAR}
+<main class="wrap page">
+  <div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../#katalog">Katalog</a> / {esc(name)}</div>
+    <div class="head">
+      <div><h1 class="display">{esc(name)}</h1><div class="prov">Proizvajalec montažnih hiš · {count}</div></div>
+      <div class="price">{price_box}</div>
+    </div>
+  </div>
+  {figure(img, 'Montažna hiša ' + name, name)}
+  <div class="lede"><p>{esc(p.get('description', ''))}</p><p>{includes} <a href="../{GUIDE}/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
+  <section><h2>Vse hiše proizvajalca {esc(name)}</h2><div class="scroll"><table class="tbl">{thead('Hiša', 'Površina', 'Spalnice', 'Streha', 'Cena', 'Na m²')}<tbody>{''.join(rows)}</tbody></table></div></section>
+  <div class="two">
+    <div class="edge"><div class="eyebrow">Prednost proizvajalca {esc(name)}</div>{esc(p.get('edge') or '')}{facts_html}</div>
+    <section class="maker-info"><h2>Spletna stran</h2>{maker_link}<h2>Drugi proizvajalci</h2><ul class="siblings">{others}</ul></section>
+  </div>
+  <div class="actions">
+    <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
+    <a class="btn line" href="../#katalog">Vse hiše v katalogu</a>
+  </div>
+</main>
+{FOOT}
+</body>
+</html>
+'''
+
+
+# Old addresses Google may already know, as instant redirects to the new ones.
+MOVED = {f'kager-vita-nova-{k}-family': f'kager-vita-nova-{k}-linija' for k in ('classic', 'edition', 'urbana', 'modern')}
+
+
+def moved(new):
+    return (f'<!doctype html><html lang="sl"><head><meta charset="utf-8"><title>Preusmeritev</title><link rel="canonical" href="{SITE}{new}/">'
+            f'<meta http-equiv="refresh" content="0; url=../{new}/"></head><body><a href="../{new}/">{SITE}{new}/</a></body></html>\n')
+
+
+def write(folder, html_):
+    os.makedirs(folder, exist_ok=True)
+    open(os.path.join(folder, 'index.html'), 'w', encoding='utf-8').write(html_)
+
+
 # shortcut: pages of models removed from the JSON are not deleted; delete their folders by hand.
 for p, m in models:
-    os.makedirs(m['slug'], exist_ok=True)
-    open(os.path.join(m['slug'], 'index.html'), 'w', encoding='utf-8').write(page(p, m))
-os.makedirs(GUIDE, exist_ok=True)
-open(os.path.join(GUIDE, 'index.html'), 'w', encoding='utf-8').write(guide())
+    write(m['slug'], page(p, m))
+for p in data['providers']:
+    write(p['id'], maker(p))
+write(GUIDE, guide())
+for old, new in MOVED.items():
+    assert new in slugs, new
+    write(old, moved(new))
 
 # index.html: slugs into the data (the catalog JS links to them) and a static link list crawlers see without JS.
-links = ''.join(f'<div><h3>{esc(p["name"])}</h3><ul>' + ''.join(f'<li><a href="{m["slug"]}/">{esc(m["name"])}</a></li>' for m in p['models']) + '</ul></div>'
+links = ''.join(f'<div><h3><a href="{p["id"]}/">{esc(p["name"])}</a></h3><ul>' + ''.join(f'<li><a href="{m["slug"]}/">{esc(m["name"])}</a></li>' for m in p['models']) + '</ul></div>'
                 for p in data['providers'])
 src = DATA_RE.sub(lambda mo: mo.group(1) + json.dumps(data, ensure_ascii=False) + mo.group(3), src)
 src = re.sub(r'(<!-- model-links -->).*?(<!-- /model-links -->)', lambda mo: mo.group(1) + links + mo.group(2), src, flags=re.S)
 open('index.html', 'w', encoding='utf-8').write(src)
 
 today = datetime.date.today().isoformat()
-locs = [SITE, SITE + GUIDE + '/'] + [SITE + s + '/' for s in slugs]
+locs = [SITE, SITE + GUIDE + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
 open('sitemap.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
                                                   ''.join(f'  <url><loc>{l}</loc><lastmod>{today}</lastmod></url>\n' for l in locs) + '</urlset>\n')
 
