@@ -30,80 +30,76 @@
         "kp-vsevem"
       ],
       "as_of": "2026-06-12",
-      "confidence": "medium",
-      "indexed": {
-        "min": 9000,
-        "max": 10000
-      }
+      "confidence": "medium"
     },
     "share_of_investment_note": "24ur (8. 1. 2026, quoting an architect): komunalni prispevek is typically about 10 % of the investment excluding the plot.",
     "municipalities": [
       {
         "obcina": "Ljubljana",
-        "calc_600_180": {
-          "min": 18755,
-          "max": 21992
-        },
+        "calc_600_180": 18755,
         "vsevem_600_200": 31748,
-        "note": "min/max = Fn 0.7 vs 1.0 (Fn for 1110 not confirmed). Odlok 2021 prices; vsevem estimates +33 % with indexation to 2025. 24ur (Jan 2026) reports almost 19,600 EUR for 200 m2 / 600 m2. Indexed x 1.25-1.33.",
+        "note": "Odlok UL RS 58/2021, art. 7: Fn for 1110 enostanovanjske stavbe = 0.7. No indexation clause in the odlok (art. 1-20), none in ZUreP-3 or Uredba 53/26. 24ur (Jan 2026) reports almost 19,600 EUR for 200 m2 / 600 m2.",
         "source_ids": [
+          "kp-lj-ul",
           "kp-vsevem-lj",
           "kp-24ur-2026"
         ],
         "as_of": "2021-04-29 odlok",
-        "confidence": "medium",
-        "indexed": {
-          "min": 23444,
-          "max": 29249
+        "confidence": "high",
+        "amount": {
+          "min": 18755,
+          "max": 18755
         }
       },
       {
         "obcina": "Maribor",
         "calc_600_180": {
-          "min": 8814,
-          "max": 9583
+          "min": 15217,
+          "max": 16542
         },
         "vsevem_600_200": 10832,
-        "note": "min/max = Fn 0.7 vs 1.0. The 2024 amendment deleted the psz article; the old psz rates are used here, so treat as uncertain. Indexed 11,000-14,000: 24ur reports 14-18k for MB, CE, KR; the psz article was repealed in MUV 6/2024.",
+        "note": "min/max = Fn 0.7 vs 1.0 (Fn for 1110 not confirmed). The 2024 amendment set psz to 100 % for all utilities (news reports; MUV text not reachable); Cpo/Cto from vsevem, Dpo/Dto 0.5/0.5. No indexation: the odlok has no indexation clause and neither ZUreP-3 nor Uredba 53/26 provides one, so assessments use the odlok prices (kp-uredba-53-26).",
         "source_ids": [
-          "kp-vsevem-mb",
-          "kp-24ur-2026"
+          "kp-mb-news",
+          "kp-vsevem"
         ],
         "as_of": "2019-12-24 odlok, amended 2024-04-16",
         "confidence": "low",
-        "indexed": {
-          "min": 11000,
-          "max": 14000
+        "amount": {
+          "min": 15217,
+          "max": 16542
         }
       },
       {
         "obcina": "Celje",
         "calc_600_180": 14229,
         "vsevem_600_200": 16536,
-        "note": "Fn 1 (default; odlok's Fn table not seen). Without gas and district heating. Indexed x 1.15-1.3.",
+        "note": "Fn 1110 = 1.0, Dpo/Dto 0.5/0.5, psz 100 % for roads, public areas, water and sewer; without gas and district heating. No indexation: the odlok has no indexation clause and neither ZUreP-3 nor Uredba 53/26 provides one, so assessments use the odlok prices (kp-uredba-53-26).",
         "source_ids": [
+          "kp-celje-ul",
           "kp-vsevem-ce"
         ],
         "as_of": "2021-07-17 odlok",
-        "confidence": "medium",
-        "indexed": {
-          "min": 16363,
-          "max": 18498
+        "confidence": "high",
+        "amount": {
+          "min": 14229,
+          "max": 14229
         }
       },
       {
         "obcina": "Kranj",
-        "calc_600_180": 12666,
+        "calc_600_180": 14010,
         "vsevem_600_200": 13278,
-        "note": "Fn 1 (default). Cpo/Cto equal to the national Pravilnik averages. Indexed x 1.15-1.3.",
+        "note": "Fn 1, Dpo/Dto 0.5/0.5; psz raised by the 2023 amendment (UL 116/23): roads and public areas 90 %, water 70 %, sewer 100 %. No indexation: the odlok has no indexation clause and neither ZUreP-3 nor Uredba 53/26 provides one, so assessments use the odlok prices (kp-uredba-53-26).",
         "source_ids": [
-          "kp-vsevem-kr"
+          "kp-kranj-ul",
+          "kp-kranj-2023"
         ],
         "as_of": "2020-10-21 odlok, amended 2023-12-02",
-        "confidence": "medium",
-        "indexed": {
-          "min": 14566,
-          "max": 16466
+        "confidence": "high",
+        "amount": {
+          "min": 14010,
+          "max": 14010
         }
       },
       {
@@ -113,14 +109,14 @@
           "max": 28075
         },
         "vsevem_600_200": 29074,
-        "note": "Range over the 5 road zones (CES1 lowest, CES4 highest; CES3 = 27,531). Fn 1, psz 100 %, Dpo/Dto 0.3/0.7, read from the odlok. Used as the indexed figure (vsevem: +49 % with indexation of the 2019 odlok); 24ur suggests the lower road-class values are closer to what is charged.",
+        "note": "Range over the 5 road zones (CES1 lowest, CES4 highest; CES3 = 27,531). Fn 1, psz 100 %, Dpo/Dto 0.3/0.7, read from the odlok. No indexation clause in the odlok (art. 1-26), none in ZUreP-3 or Uredba 53/26.",
         "source_ids": [
           "kp-koper",
           "kp-vsevem"
         ],
         "as_of": "2019-11-14 odlok",
         "confidence": "high",
-        "indexed": {
+        "amount": {
           "min": 22426,
           "max": 28075
         }
@@ -129,29 +125,29 @@
         "obcina": "Novo mesto",
         "calc_600_180": 11042,
         "vsevem_600_200": 11860,
-        "note": "Fn 1. Vsevem estimates +33 % with indexation to 2025. Indexed x 1.15-1.3.",
+        "note": "Fn 1110 = 1.0, Dpo/Dto 0.3/0.7, psz 100/100/93/55/100 %. No indexation: the odlok has no indexation clause and neither ZUreP-3 nor Uredba 53/26 provides one, so assessments use the odlok prices (kp-uredba-53-26).",
         "source_ids": [
-          "kp-vsevem-nm"
+          "kp-nm-npb3"
         ],
         "as_of": "2021-03-17 odlok",
-        "confidence": "medium",
-        "indexed": {
-          "min": 12698,
-          "max": 14355
+        "confidence": "high",
+        "amount": {
+          "min": 11042,
+          "max": 11042
         }
       },
       {
         "obcina": "Ptuj",
         "calc_600_180": 6930,
         "vsevem_600_200": 9271,
-        "note": "Computed from the odlok (Fn 0.7, Dpo/Dto 0.3/0.7, psz 95/75/51/80 %). Vsevem's figure is higher; difference not explained. Kept as is; matches 24ur.",
+        "note": "Computed from the odlok (Fn 0.7, Dpo/Dto 0.3/0.7, psz 95/75/51/80 %); matches 24ur. No indexation: the odlok has no indexation clause and neither ZUreP-3 nor Uredba 53/26 provides one, so assessments use the odlok prices (kp-uredba-53-26).",
         "source_ids": [
           "kp-ptuj",
           "kp-vsevem"
         ],
         "as_of": "2021-04-24 odlok",
         "confidence": "high",
-        "indexed": {
+        "amount": {
           "min": 6930,
           "max": 6930
         }
@@ -164,9 +160,9 @@
         ],
         "as_of": "2026-06-12",
         "confidence": "medium",
-        "indexed": {
+        "amount": {
           "min": 13861,
-          "max": 17326
+          "max": 13861
         }
       },
       {
@@ -177,9 +173,9 @@
         ],
         "as_of": "2026-06-12",
         "confidence": "medium",
-        "indexed": {
+        "amount": {
           "min": 9535,
-          "max": 11919
+          "max": 9535
         }
       },
       {
@@ -190,9 +186,9 @@
         ],
         "as_of": "2026-06-12",
         "confidence": "medium",
-        "indexed": {
+        "amount": {
           "min": 9003,
-          "max": 11254
+          "max": 9003
         }
       },
       {
@@ -203,9 +199,9 @@
         ],
         "as_of": "2026-06-12",
         "confidence": "medium",
-        "indexed": {
+        "amount": {
           "min": 9234,
-          "max": 11542
+          "max": 9234
         }
       },
       {
@@ -216,9 +212,9 @@
         ],
         "as_of": "2026-06-12",
         "confidence": "medium",
-        "indexed": {
+        "amount": {
           "min": 4901,
-          "max": 6126
+          "max": 4901
         }
       },
       {
@@ -229,9 +225,9 @@
         ],
         "as_of": "2026-06-12",
         "confidence": "medium",
-        "indexed": {
+        "amount": {
           "min": 5765,
-          "max": 7206
+          "max": 5765
         }
       },
       {
@@ -242,9 +238,9 @@
         ],
         "as_of": "2026-06-12",
         "confidence": "medium",
-        "indexed": {
+        "amount": {
           "min": 22873,
-          "max": 28591
+          "max": 22873
         }
       }
     ],
@@ -465,9 +461,10 @@
         "application": 4.5
       },
       "vat": "n/a",
-      "applies": "271.80 EUR + 0.01 % of the building value above 42,000 EUR + 4.50 EUR for the application; about 297 EUR for a 250,000 EUR house. Young families solving their housing problem may be exempt. Confidence medium-high.",
-      "confidence": "medium",
+      "applies": "ZUT tarifna št. 40 c): 271.80 EUR + 0.01 % of the building value above 42,000 EUR (for 42,000-420,000 EUR), plus 4.50 EUR for a paper application (tarifna št. 1; none for an electronic one); about 297 EUR for a 250,000 EUR house. Young families solving their housing problem are exempt: at least one child, no parent older than 30 (35 while no child is of school age yet). Use permit for a single-dwelling house: 9.10 EUR (tarifna št. 42).",
+      "confidence": "high",
       "source_ids": [
+        "zut-tarifa",
         "netteblog-gd"
       ],
       "as_of": "2026-09-11"
@@ -536,10 +533,11 @@
       "unit": "EUR",
       "value": 2029.37,
       "vat": "incl",
-      "applies": "Larger houses, EV charging.",
+      "applies": "Larger houses, EV charging. 1,663.42 EUR without DDV, 2,029.37 EUR with DDV.",
       "confidence": "high",
       "source_ids": [
-        "el-eles-2026"
+        "el-eles-2026",
+        "sodo-opm-page"
       ],
       "as_of": "2026-03-01"
     },
@@ -771,10 +769,12 @@
       "max_area_m2": 150,
       "max_eur": 25500,
       "vat": "n/a",
-      "applies": "Negative item (subsidy). Javni poziv 105SUB-sNESOB23, open, amended 12. 3. 2026. Per m2 of net heated and ventilated area, max 150 m2 for a detached house (120 m2 for a semi-detached/row house). 170/150 EUR/m2 group I (natural insulation + wooden windows), 130/110 group II (mineral), 100/90 group III (synthetic), for QH <= 10 / <= 15 kWh/m2a. Capped at 30 % of eligible costs; for a turnkey build eligible costs are at most 50 % of the contract value. Requires PHPP, QH and QK <= 15 kWh/m2a, n50 <= 0.6, recuperation >= 80 %, rainwater tank >= 6 m3, PV covering the building's electricity, >= 70 % renewables. PV itself is not eligible (Borzen PV subsidy can be added). -10 EUR/m2 if PV connection was refused.",
+      "applies": "Negative item (subsidy). Javni poziv 105SUB-sNESOB23, open, amended 12. 3. 2026. Per m2 of net heated and ventilated area, max 150 m2 for a detached house (120 m2 for a semi-detached/row house). 170/150 EUR/m2 group I (natural insulation + wooden windows), 130/110 group II (mineral), 100/90 group III (synthetic), for QH <= 10 / <= 15 kWh/m2a. Capped at 30 % of eligible costs; for a turnkey build eligible costs are at most 50 % of the contract value. Requires PHPP, QH and QK <= 15 kWh/m2a, n50 <= 0.6, recuperation >= 80 %, rainwater tank >= 6 m3, PV covering the building's electricity, >= 70 % renewables. PV itself is not eligible (Borzen PV subsidy can be added). Without PV the house is not eligible at all; -10 EUR/m2 applies only when the distribution operator refuses the PV connection (another -10 EUR/m2 if the use permit predates the call and there is no rainwater tank). PV became ineligible as a cost with the 12. 3. 2026 change. +25 % in the TNP area. A pravnomočno gradbeno dovoljenje is needed before applying; first come, first served until the funds run out.",
       "confidence": "high",
       "source_ids": [
-        "eko-105"
+        "eko-105",
+        "eko-105-cistopis",
+        "eko-105-spr2026"
       ],
       "as_of": "2026-03-17"
     },
@@ -786,9 +786,10 @@
         "reduced": 0.095,
         "general": 0.22
       },
-      "applies": "9.5 % if the house is a stanovanjski objekt for permanent living 'kot del socialne politike': uporabna površina (sum of living rooms) <= 250 m2 for an enostanovanjska stavba, and the supply/construction is invoiced directly to the investor as a construction service (SKD F). Otherwise 22 %. For a prefab house sold with assembly to the investor this is the usual reading; a kit sold without assembly, and items like kitchens or built-in wardrobes, may be 22 %. Confirm with the maker or FURS.",
+      "applies": "ZDDV-1 Priloga I, point 11, and Pravilnik art. 54: 9.5 % for a house for permanent living \"kot del socialne politike\": uporabna površina (sum of living rooms, measured under the real-estate register rules) <= 250 m2 for a single-dwelling house, and the supply or construction invoiced directly to the investor (construction services = SKD F). Otherwise 22 %. A prefab house supplied and assembled by the maker for the investor is the usual reading; a kit without assembly is a supply of goods, likely 22 % (no FURS guidance found).",
       "confidence": "medium",
       "source_ids": [
+        "zddv1-priloga1",
         "ddv-pravilnik-54"
       ],
       "as_of": "2026-01-01"

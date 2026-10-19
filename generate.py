@@ -940,16 +940,16 @@ def costs_page():
     kps, kp_rows = [], []
     for m in kp['municipalities']:
         c = m.get('calc_600_180')
-        lo, hi = m['indexed']['min'], m['indexed']['max']  # the calculator uses the indexed estimate, the table shows both
-        note = ('izračun po odloku za parcelo 600 m² in 180 m² BTP' if c else 'izračun vsevem.si za parcelo 600 m² in 200 m² BTP') + ', z indeksacijo'
+        lo, hi = m['amount']['min'], m['amount']['max']
+        note = 'izračun po odloku za parcelo 600 m² in 180 m² BTP' if c else 'izračun vsevem.si za parcelo 600 m² in 200 m² BTP'
         kps.append({'id': slugify(m['obcina']), 'name': m['obcina'], 'lo': lo, 'hi': hi, 'conf': m['confidence'], 'src': m['source_ids'], 'note': note})
         clo, chi = (c['min'], c['max']) if isinstance(c, dict) else (c, c)
         calc_txt = (eur(clo) if clo == chi else eur(clo) + ' – ' + eur(chi)) if c else '—'
         kp_rows.append(f'<tr><th scope="row">{esc(m["obcina"])}</th><td class="n">{calc_txt}</td><td class="n">{eur(m["vsevem_600_200"])}</td>'
-                       f'<td class="n">{eur(lo) if lo == hi else eur(lo) + " – " + eur(hi)}</td><td>{conf[m["confidence"]]} {cite(*m["source_ids"])}</td></tr>')
-    ni = nat['indexed']
+                       f'<td>{conf[m["confidence"]]} {cite(*m["source_ids"])}</td></tr>')
+    ni = {'min': nat['typical'], 'max': nat['typical']}
     kps.append({'id': 'druga', 'name': 'Druga občina (slovensko povprečje)', 'lo': ni['min'], 'hi': ni['max'], 'conf': nat['confidence'], 'src': nat['source_ids'],
-                'note': f'povprečje {covered} občin z indeksacijo; brez nje {eur(nat["typical"])}, razpon od {eur(nat["min"])} ({nat_min}) do {eur(nat["max"])} ({nat_max})'})
+                'note': f'povprečje {covered} občin; razpon od {eur(nat["min"])} ({nat_min}) do {eur(nat["max"])} ({nat_max})'})
     kp_opts = ''.join(f'<option value="{k["id"]}"{" selected" if k["id"] == "druga" else ""}>{esc(k["name"])} ({eur(k["lo"]) if k["lo"] == k["hi"] else eur(k["lo"]) + " – " + eur(k["hi"])})</option>'
                       for k in sorted(kps[:-1], key=lambda k: k['name']) + kps[-1:])
 
@@ -995,7 +995,7 @@ def costs_page():
     slab_lo, slab_hi = rng('temeljna_plosca_m2')
     t_rates = sorted({t['rate'] for t in tiers}, reverse=True)
 
-    desc = (f'Kalkulator stroškov gradnje montažne hiše: komunalni prispevek z indeksacijo okoli {eur(ni["min"])} – {eur(ni["max"])}, '
+    desc = (f'Kalkulator stroškov gradnje montažne hiše: komunalni prispevek povprečno {eur(ni["min"])}, '
             f'projektna dokumentacija {span("projekt_paket")}, priključki {span("prikljucki_skupaj")}, temeljna plošča {slab_lo}–{slab_hi} €/m² in subvencija Eko sklada do {eur(snes["max_eur"])}.')
     h1 = 'Koliko stane gradnja montažne hiše?'
     ld = {'@context': 'https://schema.org', '@type': 'Article', 'headline': h1, 'description': desc, 'inLanguage': 'sl', 'url': url,
@@ -1026,7 +1026,7 @@ def costs_page():
       </div>
       <label>Zemljišče (€)<input type="number" id="plot" inputmode="numeric" min="0" step="1000" placeholder="0"><small>Neobvezno; pustite prazno, če parcelo že imate.</small></label>
       <label>Občina (komunalni prispevek)<select id="kp">{kp_opts}</select>
-        <small>Ocena za tipičen primer: parcela okoli 600 m² in hiša okoli 150 m² neto, s cenami iz odloka, indeksiranimi do danes. Dejanska odmera je odvisna od cone in olajšav.</small></label>
+        <small>Ocena za tipičen primer: parcela okoli 600 m² in hiša okoli 150 m² neto, s cenami iz občinskega odloka. Dejanska odmera je odvisna od cone in olajšav.</small></label>
       <label>Priključna moč elektrike<select id="kw"><option value="11">11 kW (3 × 16 A)</option><option value="17" selected>17 kW (3 × 25 A), s toplotno črpalko</option><option value="22">22 kW (3 × 32 A)</option></select></label>
       <label>Odpadne vode<select id="san"><option value="kan">Javna kanalizacija (priključek)</option><option value="mkcn">Mala čistilna naprava (MKČN)</option></select>
         <small>Pri MKČN je upoštevana vgrajena naprava: naprava, izkop, vgradnja in ponikovalnica.</small></label>
@@ -1052,9 +1052,9 @@ def costs_page():
     <p>Komunalni prispevek plačate občini pred izdajo gradbenega dovoljenja. Izračuna se iz površine parcele in bruto tlorisne površine hiše (BTP) ter cen komunalne opreme
       (ceste, vodovod, kanalizacija, javne površine) iz občinskega odloka: KP = Σ (A<sub>parcela</sub> × Cpo × Dpo + A<sub>BTP</sub> × Cto × Dto × Fn) × psz {cite(*kp['source_ids'][:3])}.
       Po izračunu vsevem.si za {covered} od {of} občin (parcela 600 m², 200 m² BTP) je povprečje {eur(nat['typical'])}, najmanj {eur(nat['min'])} ({nat_min}), največ {eur(nat['max'])} ({nat_max}) {cite(*nat['source_ids'])}.
-      Cene v odlokih so večinoma iz let 2019–2021, odmere pa se indeksirajo (indeks GZS za ostalo nizko gradnjo od leta sprejetja odloka): vsevem.si ocenjuje +33 % za Ljubljano (2021–2025) in +49 % za koprski odlok iz leta 2019 {cite('kp-vsevem-lj', 'kp-vsevem')}.
-      Kalkulator zato uporablja indeksirane ocene iz zadnjega stolpca, za druge občine {eur(ni['min'])} – {eur(ni['max'])}. Od 28. 3. 2026 velja nova uredba (Ur. l. RS 53/26), ki lahko pravila odmere spremeni {cite('kp-uredba-2026')}.</p>
-    <div class="scroll"><table class="tbl">{thead('Občina', 'Po odloku (600 m², 180 m² BTP)', 'Vsevem.si (600 m², 200 m² BTP)', 'Z indeksacijo', 'Zanesljivost')}<tbody>{''.join(kp_rows)}</tbody></table></div>
+      Odmera se računa s cenami iz veljavnega odloka. Preverjeni odloki (Ljubljana, Koper, Celje, Kranj, Novo mesto, Ptuj) nimajo določbe o indeksaciji, prav tako je nimata zakon ZUreP-3 in nova uredba (Ur. l. RS 53/26, velja od 28. 3. 2026),
+      ki za tipično novo hišo pravil odmere ne spreminja {cite('kp-uredba-53-26')}. Kalkulator uporablja zneske iz prvega stolpca, kjer jih imamo, sicer izračun vsevem.si; za druge občine povprečje {eur(ni['min'])}.</p>
+    <div class="scroll"><table class="tbl">{thead('Občina', 'Po odloku (600 m², 180 m² BTP)', 'Vsevem.si (600 m², 200 m² BTP)', 'Zanesljivost')}<tbody>{''.join(kp_rows)}</tbody></table></div>
   </section>
   <section class="prose"><h2>Koliko stane projektna dokumentacija za hišo?</h2>
     <p>Za gradbeno dovoljenje potrebujete projekt DGD ({span('projekt_dgd')}) {cite(*items['projekt_dgd']['source_ids'])}, za gradnjo še projekt za izvedbo PZI ({span('projekt_pzi')}),
@@ -1066,7 +1066,7 @@ def costs_page():
       obvezni gradbeni nadzor ({span('gradbeni_nadzor')}, običajno 1,5–3 % vrednosti gradnje) {cite(*items['gradbeni_nadzor']['source_ids'])}, energetsko izkaznico ({span('energetska_izkaznica')}) {cite('mm-ei')}
       in elaborat za vpis v kataster stavb ({span('kataster_stavb')}) {cite(*items['kataster_stavb']['source_ids'])}.</p>
     <p>Upravna taksa za gradbeno dovoljenje je {comma(tx['base'])} € in {comma(tx['rate'] * 100)} % vrednosti objekta nad {eur(tx['above'])} ter {comma(tx['application'])} € za vlogo, za hišo za 250.000 € okoli {tax_250} {cite('netteblog-gd')};
-      mlade družine, ki rešujejo stanovanjsko vprašanje, so takse lahko oproščene. Za subvencijo Eko sklada potrebujete še izračun PHPP ({span('phpp')}) {cite('arhim-phpp')}.</p>
+      takse za vlogo ni, če jo oddate elektronsko. Mlade družine, ki rešujejo stanovanjski problem (vsaj en otrok, noben od staršev ni starejši od 30 let oziroma 35 let, dokler otrok ni šoloobvezen), so takse oproščene {cite('zut-tarifa')}. Za subvencijo Eko sklada potrebujete še izračun PHPP ({span('phpp')}) {cite('arhim-phpp')}.</p>
   </section>
   <section class="prose"><h2>Koliko stanejo priključki za hišo?</h2>
     <p>Za nov priključek na elektro omrežje plačate omrežnino za priključno moč: {eles_txt} €/kW brez DDV pri nizki napetosti (cenik ELES 2026) {cite('el-eles-2026')}.
@@ -1095,7 +1095,7 @@ def costs_page():
       odvisno od vrste izolacije in potrebe po toploti, za največ {snes['max_area_m2']} m² samostoječe hiše, torej do {eur(snes['max_eur'])} {cite('eko-105')}.
       Subvencija je največ 30 % upravičenih stroškov, ti pa so pri gradnji na ključ največ polovica pogodbene vrednosti, torej največ 15 % cene hiše.
       Projekt, nadzor, zunanja ureditev in sončna elektrarna niso upravičeni stroški.</p>
-    <p>Pogoji so strogi: izračun PHPP, potreba po toploti in hladu največ 15 kWh/m²a, zrakotesnost n50 ≤ 0,6, rekuperacija vsaj 80 %, zbiralnik deževnice vsaj 6 m³, sončna elektrarna in vsaj 70 % obnovljivih virov.
+    <p>Pogoji so strogi: izračun PHPP, potreba po toploti in hladu največ 15 kWh/m²a, zrakotesnost n50 ≤ 0,6, rekuperacija vsaj 80 %, zbiralnik deževnice vsaj 6 m³, sončna elektrarna in vsaj 70 % obnovljivih virov. Brez sončne elektrarne do subvencije niste upravičeni; 10 €/m² manj dobite le, če distributer priključitev elektrarne zavrne {cite('eko-105-cistopis')}.
       {and_join(subsidized)} {verb(subsidized, 'navaja', 'navajata', 'navajajo')} ceno, ki že upošteva subvencijo, zato je kalkulator pri teh hišah ne odšteje še enkrat.</p>
   </section>
   <section class="prose"><h2>Koliko je DDV pri gradnji hiše?</h2>
@@ -1105,7 +1105,7 @@ def costs_page():
   </section>
   <section class="prose"><h2>Viri</h2><ol class="viri">{viri_html}</ol>
     <p class="credit-line">Vsi viri so bili pregledani {checked}. Okvirne cene z gradbenih portalov so se pri preverjanju izkazale za prenizke ali nepopolne, zato kalkulator, kjer je mogoče, uporablja cenike posameznih del in dejanske ponudbe.
-      Komunalni prispevek je najmanj natančna številka: odloki ga računajo od bruto površine, ki jo ocenimo kot 1,2 × neto, cone, faktorji za stanovanjske hiše, indeksacija in olajšave pa znesek spremenijo.
+      Komunalni prispevek je najmanj natančna številka: odloki ga računajo od bruto površine, ki jo ocenimo kot 1,2 × neto, cone, faktorji za stanovanjske hiše in olajšave pa znesek spremenijo.
       Večina tržnih cen ne navaja, ali vključujejo DDV; uporabite jih kot razpon, ne kot ponudbo. Izvedba elektro priključka in telekomunikacijski priključek sta groba ocena; cene plinskega priključka nismo našli.</p>
   </section>
   <div class="actions">
