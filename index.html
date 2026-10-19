@@ -114,7 +114,7 @@ section { scroll-margin-top: 16px; }
 .q-body { min-height: 300px; }
 .quiz { display: flex; flex-direction: column; }
 .quiz .nav { margin-top: auto; }
-.q-title:focus { outline: none; }
+.q-title:focus, #reveal-title:focus { outline: none; }
 .dial.unset output { color: var(--mist); }
 .dial .note { font-size: 13px; color: var(--mist); margin: 10px 0 0; min-height: 1.55em; }
 .prio-note { font-size: 13px; color: var(--mist); margin: 16px 0 0; }
@@ -228,6 +228,7 @@ section { scroll-margin-top: 16px; }
 .alt .s { font-size: 13px; color: var(--mist); padding: 4px 16px 0; }
 .alt .row { display: flex; justify-content: space-between; gap: 10px; padding: 12px 16px 15px; font-size: 13px; font-variant-numeric: tabular-nums; }
 .alt .pct { color: var(--glow); font-weight: 600; }
+.alt .an { font-size: 12px; line-height: 1.4; color: var(--mist); padding: 0 16px 14px; margin-top: -8px; text-align: right; }
 
 /* ---------- catalog ---------- */
 .catalog { padding-block: clamp(50px, 7vw, 90px); border-top: 1px solid var(--line); }
@@ -236,7 +237,7 @@ section { scroll-margin-top: 16px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chips label { cursor: pointer; }
 .chips input { position: absolute; opacity: 0; pointer-events: none; }
-.chips span { display: block; padding: 8px 14px; border-radius: 999px; font-size: 13px; box-shadow: inset 0 0 0 1px var(--line); color: var(--mist); transition: all .2s; }
+.chips span { display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; font-size: 13px; box-shadow: inset 0 0 0 1px var(--line); color: var(--mist); transition: all .2s; }
 .chips label:hover span { color: var(--ink); }
 .chips input:checked + span { background: var(--ink); color: var(--night); box-shadow: none; font-weight: 600; }
 .chips input:focus-visible + span { outline: 2px solid var(--glow); outline-offset: 2px; }
@@ -290,6 +291,8 @@ td .thumb { display: inline-block; flex: none; width: 64px; height: 40px; object
 .bars i b.f { background: var(--glow); }
 
 .guide-link { margin: 24px 0 0; font-weight: 600; }
+.more { margin: 16px 0 0; text-align: center; }
+.more[hidden] { display: none; }
 .all-houses { margin-top: 24px; border-radius: 16px; box-shadow: inset 0 0 0 1px var(--line); padding: 16px 22px; font-size: 14px; }
 .all-houses summary { cursor: pointer; color: var(--mist); }
 .all-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; margin-top: 16px; }
@@ -416,7 +419,7 @@ footer nav a:hover { color: var(--ink); }
   <section class="reveal" id="hisa" hidden>
     <div class="wrap">
       <div class="reveal-head">
-        <div><div class="eyebrow" id="reveal-eyebrow">Vaša hiša</div><h2 class="display" id="reveal-title" style="margin-top:10px">Najboljše ujemanje</h2></div>
+        <div><div class="eyebrow" id="reveal-eyebrow">Vaša hiša</div><h2 class="display" id="reveal-title" tabindex="-1" style="margin-top:10px">Najboljše ujemanje</h2></div>
       </div>
       <div id="result"></div>
     </div>
@@ -429,13 +432,14 @@ footer nav a:hover { color: var(--ink); }
         <div class="chips" id="chips" role="radiogroup" aria-label="Proizvajalec"></div>
       </div>
       <div class="filters" id="filters">
-        <label>Razvrsti<select id="f-sort"><option value="price">Cena: najnižja najprej</option><option value="price-d">Cena: najvišja najprej</option><option value="area">Površina: najmanjša najprej</option><option value="area-d">Površina: največja najprej</option><option value="ppm">Cena na m²: najnižja najprej</option></select></label>
+        <label>Razvrsti<select id="f-sort"><option value="price">Primerljiva cena: najnižja najprej</option><option value="price-d">Primerljiva cena: najvišja najprej</option><option value="area">Površina: najmanjša najprej</option><option value="area-d">Površina: največja najprej</option><option value="ppm">Primerljiva cena na m²: najnižja najprej</option></select></label>
         <label>Spalnice<select id="f-bed"><option value="">Vse</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4 ali več</option></select></label>
         <label>Etaže<select id="f-floors"><option value="">Vse</option><option value="1">Pritlične</option><option value="1.5">Z mansardo</option><option value="2">Nadstropne</option></select></label>
         <label>Cena<select id="f-price"><option value="">Vse cene</option><option value="0-150000">do 150.000 €</option><option value="150000-200000">150.000–200.000 €</option><option value="200000-250000">200.000–250.000 €</option><option value="250000-300000">250.000–300.000 €</option><option value="300000-400000">300.000–400.000 €</option><option value="400000-1e9">nad 400.000 €</option></select></label>
         <span class="count" id="f-count" aria-live="polite"></span>
       </div>
       <div class="table-wrap"><table id="tbl"></table></div>
+      <p class="more" id="f-more-wrap" hidden><button type="button" class="btn line" id="f-more"></button></p>
       <div class="makers" id="makers"></div>
       <p class="guide-link"><a href="cena-montazne-hise/">Koliko stane montažna hiša? Primerjava cen proizvajalcev →</a><br><a href="tlorisi-montaznih-his/">Tlorisi montažnih hiš po velikosti →</a><br><a href="najcenejse-montazne-hise/">Najcenejše montažne hiše na ključ →</a><br><a href="majhne-montazne-hise/">Majhne montažne hiše do 100 m² →</a><br><a href="koliko-stane-gradnja-hise/">Koliko stane gradnja hiše? Kalkulator stroškov →</a></p>
       <details class="all-houses"><summary>Vse hiše po proizvajalcih</summary><div class="all-grid"><!-- model-links --><div><h3><a href="marles/">Marles</a></h3><ul><li><a href="marles-pure-joy-91/">Pure Joy 91</a></li><li><a href="marles-pure-sky-lux-95/">Pure Sky Lux 95</a></li><li><a href="marles-pure-pulse-scape-126/">Pure Pulse Scape 126</a></li><li><a href="marles-pure-aura-107/">Pure Aura 107</a></li><li><a href="marles-pure-vista-lux-113/">Pure Vista Lux 113</a></li><li><a href="marles-pure-lumniya-lux-125/">Pure Lumniya Lux 125</a></li><li><a href="marles-pure-serenity-136/">Pure Serenity 136</a></li><li><a href="marles-prime-skyglow-147/">Prime SkyGlow 147</a></li><li><a href="marles-prime-urbannest-140/">Prime UrbanNest 140</a></li><li><a href="marles-prime-seabreeze-179/">Prime SeaBreeze 179</a></li><li><a href="marles-prime-waterfall-265/">Prime WaterFall 265</a></li><li><a href="marles-prime-sunshine-333/">Prime SunShine 333</a></li><li><a href="marles-tiny-pixel-48/">Tiny Pixel 48</a></li><li><a href="marles-fresh-mdlr-110-s/">Fresh MDLR 110 S</a></li><li><a href="marles-fresh-mdlr-125-d/">Fresh MDLR 125 D</a></li><li><a href="marles-fresh-mdlr-172-d/">Fresh MDLR 172 D</a></li><li><a href="marles-fresh-mdlr-49-s/">Fresh MDLR 49 S</a></li><li><a href="marles-fresh-mdlr-87-s/">Fresh MDLR 87 S</a></li><li><a href="marles-fresh-mdlr-153-d/">Fresh MDLR 153 D</a></li><li><a href="marles-pure-lumniya-haven-135/">Pure Lumniya Haven 135</a></li><li><a href="marles-pure-lumniya-haven-124/">Pure Lumniya Haven 124</a></li><li><a href="marles-pure-lumniya-haven-146/">Pure Lumniya Haven 146</a></li><li><a href="marles-pure-lumniya-lux-149/">Pure Lumniya Lux 149</a></li><li><a href="marles-lumniya-villa-149/">Lumniya Villa 149</a></li><li><a href="marles-lumniya-villa-125/">Lumniya Villa 125</a></li><li><a href="marles-starlight-134/">StarLight 134</a></li><li><a href="marles-pure-sky-scape-95/">Pure Sky Scape 95</a></li><li><a href="marles-pure-sky-scape-114/">Pure Sky Scape 114</a></li><li><a href="marles-pure-sky-scape-139/">Pure Sky Scape 139</a></li><li><a href="marles-pure-spark-121/">Pure Spark 121</a></li><li><a href="marles-pure-spark-131/">Pure Spark 131</a></li><li><a href="marles-pure-pulse-lux-126/">Pure Pulse Lux 126</a></li><li><a href="marles-pure-pulse-lux-138/">Pure Pulse Lux 138</a></li></ul></div><div><h3><a href="lumar/">Lumar</a></h3><ul><li><a href="lumar-gea-92/">Gea 92</a></li><li><a href="lumar-gea-105/">Gea 105</a></li><li><a href="lumar-vivus-144/">Vivus 144</a></li><li><a href="lumar-alfa-148/">Alfa 148</a></li><li><a href="lumar-komfort-202/">Komfort 202</a></li><li><a href="lumar-primus-d-126/">Primus-D 126</a></li><li><a href="lumar-eos-d-134/">Eos-D 134</a></li><li><a href="lumar-lumis-150/">Lumis 150</a></li><li><a href="lumar-linea-154/">Linea 154</a></li><li><a href="lumar-urbano-d-154/">Urbano D 154</a></li><li><a href="lumar-kubus-r-154/">Kubus R 154</a></li><li><a href="lumar-stratos-163/">Stratos 163</a></li><li><a href="lumar-zen-191/">Zen 191</a></li></ul></div><div><h3><a href="kager/">Kager</a></h3><ul><li><a href="kager-vita-nova-prima-134/">VITA NOVA Prima 134</a></li><li><a href="kager-vita-nova-prima-138/">VITA NOVA Prima 138</a></li><li><a href="kager-vita-nova-prima-141/">VITA NOVA Prima 141</a></li><li><a href="kager-vita-nova-classic-linija/">VITA NOVA Classic (linija)</a></li><li><a href="kager-vita-nova-edition-linija/">VITA NOVA Edition (linija)</a></li><li><a href="kager-vita-nova-urbana-linija/">VITA NOVA Urbana (linija)</a></li><li><a href="kager-vita-nova-modern-linija/">VITA NOVA Modern (linija)</a></li></ul></div><div><h3><a href="rihter/">Rihter</a></h3><ul><li><a href="rihter-hisa-087/">Hiša 087</a></li><li><a href="rihter-hisa-100/">Hiša 100</a></li><li><a href="rihter-hisa-113-2/">Hiša 113/2</a></li><li><a href="rihter-hisa-126/">Hiša 126</a></li><li><a href="rihter-hisa-136/">Hiša 136</a></li><li><a href="rihter-hisa-153/">Hiša 153</a></li><li><a href="rihter-hisa-185/">Hiša 185</a></li><li><a href="rihter-hisa-106/">Hiša 106</a></li><li><a href="rihter-hisa-114-3/">Hiša 114/3</a></li><li><a href="rihter-hisa-122/">Hiša 122</a></li><li><a href="rihter-hisa-138/">Hiša 138</a></li><li><a href="rihter-hisa-149/">Hiša 149</a></li><li><a href="rihter-hisa-162/">Hiša 162</a></li><li><a href="rihter-hisa-183/">Hiša 183</a></li><li><a href="rihter-hisa-101/">Hiša 101</a></li><li><a href="rihter-hisa-105-2/">Hiša 105/2</a></li><li><a href="rihter-hisa-114-4/">Hiša 114/4</a></li><li><a href="rihter-hisa-116/">Hiša 116</a></li><li><a href="rihter-hisa-127/">Hiša 127</a></li><li><a href="rihter-hisa-131/">Hiša 131</a></li><li><a href="rihter-hisa-135-1/">Hiša 135/1</a></li><li><a href="rihter-hisa-137-1/">Hiša 137/1</a></li><li><a href="rihter-hisa-139-1/">Hiša 139/1</a></li><li><a href="rihter-hisa-141/">Hiša 141</a></li><li><a href="rihter-hisa-143-1/">Hiša 143/1</a></li><li><a href="rihter-hisa-171/">Hiša 171</a></li><li><a href="rihter-hisa-174/">Hiša 174</a></li><li><a href="rihter-hisa-116-1/">Hiša 116/1</a></li><li><a href="rihter-hisa-116-3/">Hiša 116/3</a></li><li><a href="rihter-hisa-132/">Hiša 132</a></li><li><a href="rihter-hisa-133/">Hiša 133</a></li><li><a href="rihter-hisa-133-1/">Hiša 133/1</a></li><li><a href="rihter-hisa-144-1/">Hiša 144/1</a></li><li><a href="rihter-hisa-147/">Hiša 147</a></li><li><a href="rihter-hisa-152/">Hiša 152</a></li><li><a href="rihter-hisa-152-1/">Hiša 152/1</a></li><li><a href="rihter-hisa-154/">Hiša 154</a></li><li><a href="rihter-hisa-155-1/">Hiša 155/1</a></li><li><a href="rihter-hisa-155/">Hiša 155</a></li><li><a href="rihter-hisa-168/">Hiša 168</a></li><li><a href="rihter-hisa-173/">Hiša 173</a></li><li><a href="rihter-hisa-175-1/">Hiša 175/1</a></li></ul></div><div><h3><a href="jelovica/">Jelovica</a></h3><ul><li><a href="jelovica-prima-93/">Prima 93</a></li><li><a href="jelovica-trend-s-120/">Trend S 120</a></li><li><a href="jelovica-klasik-s-120/">Klasik S 120</a></li><li><a href="jelovica-prima-125/">Prima 125</a></li><li><a href="jelovica-kubus-b-126/">Kubus B 126</a></li><li><a href="jelovica-trend-b-126/">Trend B 126</a></li><li><a href="jelovica-klasik-b-126/">Klasik B 126</a></li><li><a href="jelovica-klasik-t-134/">Klasik T 134</a></li><li><a href="jelovica-kubus-t-134/">Kubus T 134</a></li><li><a href="jelovica-trend-t-134/">Trend T 134</a></li><li><a href="jelovica-trend-d-141/">Trend D 141</a></li><li><a href="jelovica-klasik-c-145/">Klasik C 145</a></li><li><a href="jelovica-trend-c-145/">Trend C 145</a></li><li><a href="jelovica-klasik-g-146/">Klasik G 146</a></li><li><a href="jelovica-klasik-v-146/">Klasik V 146</a></li><li><a href="jelovica-trend-v-146/">Trend V 146</a></li><li><a href="jelovica-trend-g-146/">Trend G 146</a></li><li><a href="jelovica-trend-h-147/">Trend H 147</a></li><li><a href="jelovica-klasik-h-147/">Klasik H 147</a></li><li><a href="jelovica-trend-a-148/">Trend A 148</a></li><li><a href="jelovica-kubus-i-157/">Kubus I 157</a></li><li><a href="jelovica-trend-i-157/">Trend I 157</a></li><li><a href="jelovica-klasik-l-161/">Klasik L 161</a></li><li><a href="jelovica-trend-l-161/">Trend L 161</a></li><li><a href="jelovica-kubus-l-161/">Kubus L 161</a></li><li><a href="jelovica-kubus-j-166/">Kubus J 166</a></li><li><a href="jelovica-trend-j-166/">Trend J 166</a></li></ul></div><div><h3><a href="riko/">Riko hiše</a></h3><ul><li><a href="riko-mila/">Mila</a></li><li><a href="riko-minima-s/">Minima S</a></li><li><a href="riko-minima-m/">Minima M</a></li><li><a href="riko-minima-l/">Minima L</a></li><li><a href="riko-carna/">Čarna</a></li><li><a href="riko-lavaldia/">Lavaldia</a></li></ul></div><div><h3><a href="noah/">NOAH</a></h3><ul><li><a href="noah-klasik-115/">KLASIK 115</a></li><li><a href="noah-line-176/">LINE 176</a></li><li><a href="noah-noe-167/">NOE 167</a></li><li><a href="noah-noah-159/">NOAH 159</a></li><li><a href="noah-neo-146/">NEO 146</a></li><li><a href="noah-prizma-x-144/">PRIZMA X 144</a></li><li><a href="noah-lukas-x-144/">LUKAS X 144</a></li><li><a href="noah-prizma-r-124/">PRIZMA R 124</a></li><li><a href="noah-linda-x-122/">LINDA X 122</a></li><li><a href="noah-box-121/">BOX 121</a></li><li><a href="noah-nano-r-115/">NANO R 115</a></li><li><a href="noah-noah-113/">NOAH 113</a></li><li><a href="noah-kubo-97/">KUBO 97</a></li><li><a href="noah-one-95-1/">ONE 95/1</a></li><li><a href="noah-eva-v-81/">EVA V 81</a></li><li><a href="noah-neli-v-70/">NELI V 70</a></li><li><a href="noah-nano-v-64-dvokapnica/">NANO V 64 (dvokapnica)</a></li><li><a href="noah-nano-r-64-ravna-streha/">NANO R 64 (ravna streha)</a></li><li><a href="noah-mini-60/">MINI 60</a></li><li><a href="noah-vila-245-r/">VILA 245 R</a></li><li><a href="noah-duo-190-dvostanovanjska/">DUO 190 (dvostanovanjska)</a></li><li><a href="noah-lina-v-62/">LINA V 62</a></li><li><a href="noah-one-95-2/">ONE 95/2</a></li><li><a href="noah-nano-v-115/">NANO V 115</a></li><li><a href="noah-nano-x-115/">NANO X 115</a></li><li><a href="noah-prizma-v-124/">PRIZMA V 124</a></li><li><a href="noah-nano-v-125/">NANO V 125</a></li><li><a href="noah-klasik-b-130/">KLASIK B 130</a></li><li><a href="noah-line-136/">LINE 136</a></li><li><a href="noah-nova-141/">NOVA 141</a></li><li><a href="noah-prizma-v-144/">PRIZMA V 144</a></li><li><a href="noah-duo-163-dvostanovanjska/">DUO 163 (dvostanovanjska)</a></li><li><a href="noah-lux-168/">LUX 168</a></li></ul></div><div><h3><a href="ziher/">Žiher hiše</a></h3><ul><li><a href="ziher-vivat-70/">Vivat 70</a></li><li><a href="ziher-vivat-80/">Vivat 80</a></li><li><a href="ziher-vivat-90/">Vivat 90</a></li><li><a href="ziher-petovia-90/">Petovia 90</a></li><li><a href="ziher-petovia-115/">Petovia 115</a></li><li><a href="ziher-livia/">Livia</a></li><li><a href="ziher-cubus-atrium/">Cubus Atrium</a></li><li><a href="ziher-smart-107/">Smart 107</a></li><li><a href="ziher-smart-120/">Smart 120</a></li><li><a href="ziher-smart-140/">Smart 140</a></li><li><a href="ziher-cubus-classic/">Cubus Classic</a></li><li><a href="ziher-romula/">Romula</a></li><li><a href="ziher-celeia/">Celeia</a></li><li><a href="ziher-aurora/">Aurora</a></li><li><a href="ziher-smarthouse-s/">SmartHouse S</a></li><li><a href="ziher-smarthouse-m/">SmartHouse M</a></li><li><a href="ziher-smarthouse-l/">SmartHouse L</a></li></ul></div><!-- /model-links --></div></details>
@@ -572,7 +576,13 @@ footer nav a:hover { color: var(--ink); }
   // Nothing is pre-selected: tile answers start empty, the two sliders start at a typical value marked "not set" until touched or confirmed.
   const state = { floors: null, bedrooms: null, bathrooms: null, area: 130, areaSet: false, style: null, budget: 300000, budgetSet: false, nobudget: false, stretch: null, prio: { energy: null, sound: null, natural: null, speed: null }, step: 0, selected: null, done: false };
   try { const s = JSON.parse(localStorage.getItem('hise-quiz-4') || '{}'); Object.assign(state, s, { selected: null }); } catch (e) {}
+  // Price rules: the big number is the maker's own price; rankings use the comparable price, and only among houses whose price is comparable
   const pc = m => m.price_cmp ?? m.price_eur; // comparable price where the data has it, else the maker's price
+  const cmpOk = m => m.cmp_ok !== false; // missing field counts as comparable
+  const byPrice = (a, b) => !cmpOk(a) - !cmpOk(b) || (pc(a) ?? 1e9) - (pc(b) ?? 1e9);
+  // the small line under the maker's price: what the comparable price is, or why there is none
+  const cmpLine = m => m.price_eur == null ? '' : !cmpOk(m) ? 'Cena ni primerljiva: ' + (m.cmp_note || 'ni cena na ključ')
+    : pc(m) !== m.price_eur ? 'Primerljiva cena ~' + fmtEur(pc(m)) + (m.cmp_note ? ' · ' + m.cmp_note : '') : (m.cmp_note || '');
 
   // Shared result link: #r=floors_bedrooms_bathrooms_area_style_budget(0 = none)_stretch_prio[_house slug]
   let shared = false; // a result opened from someone's link is not saved over the visitor's own answers until they change one
@@ -677,7 +687,7 @@ footer nav a:hover { color: var(--ink); }
     });
     return { pct: max ? Math.round(100 * pts / max) : null, reasons };
   }
-  const rank = () => MODELS.filter(m => m.area_m2 != null).map(m => Object.assign({ s: score(m) }, m)).sort((a, b) => (b.s.pct ?? 0) - (a.s.pct ?? 0) || (pc(a) ?? 1e9) - (pc(b) ?? 1e9));
+  const rank = () => MODELS.filter(m => m.area_m2 != null).map(m => Object.assign({ s: score(m) }, m)).sort((a, b) => (b.s.pct ?? 0) - (a.s.pct ?? 0) || byPrice(a, b));
 
   // ---------- rendering ----------
   const $ = id => document.getElementById(id);
@@ -702,12 +712,13 @@ footer nav a:hover { color: var(--ink); }
   let lastStageId = null;
   function renderStage(top) {
     $('stage-name').textContent = top.name;
-    $('stage-prov').textContent = `${top.provider} · ${floorLabel(top.floors)} · ${Math.round(top.area_m2)} m²`;
-    const wait = !anyAnswer();
+    $('stage-prov').textContent = `${top.provider} · ${floorLabel(top.floors)} · ${Math.round(top.area_m2)}\u00a0m²`;
+    const nAns = ['floors', 'bedrooms', 'bathrooms', 'style'].filter(k => state[k] != null).length + state.areaSet + state.budgetSet;
+    const wait = !anyAnswer(), early = !state.done && nAns < 3; // a % after one or two answers overclaims
     document.querySelector('.stage-cap .eyebrow').textContent = wait ? 'Primer iz kataloga' : 'Trenutno vodi';
-    $('stage-match').classList.toggle('wait', wait);
-    $('stage-pct').textContent = wait ? 'Odgovorite na prvo vprašanje' : top.s.pct + ' %';
-    $('stage-match').querySelector('span').hidden = wait;
+    $('stage-match').classList.toggle('wait', wait || early);
+    $('stage-pct').textContent = wait ? 'Odgovorite na prvo vprašanje' : early ? 'Odstotek ujemanja po 3 odgovorih' : top.s.pct + ' %';
+    $('stage-match').querySelector('span').hidden = wait || early;
     if (top.id !== lastStageId) { $('stage-scene').innerHTML = top.image ? photo(top, '(min-width: 900px) 45vw, 100vw') + `<span class="credit">Foto: ${esc(top.provider)}</span>` : scene(top, { h: 360 }); lastStageId = top.id; }
   }
   function renderResult(lightsOn) {
@@ -731,7 +742,7 @@ footer nav a:hover { color: var(--ink); }
         <div class="pick-body">
           <div class="pick-title">
             <div><h3 class="display">${esc(top.name)}</h3><div class="prov">${esc(top.provider)}${prov.construction ? ' · ' + esc(prov.construction) : ''}</div></div>
-            <div class="price"><b>${pc(top) != null ? fmtEur(pc(top)) : 'Na povpraševanje'}</b><span>${pc(top) != null ? (top.cmp_note ? `<span class="cmpn">${esc(top.cmp_note)}</span> · ` : '') + (pc(top) !== top.price_eur && top.price_eur != null ? `cena proizvajalca ${fmtEur(top.price_eur)}: ` : '') + esc(top.price_stage || 'faza gradnje ni navedena') : 'Proizvajalec cene ne objavlja.'}</span></div>
+            <div class="price"><b>${top.price_eur != null ? fmtEur(top.price_eur) : 'Na povpraševanje'}</b><span>${top.price_eur != null ? (cmpLine(top) ? `<span class="cmpn">${esc(cmpLine(top))}</span><br>` : '') + 'Cena proizvajalca: ' + esc(top.price_stage || 'faza gradnje ni navedena') : 'Proizvajalec cene ne objavlja.'}</span></div>
           </div>
           <dl class="specs">${cell('Etaže', floorLabel(top.floors))}${cell('Površina', top.area_m2 ? Math.round(top.area_m2) + ' m²' : NA)}${cell('Spalnice', top.bedrooms ?? NA)}${cell('Kopalnice', top.bathrooms ?? NA)}${cell('Streha', top.roof ? ROOF[top.roof] : NA)}</dl>
           <div class="two">
@@ -742,7 +753,7 @@ footer nav a:hover { color: var(--ink); }
         </div>
       </article>
       <div class="alts"><div class="alts-head"><h3>Druge hiše, ki vam ustrezajo</h3>${top3.length === 3 ? `<a class="btn line" href="primerjava/#${top3.join(',')}">Primerjaj najboljše 3 <span class="arrow">→</span></a>` : ''}</div><div class="alt-row">
-        ${ranked.filter(r => r !== top).slice(0, 6).map(r => `<div class="alt"><button type="button" data-id="${r.id}"><div class="mini">${r.image ? `<img src="${esc(r.image)}" alt="" loading="lazy">` : scene(r, { h: 300, stars: false })}</div><div class="t">${esc(r.name)}</div><div class="s">${esc(r.provider)} · ${floorLabel(r.floors)} · ${Math.round(r.area_m2)} m²</div><div class="row"><span class="pct">${r.s.pct} % ujemanje</span><span>${pc(r) != null ? fmtEur(pc(r)) + (r.cmp_note ? `<span class="muted" title="${esc(r.cmp_note)}"> *</span>` : '') : '<span class="muted">na povpraševanje</span>'}</span></div></button>${r.slug ? `<a class="open" href="${esc(r.slug)}/">Podrobnosti o hiši →</a>` : ''}</div>`).join('')}
+        ${ranked.filter(r => r !== top).slice(0, 6).map(r => `<div class="alt"><button type="button" data-id="${r.id}"><div class="mini">${r.image ? `<img src="${esc(r.image)}" alt="" loading="lazy">` : scene(r, { h: 300, stars: false })}</div><div class="t">${esc(r.name)}</div><div class="s">${esc(r.provider)} · ${floorLabel(r.floors)} · ${Math.round(r.area_m2)} m²</div><div class="row"><span class="pct">${r.s.pct} % ujemanje</span><span>${r.price_eur != null ? fmtEur(r.price_eur) : '<span class="muted">na povpraševanje</span>'}</span></div>${cmpLine(r) ? `<div class="an">${esc(cmpLine(r))}</div>` : ''}</button>${r.slug ? `<a class="open" href="${esc(r.slug)}/">Podrobnosti o hiši →</a>` : ''}</div>`).join('')}
       </div></div>`;
     document.querySelectorAll('.alt > button').forEach(b => b.addEventListener('click', () => { state.selected = b.dataset.id; renderResult(true); lightUp(); $('hisa').scrollIntoView({ block: 'start' }); }));
     const bb = $('back-best'); if (bb) bb.addEventListener('click', () => { state.selected = null; renderResult(true); lightUp(); });
@@ -798,8 +809,9 @@ footer nav a:hover { color: var(--ink); }
   function markSet() { const d = $('q-body').querySelector('.dial'); if (d) { d.classList.remove('unset'); d.querySelector('.note').textContent = ''; } }
   function autoNext() { clearTimeout(autoTimer); autoTimer = setTimeout(() => go(state.step + 1), 380); }
   // keep focus inside the quiz on every step change, so the keys keep working and screen readers hear the new question
+  let movedAt = 0;
   function go(i) {
-    state.step = i; renderStep(true);
+    state.step = i; movedAt = Date.now(); renderStep(true);
     const b = $('q-body'), title = $('q-title');
     (b.querySelector('.tiles input:checked') || b.querySelector('input[type=range]:not(:disabled)') || title).focus({ preventScroll: true });
     if (title.getBoundingClientRect().top < 0) form.scrollIntoView({ block: 'start' });
@@ -816,7 +828,7 @@ footer nav a:hover { color: var(--ink); }
     const open = firstOpen();
     if (open >= 0 && open !== state.step) go(open);
     else if (state.step < STEPS.length - 1) go(state.step + 1);
-    else { state.done = true; state.selected = null; renderResult(true); $('hisa').scrollIntoView({ block: 'start' }); setTimeout(lightUp, 350); }
+    else { state.done = true; state.selected = null; renderResult(true); $('hisa').scrollIntoView({ block: 'start' }); $('reveal-title').focus({ preventScroll: true }); setTimeout(lightUp, 350); }
   }
   $('prev').addEventListener('click', () => { clearTimeout(autoTimer); if (state.step > 0) go(state.step - 1); });
   $('next').addEventListener('click', next);
@@ -825,7 +837,7 @@ footer nav a:hover { color: var(--ink); }
   document.addEventListener('keydown', e => {
     if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
     if (!form.contains(e.target)) { const q = form.getBoundingClientRect(); if (e.target !== document.body || q.bottom < 80 || q.top > innerHeight - 80) return; }
-    if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') { e.preventDefault(); next(); return; }
+    if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') { e.preventDefault(); if (!e.repeat && Date.now() - movedAt > 600) next(); return; }
     const n = parseInt(e.key, 10);
     if (n >= 1 && n <= 9 && e.target.type !== 'range') { const opts = $('q-body').querySelectorAll('.tiles input'); if (opts[n - 1]) { opts[n - 1].checked = true; opts[n - 1].dispatchEvent(new Event('input', { bubbles: true })); opts[n - 1].focus({ preventScroll: true }); } }
   });
@@ -833,39 +845,49 @@ footer nav a:hover { color: var(--ink); }
   // ---------- catalog ----------
   let provFilter = '';
   $('chips').innerHTML = [['', 'Vsi']].concat(PROVIDERS.map(p => [p.id, p.name])).map(([v, t]) => `<label><input type="radio" name="prov" id="f-prov-${v || 'all'}" value="${v}" ${v === '' ? 'checked' : ''}><span>${esc(t)}</span></label>`).join('');
-  $('chips').addEventListener('change', e => { provFilter = e.target.value; renderTable(); });
-  $('filters').addEventListener('change', renderTable);
+  let pages = 1; // pages of the catalog shown; back to 1 whenever the sort or a filter changes
+  const pageSize = () => matchMedia('(max-width: 720px)').matches ? 24 : 50;
+  $('chips').addEventListener('change', e => { provFilter = e.target.value; pages = 1; renderTable(); });
+  $('filters').addEventListener('change', () => { pages = 1; renderTable(); });
+  $('f-more').addEventListener('click', () => {
+    const before = $('tbl').querySelectorAll('tbody td.house a').length;
+    pages++; renderTable();
+    const first = $('tbl').querySelectorAll('tbody td.house a')[before];
+    if (first) first.focus(); // move to the first newly shown house
+  });
   const pl = (n, ...f) => plural(n % 100 || 100, ...f); // Slovenian plural by the last two digits
   function renderTable() {
     const v = id => $(id).value, sort = v('f-sort'), bed = v('f-bed'), fl = v('f-floors'), pr = v('f-price');
     const [lo, hi] = (pr || '0-1e12').split('-').map(Number);
-    const ppm = m => pc(m) != null && m.area_m2 ? pc(m) / m.area_m2 : null;
+    const ppm = m => pc(m) != null && m.area_m2 ? pc(m) / m.area_m2 : null; // on the comparable basis
     const key = { price: pc, 'price-d': pc, area: m => m.area_m2, 'area-d': m => m.area_m2, ppm }[sort], dir = sort.endsWith('-d') ? -1 : 1;
+    const col = sort.startsWith('price') ? 'price' : sort.startsWith('area') ? 'area' : '';
     const filled = m => ['floors', 'area_m2', 'bedrooms', 'bathrooms', 'roof'].filter(k => m[k] != null).length;
     // missing values always sort last; ties go to the house with more known specs
     const rows = MODELS.filter(m => (!provFilter || m.providerId === provFilter) && (!bed || (bed === '4' ? m.bedrooms >= 4 : m.bedrooms === +bed))
-        && (!fl || (fl === '2' ? m.floors >= 2 : m.floors === +fl)) && (!pr || (pc(m) != null && pc(m) >= lo && pc(m) < hi)))
-      .sort((a, b) => { const x = key(a), y = key(b); return (x == null) - (y == null) || (x != null && y != null ? dir * (x - y) : 0) || filled(b) - filled(a); });
-    const col = sort.startsWith('price') ? 'price' : sort.startsWith('area') ? 'area' : '';
+        && (!fl || (fl === '2' ? m.floors >= 2 : m.floors === +fl)) && (!pr || (m.price_eur != null && m.price_eur >= lo && m.price_eur < hi)))
+      .sort((a, b) => { const x = key(a), y = key(b); return (x == null) - (y == null) || (col !== 'area' ? !cmpOk(a) - !cmpOk(b) : 0) || (x != null && y != null ? dir * (x - y) : 0) || filled(b) - filled(a); });
     const srt = c => c === col ? ` aria-sort="${dir > 0 ? 'ascending' : 'descending'}"` : '';
     const spec = (val, html) => val == null ? `<td class="spec na">${NA}</td>` : `<td class="spec">${html}</td>`;
     const nspec = (val, html) => val == null ? `<td class="spec num na">${NA}</td>` : `<td class="spec num">${html}</td>`;
-    const n = rows.length;
+    const n = rows.length, shown = Math.min(n, pages * pageSize()), left = n - shown;
+    $('f-more-wrap').hidden = !left;
+    $('f-more').textContent = `Pokaži več (${left})`;
     $('f-count').textContent = `${pl(n, 'Prikazana', 'Prikazani', 'Prikazane', 'Prikazanih')} ${n} od ${MODELS.length} hiš`;
-    $('tbl').innerHTML = `<thead><tr><th scope="col">Hiša</th><th scope="col">Etaže</th><th scope="col" class="num"${srt('area')}>m²</th><th scope="col" class="num">Spalnice</th><th scope="col" class="num">Kopalnice</th><th scope="col">Streha</th><th scope="col" class="num"${srt('price')}>Cena</th><th scope="col">Kaj cena vključuje</th><th scope="col"><span class="sr-only">Primerjava</span></th></tr></thead><tbody>${n ? rows.map(m => {
-      const p = pc(m);
+    $('tbl').innerHTML = `<thead><tr><th scope="col">Hiša</th><th scope="col">Etaže</th><th scope="col" class="num"${srt('area')}>m²</th><th scope="col" class="num">Spalnice</th><th scope="col" class="num">Kopalnice</th><th scope="col">Streha</th><th scope="col" class="num"${srt('price')}>Cena</th><th scope="col">Kaj cena vključuje</th><th scope="col"><span class="sr-only">Primerjava</span></th></tr></thead><tbody>${n ? rows.slice(0, shown).map(m => {
+      const p = m.price_eur, cl = cmpLine(m);
       return `<tr><td class="house"><div>${m.image ? `<img class="thumb" src="${esc(m.thumb || m.image)}" alt="" loading="lazy">` : '<span class="thumb"></span>'}<span><a href="${esc(m.slug)}/">${esc(m.name)}</a><span class="mk">${esc(m.provider)}</span></span></div></td>`
         + spec(m.floors, floorLabel(m.floors) + (m.flags && m.flags.length ? ` <span class="muted" title="${esc(m.flags.join(', '))}">*</span>` : ''))
         + nspec(m.area_m2, `${Math.round(m.area_m2)}<span class="u"> m²</span>`)
         + nspec(m.bedrooms, `${m.bedrooms}<span class="u"> ${pl(m.bedrooms || 0, 'spalnica', 'spalnici', 'spalnice', 'spalnic')}</span>`)
         + nspec(m.bathrooms, `${m.bathrooms}<span class="u"> ${pl(m.bathrooms || 0, 'kopalnica', 'kopalnici', 'kopalnice', 'kopalnic')}</span>`)
         + spec(m.roof, `${m.roof ? ROOF[m.roof] : ''}<span class="u"> streha</span>`)
-        + `<td class="num pr">${p != null ? fmtEur(p) + (m.cmp_note ? `<small class="cn">${esc(m.cmp_note)}</small>` : '') + (ppm(m) ? `<span class="cmpp">${fmtEur(ppm(m))}/m²</span>` : '') : '<span class="na">na povpraševanje</span>'}</td>`
-        + `<td class="note">${m.price_eur != null ? (p !== m.price_eur ? `Cena proizvajalca ${fmtEur(m.price_eur)}: ` : '') + esc(m.price_stage || '') : ''}</td>`
+        + `<td class="num pr">${p != null ? fmtEur(p) + (cl ? `<small class="cn">${esc(cl)}</small>` : '') + (ppm(m) && cmpOk(m) ? `<span class="cmpp">${fmtEur(ppm(m))}/m²${pc(m) !== p ? ' primerljivo' : ''}</span>` : '') : '<span class="na">na povpraševanje</span>'}</td>`
+        + `<td class="note">${p != null ? esc(m.price_stage || '') : ''}</td>`
         + `<td class="cmpc"><button type="button" class="cmp sm" data-slug="${esc(m.slug)}" data-name="${esc(m.provider + ' ' + m.name)}">+ Primerjaj</button></td></tr>`;
     }).join('') : `<tr><td class="empty" colspan="9">Nobena hiša ne ustreza izbranim filtrom. <button type="button" class="reset" id="f-reset">Počisti filtre</button></td></tr>`}</tbody>`;
     const rs = $('f-reset');
-    if (rs) rs.addEventListener('click', () => { ['f-bed', 'f-floors', 'f-price'].forEach(id => { $(id).value = ''; }); $('f-prov-all').checked = true; provFilter = ''; renderTable(); });
+    if (rs) rs.addEventListener('click', () => { ['f-bed', 'f-floors', 'f-price'].forEach(id => { $(id).value = ''; }); $('f-prov-all').checked = true; provFilter = ''; pages = 1; renderTable(); });
     if (window.HVCompare) window.HVCompare.refresh();
   }
   const bars = (r, label) => `<i role="img" aria-label="${label}: ${r != null ? r + ' od 3' : 'ni podatka'}">${[1, 2, 3].map(k => `<b class="${r != null && r >= k ? 'f' : ''}"></b>`).join('')}</i>`;
