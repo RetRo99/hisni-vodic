@@ -6,6 +6,7 @@ import collections, datetime, glob, html, json, os, re, statistics, unicodedata
 
 SITE = 'https://hisomer.si/'
 GUIDE = 'cena-montazne-hise'
+PLANS = 'tlorisi-montaznih-his'
 ROOT = os.path.dirname(os.path.abspath(__file__))
 os.chdir(ROOT)
 
@@ -51,7 +52,8 @@ css = re.search(r'<style>(.*?)</style>', src, re.S).group(1)
 CSS = css[css.index(':root {'):css.index('/* ---------- hero')] + '\n'.join(
     l for l in css.splitlines() if l.startswith(('.btn', '.price', '.specs', '.edge', '.facts', '.two', 'footer'))) + '''
 .bar { position: static; }
-.mark { color: var(--ink); text-decoration: none; }
+.mark { color: var(--ink); text-decoration: none; white-space: nowrap; }
+@media (max-width: 420px) { .bar nav { gap: 12px; font-size: 13px; } }
 .page { display: grid; gap: 28px; padding-block: 8px 64px; }
 .crumbs a { color: var(--mist); text-decoration: none; }
 .crumbs a:hover { color: var(--ink); }
@@ -88,7 +90,7 @@ HEAD_END = re.search(r'<meta name="theme-color".*?</head>', src, re.S).group(0).
 MARK = re.search(r'<div class="mark">(.*?)</div>', src).group(1)
 BAR = f'''<div class="bar"><div class="wrap">
   <a class="mark" href="../">{MARK}</a>
-  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../{GUIDE}/">Cene</a></nav>
+  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../{GUIDE}/">Cene</a><a href="../{PLANS}/">Tlorisi</a></nav>
 </div></div>'''
 FOOT = (f'<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev ({esc(data["collected"])}). '
         'Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p></div></footer>')
@@ -132,6 +134,21 @@ def maker_bits(p):
             '<ul class="facts">' + ''.join(f'<li>{esc(f)}</li>' for f in facts) + '</ul>' if facts else '')
 
 
+def house_plans(m):
+    """Floor plans img/tloris/<slug>-1.jpg, -2.jpg ... (ground floor first), downloaded from the maker's page."""
+    return sorted(glob.glob(f"img/tloris/{m['slug']}-*.jpg"), key=lambda f: int(re.search(r'-(\d+)\.jpg$', f).group(1)))
+
+
+PLAN_FLOOR = {('rihter-hisa-162', 2): 'kleti'}  # plans that break the ground-floor-then-upper-floor order
+
+
+def plan_alt(m, name, i, count):
+    floor = PLAN_FLOOR.get((m['slug'], i)) or (
+        ('pritličja' if m['floors'] == 1 else '') if count == 1 else
+        'pritličja' if i == 1 else 'mansarde' if m['floors'] == 1.5 else 'nadstropja')
+    return f"Tloris{' ' + floor if floor else ''} – {name}" + (f", {round(m['area_m2'])} m²" if m['area_m2'] else '')
+
+
 def page(p, m):
     name = f"{p['name']} {m['name']}"
     url = SITE + m['slug'] + '/'
@@ -141,8 +158,7 @@ def page(p, m):
     roof = ROOF.get(m['roof'])
     price = eur(m['price_eur']) if m['price_eur'] is not None else None
     bed, bath = m['bedrooms'], m['bathrooms']
-    # floor plans img/tloris/<slug>-1.jpg, -2.jpg ... (ground floor first), downloaded from the maker's page
-    plans = sorted(glob.glob(f"img/tloris/{m['slug']}-*.jpg"), key=lambda f: int(re.search(r'-(\d+)\.jpg$', f).group(1)))
+    plans = house_plans(m)
 
     s1 = f"{name} je {floor_long}" + (f" s površino {area} m²" if area else '') + f" proizvajalca {p['name']}."
     rooms = [f"{n} {plural(n, w + 'o', w + 'i', w + 'e', w)}" for n, w in ((bed, 'spalnic'), (bath, 'kopalnic')) if n]
@@ -169,9 +185,9 @@ def page(p, m):
     note = ' Opomba: ' + esc(', '.join(m['flags'])) + '.' if m['flags'] else ''
     stage = esc(m['price_stage']) if price else 'Proizvajalec cene ne objavlja.'
     plans_html = ('<section><h2>Tloris</h2><div class="plans">' + ''.join(
-        f'<a href="../{f}"><img src="../{f}" alt="Tloris {esc(name)}' + (f', etaža {i}' if len(plans) > 1 else '') + '" loading="lazy"></a>'
+        f'<a href="../{f}"><img src="../{f}" alt="{esc(plan_alt(m, name, i, len(plans)))}" loading="lazy"></a>'
         for i, f in enumerate(plans, 1)) + f'</div><p class="credit-line">Tloris: {esc(p["name"])}, '
-        f'<a href="{esc(m["url"])}" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a></p></section>') if plans else ''
+        f'<a href="{esc(m["url"])}" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a> · <a href="../{PLANS}/">Vsi tlorisi</a></p></section>') if plans else ''
     title = f"{name} – cena, tloris, m² · Hišni vodič"
     return f'''{head(title, name + ' – cena in lastnosti', desc, url, image_abs, ld)}
 <body>
@@ -372,6 +388,72 @@ def maker(p):
 '''
 
 
+PLANS_CSS = '''
+.page > * { min-width: 0; }
+.jump { display: flex; flex-wrap: wrap; gap: 8px; }
+.jump a { padding: 8px 14px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); text-decoration: none; font-size: 14px; }
+.jump a:hover { box-shadow: inset 0 0 0 1px var(--glow); }
+.plan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+.card { display: block; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); color: var(--ink); text-decoration: none; }
+.card:hover { box-shadow: 0 0 0 1px var(--glow); }
+.card .pic { background: #fff; aspect-ratio: 4 / 3; }
+.card img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.card span { display: block; padding: 12px 14px 14px; font-size: 14px; color: var(--mist); }
+.card b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 2px; }
+'''
+
+
+def plans_page():
+    url = SITE + PLANS + '/'
+    # shortcut: shows each house's full-size ground-floor plan, lazy-loaded; make thumbnails if the page gets slow.
+    houses = sorted(((p, m, house_plans(m)) for p, m in models if house_plans(m)), key=lambda t: (t[1]['area_m2'] or 10 ** 4, t[1]['name']))
+    bands = [(0, 80, 'do 80 m²'), (80, 100, '80–100 m²'), (100, 120, '100–120 m²'), (120, 140, '120–140 m²'), (140, 160, '140–160 m²'), (160, 10 ** 4, '160 m² in več')]
+    sections, jump = [], []
+    for a, b, label in bands + [(None, None, 'brez navedene površine')]:
+        group = [t for t in houses if (t[1]['area_m2'] is None if a is None else t[1]['area_m2'] and a <= t[1]['area_m2'] < b)]
+        if not group:
+            continue
+        anchor = slugify(label)
+        cards = []
+        for p, m, plans in group:
+            name = f"{p['name']} {m['name']}"
+            bits = [f"{round(m['area_m2'])} m²" if m['area_m2'] else '', FLOORS.get(m['floors'], ('',))[0],
+                    f"{m['bedrooms']} {plural(m['bedrooms'], 'spalnica', 'spalnici', 'spalnice', 'spalnic')}" if m['bedrooms'] else '',
+                    eur(m['price_eur']) if m['price_eur'] else '']
+            cards.append(f'<a class="card" href="../{m["slug"]}/"><div class="pic"><img src="../{plans[0]}" alt="{esc(plan_alt(m, name, 1, len(plans)))}" loading="lazy"></div>'
+                         f'<span><b>{esc(name)}</b>{" · ".join(x for x in bits if x)}</span></a>')
+        jump.append(f'<a href="#{anchor}">{label}</a>')
+        sections.append(f'<section id="{anchor}"><h2>Tlorisi hiš {label} <small class="eyebrow">{len(group)}</small></h2><div class="plan-grid">{"".join(cards)}</div></section>')
+    areas = [m['area_m2'] for _, m, _ in houses if m['area_m2']]
+    makers = sorted({p['name'] for p, _, _ in houses}, key=[p['name'] for p in data['providers']].index)
+    desc = (f'Tlorisi {len(houses)} tipskih montažnih hiš slovenskih proizvajalcev od {round(min(areas))} do {round(max(areas))} m², '
+            'razvrščeni po velikosti, s ceno in številom spalnic.')
+    image = SITE + houses[0][2][0]
+    ld = {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': 'Tlorisi montažnih hiš', 'url': url, 'description': desc,
+          'inLanguage': 'sl', 'image': image}
+    return f'''{head(f'Tlorisi montažnih hiš: {len(houses)} tlorisov po velikosti · Hišni vodič', 'Tlorisi montažnih hiš', desc, url, image, ld).replace('</head>', '<style>' + PLANS_CSS + '</style></head>')}
+<body>
+{BAR}
+<main class="wrap page">
+  <div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / Tlorisi</div>
+    <div class="head"><div><h1 class="display">Tlorisi montažnih hiš</h1><div class="prov">{len(houses)} tipskih hiš · {esc(and_join(makers))}</div></div></div>
+  </div>
+  <div class="lede"><p>Tlorisi tipskih montažnih hiš slovenskih proizvajalcev, razvrščeni po bivalni površini. Pri hišah z mansardo ali nadstropjem je prikazano pritličje;
+    kliknite hišo za vse etaže, ceno in kaj vključuje. Tlorisi so last proizvajalcev.</p></div>
+  <nav class="jump" aria-label="Velikost hiše">{''.join(jump)}</nav>
+  {''.join(sections)}
+  <div class="actions">
+    <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
+    <a class="btn line" href="../{GUIDE}/">Primerjava cen</a>
+  </div>
+</main>
+{FOOT}
+</body>
+</html>
+'''
+
+
 # Old addresses Google may already know, as instant redirects to the new ones.
 MOVED = {f'kager-vita-nova-{k}-family': f'kager-vita-nova-{k}-linija' for k in ('classic', 'edition', 'urbana', 'modern')}
 
@@ -392,6 +474,7 @@ for p, m in models:
 for p in data['providers']:
     write(p['id'], maker(p))
 write(GUIDE, guide())
+write(PLANS, plans_page())
 for old, new in MOVED.items():
     assert new in slugs, new
     write(old, moved(new))
@@ -403,10 +486,9 @@ src = DATA_RE.sub(lambda mo: mo.group(1) + json.dumps(data, ensure_ascii=False) 
 src = re.sub(r'(<!-- model-links -->).*?(<!-- /model-links -->)', lambda mo: mo.group(1) + links + mo.group(2), src, flags=re.S)
 open('index.html', 'w', encoding='utf-8').write(src)
 
-today = datetime.date.today().isoformat()
-locs = [SITE, SITE + GUIDE + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
+locs = [SITE, SITE + GUIDE + '/', SITE + PLANS + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
 open('sitemap.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-                                                  ''.join(f'  <url><loc>{l}</loc><lastmod>{today}</lastmod></url>\n' for l in locs) + '</urlset>\n')
+                                                  ''.join(f'  <url><loc>{l}</loc></url>\n' for l in locs) + '</urlset>\n')
 
 assert len(slugs) == len(models) and all(os.path.isfile(l[len(SITE):] + 'index.html') for l in locs) and src.count('<li><a href="') >= len(models)
 print(f'{len(slugs)} pages, {len(locs)} sitemap URLs')

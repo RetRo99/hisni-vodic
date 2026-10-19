@@ -81,7 +81,8 @@ button, input, select { font: inherit; color: inherit; }
 footer { padding-block: 30px 50px; border-top: 1px solid var(--line); color: var(--mist); font-size: 13px; }
 footer p { max-width: 80ch; margin: 0; }
 .bar { position: static; }
-.mark { color: var(--ink); text-decoration: none; }
+.mark { color: var(--ink); text-decoration: none; white-space: nowrap; }
+@media (max-width: 420px) { .bar nav { gap: 12px; font-size: 13px; } }
 .page { display: grid; gap: 28px; padding-block: 8px 64px; }
 .crumbs a { color: var(--mist); text-decoration: none; }
 .crumbs a:hover { color: var(--ink); }
@@ -118,7 +119,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 <body>
 <div class="bar"><div class="wrap">
   <a class="mark" href="../"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 15 16 5l12 10" stroke="#eef2f9" stroke-width="2.4" stroke-linejoin="round"/><rect x="8" y="15" width="16" height="12" stroke="#eef2f9" stroke-width="2.4"/><rect x="13" y="19" width="6" height="8" fill="#ffc477"/></svg>Hišni vodič</a>
-  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a></nav>
+  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a><a href="../tlorisi-montaznih-his/">Tlorisi</a></nav>
 </div></div>
 <main class="wrap page">
   <div>
@@ -135,7 +136,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     <a class="btn glow" href="https://hisomer.si/#kviz">Ali vam pristaja? Rešite kviz <span class="arrow">→</span></a>
     <a class="btn line" href="https://www.lumar.si/hise/avantgarde/eos/eos-d-134" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
   </div>
-  <section><h2>Tloris</h2><div class="plans"><a href="../img/tloris/lumar-eos-d-134-1.jpg"><img src="../img/tloris/lumar-eos-d-134-1.jpg" alt="Tloris Lumar Eos-D 134, etaža 1" loading="lazy"></a><a href="../img/tloris/lumar-eos-d-134-2.jpg"><img src="../img/tloris/lumar-eos-d-134-2.jpg" alt="Tloris Lumar Eos-D 134, etaža 2" loading="lazy"></a></div><p class="credit-line">Tloris: Lumar, <a href="https://www.lumar.si/hise/avantgarde/eos/eos-d-134" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a></p></section>
+  <section><h2>Tloris</h2><div class="plans"><a href="../img/tloris/lumar-eos-d-134-1.jpg"><img src="../img/tloris/lumar-eos-d-134-1.jpg" alt="Tloris pritličja – Lumar Eos-D 134, 134 m²" loading="lazy"></a><a href="../img/tloris/lumar-eos-d-134-2.jpg"><img src="../img/tloris/lumar-eos-d-134-2.jpg" alt="Tloris nadstropja – Lumar Eos-D 134, 134 m²" loading="lazy"></a></div><p class="credit-line">Tloris: Lumar, <a href="https://www.lumar.si/hise/avantgarde/eos/eos-d-134" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a> · <a href="../tlorisi-montaznih-his/">Vsi tlorisi</a></p></section>
   <div class="two">
     <section class="maker-info"><h2>O proizvajalcu Lumar</h2><p>Mariborski proizvajalec z več kot 3000 zgrajenimi hišami. Vse hiše so skoraj nič-energijske, na voljo tudi masivni les brez lepil (iQwood).</p><p><a href="https://www.lumar.si" target="_blank" rel="noopener">lumar.si ↗</a></p></section>
     <div class="edge"><div class="eyebrow">Prednost proizvajalca Lumar</div>Vsaka hiša je skoraj nič-energijska, 35 let garancije na konstrukcijo in izbira masivnega lesa brez lepil.<ul class="facts"><li>Konstrukcija: lesena okvirna ali masivni les (CLT, iQwood)</li><li>Energija: skoraj nič-energijska (sNES), stena U 0,12–0,15</li><li>Gradnja: finaliziran objekt v 6 mesecih od začetka montaže</li><li>Garancija na konstrukcijo: 35 let</li></ul></div>
