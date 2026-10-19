@@ -450,36 +450,52 @@
     },
     {
       "key": "temeljna_plosca_m2",
-      "label": "Temeljna plošča",
+      "label": "Temeljna plošča (toplotno izolirana)",
       "unit": "EUR/m2",
       "value": {
-        "min": 100,
-        "max": 150
+        "min": 130,
+        "max": 200
       },
       "vat": "unknown",
-      "applies": "Per m2 of slab (about the ground-floor footprint). Only when the maker's price is 'brez temeljne plošče'; usually not in the base price.",
+      "applies": "Per m2 of slab (about the ground-floor footprint), insulated slab as prefab makers require it: podložni beton, XPS 2 x 8-12 cm, hidroizolacija, rebar, concrete, formwork and edge insulation. Excavation and gravel bed are extra (zemeljska dela). Installations under the slab only partly included. Only when the maker's price is 'brez temeljne plošče'. A bare reinforced-concrete slab without insulation is 80-130 EUR/m2, which is where older 100-150 figures come from.",
       "confidence": "medium",
       "source_ids": [
-        "tp-omisli",
-        "gh-primerjam-2025"
+        "tp-mojmojster-2026",
+        "tp-primerjam-2026"
       ],
-      "as_of": "2025-10-23"
+      "as_of": "2026-01-19"
     },
     {
-      "key": "temeljna_plosca_hisa",
-      "label": "Temeljna plošča (hiša ~150 m2)",
+      "key": "temeljna_plosca_primer",
+      "label": "Temeljna plošča, primer 100 m²",
       "unit": "EUR",
       "value": {
-        "min": 8000,
-        "max": 12000
+        "min": 13000,
+        "max": 20000
       },
       "vat": "unknown",
-      "applies": "Per-house figure for a 150 m2 house. Primerjam's price box gives 12,500-18,800 EUR per 100 m2, so the per-house range is soft.",
+      "applies": "Worked example for a 100 m2 insulated slab, without excavation and gravel bed.",
       "confidence": "medium",
       "source_ids": [
-        "gh-primerjam-2025"
+        "tp-mojmojster-2026"
       ],
-      "as_of": "2025"
+      "as_of": "2026-01-19"
+    },
+    {
+      "key": "izkop_tampon_m2",
+      "label": "Izkop in tamponsko nasutje pod ploščo",
+      "unit": "EUR/m2",
+      "value": {
+        "min": 30,
+        "max": 45
+      },
+      "vat": "unknown",
+      "applies": "Per m2 of slab: excavation 9-14.5 plus a 50 cm gravel bed 20-32. Terrain changes it a lot; covered by the zemeljska_dela line in the calculator.",
+      "confidence": "medium",
+      "source_ids": [
+        "tp-mojmojster-2026"
+      ],
+      "as_of": "2026-01-19"
     },
     {
       "key": "zemeljska_dela",
