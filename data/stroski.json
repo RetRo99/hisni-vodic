@@ -453,15 +453,16 @@
       "label": "Temeljna plošča (toplotno izolirana)",
       "unit": "EUR/m2",
       "value": {
-        "min": 130,
-        "max": 200
+        "min": 150,
+        "max": 250
       },
       "vat": "unknown",
-      "applies": "Per m2 of slab (about the ground-floor footprint), insulated slab as prefab makers require it: podložni beton, XPS 2 x 8-12 cm, hidroizolacija, rebar, concrete, formwork and edge insulation. Excavation and gravel bed are extra (zemeljska dela). Installations under the slab only partly included. Only when the maker's price is 'brez temeljne plošče'. A bare reinforced-concrete slab without insulation is 80-130 EUR/m2, which is where older 100-150 figures come from.",
+      "applies": "Per m2 of gross slab area (about the ground-floor footprint plus walls), insulated slab as prefab makers require it. Range = sum of MojMojster's 2026 line items: slab 25 cm 80-120, XPS 2 x 10 cm 33-47, hidroizolacija 18-35, podložni beton 6-12, installations under the slab 15-40 (152-254). Its headline 130-200 and Primerjam's 125-188 sit at the low end; real quotes (forum 180-215, and a 2025 quote the site owner received of at least 220 per gross m2) sit in the upper half. Excavation and gravel bed are extra (zemeljska dela). Only when the maker's price is 'brez temeljne plošče'. A bare uninsulated slab is 80-130 EUR/m2.",
       "confidence": "medium",
       "source_ids": [
         "tp-mojmojster-2026",
-        "tp-primerjam-2026"
+        "tp-primerjam-2026",
+        "tp-slotech-2024"
       ],
       "as_of": "2026-01-19"
     },
@@ -470,11 +471,11 @@
       "label": "Temeljna plošča, primer 100 m²",
       "unit": "EUR",
       "value": {
-        "min": 13000,
-        "max": 20000
+        "min": 15000,
+        "max": 25000
       },
       "vat": "unknown",
-      "applies": "Worked example for a 100 m2 insulated slab, without excavation and gravel bed.",
+      "applies": "100 m2 of insulated slab at the line-item range, without excavation and gravel bed.",
       "confidence": "medium",
       "source_ids": [
         "tp-mojmojster-2026"

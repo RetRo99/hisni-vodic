@@ -1049,8 +1049,8 @@ def costs_page():
       naprava za 4–6 PE stane okoli {span('mkcn')} brez izkopa in vgradnje {cite('pr-merkur-mkcn')}; številne občine jo sofinancirajo. Vsi priključki skupaj po oceni stanejo {span('prikljucki_skupaj')} {cite('gh-primerjam-2025')}.</p>
   </section>
   <section class="prose"><h2>Koliko stane temeljna plošča?</h2>
-    <p>Toplotno izolirana temeljna plošča, kakršno zahtevajo proizvajalci montažnih hiš (podložni beton, dva sloja XPS, hidroizolacija, armatura in beton), stane {slab_lo}–{slab_hi} € na m² {cite('tp-mojmojster-2026')} {cite('tp-primerjam-2026')};
-      za ploščo s 100 m² to pomeni {span('temeljna_plosca_primer')}. Izkop in tamponsko nasutje stanejo dodatno okoli {span('izkop_tampon_m2')} na m² {cite('tp-mojmojster-2026')}, zato sta v kalkulatorju pri zemeljskih delih.
+    <p>Toplotno izolirana temeljna plošča, kakršno zahtevajo proizvajalci montažnih hiš (podložni beton, dva sloja XPS, hidroizolacija, armatura in beton), stane {slab_lo}–{slab_hi} € na m² bruto površine plošče {cite('tp-mojmojster-2026')}; to je seštevek cen posameznih del (plošča, XPS, hidroizolacija, podložni beton, instalacije pod ploščo).
+      Za ploščo s 100 m² to pomeni {span('temeljna_plosca_primer')}. Okvirne cene na portalih so nižje, 125–200 € na m² {cite('tp-primerjam-2026')}, dejanske ponudbe pa so bližje zgornjemu delu razpona {cite('tp-slotech-2024')}. Izkop in tamponsko nasutje stanejo dodatno okoli {span('izkop_tampon_m2')} na m² {cite('tp-mojmojster-2026')}, zato sta v kalkulatorju pri zemeljskih delih.
       Nižje ocene okoli 100–150 € na m², ki jih najdete na spletu, veljajo za neizolirano armiranobetonsko ploščo.
       Ni vključena v ceno, ki jo {verb(no_slab, 'navaja', 'navajata', 'navajajo')} {and_join(no_slab)} ({no_slab_n} {plural(no_slab_n, 'hiša', 'hiši', 'hiše', 'hiš')} v vodiču), zato jo kalkulator tem hišam prišteje.
       Površino plošče oceni kot tloris pritličja (neto površina, deljena s številom etaž) in 15 % za stene.</p>
