@@ -639,6 +639,42 @@ links = ''.join(f'<div><h3><a href="{p["id"]}/">{esc(p["name"])}</a></h3><ul>' +
                 for p in data['providers'])
 src = DATA_RE.sub(lambda mo: mo.group(1) + json.dumps(data, ensure_ascii=False) + mo.group(3), src)
 src = re.sub(r'(<!-- model-links -->).*?(<!-- /model-links -->)', lambda mo: mo.group(1) + links + mo.group(2), src, flags=re.S)
+
+
+def home_faq():
+    """Questions and answers on the home page, as static text with numbers from the data (the rest of the page is built by JS)."""
+    provs = data['providers']
+    priced = [m for _, m in models if m['price_eur'] and m['area_m2']]
+    med_m2 = eur(round(statistics.median(m['price_eur'] / m['area_m2'] for m in priced)))
+    areas = sorted(m['area_m2'] for _, m in models if m['area_m2'])
+    mid = [a for a in areas if 120 <= a < 160]
+    no_slab = [p['name'] for p in provs if any('brez temeljne plošče' in m['price_stage'].lower() for m in p['models'] if m['price_eur'])]
+    warranties = sorted({p['warranty_years'] for p in provs if p.get('warranty_years')})
+    by = lambda key: ''.join(f'<li><a href="{p["id"]}/">{esc(p["name"])}</a>: {esc(p[key])}</li>' for p in provs if p.get(key))
+    qa = [
+        ('Koliko stane montažna hiša?',
+         f'<p>Med {len(priced)} tipskimi montažnimi hišami slovenskih proizvajalcev z objavljeno ceno je najcenejša {eur(min(m["price_eur"] for m in priced))}, '
+         f'najdražja {eur(max(m["price_eur"] for m in priced))}. Srednja cena je {med_m2} na m² bivalne površine.</p>'
+         f'<p>Cene niso neposredno primerljive, ker proizvajalci navajajo cene za različne pakete. <a href="{GUIDE}/">Primerjava cen po proizvajalcih</a></p>'),
+        ('Kateri so slovenski proizvajalci montažnih hiš?',
+         f'<p>V vodiču je {len(models)} tipskih hiš {len(provs)} proizvajalcev:</p><ul>' +
+         ''.join(f'<li><a href="{p["id"]}/">{esc(p["name"])}</a>, {len(p["models"])} {plural(len(p["models"]), "hiša", "hiši", "hiše", "hiš")}</li>' for p in provs) + '</ul>'),
+        ('Koliko časa traja gradnja montažne hiše?', f'<p>Proizvajalci, ki čas gradnje objavljajo, navajajo:</p><ul>{by("build_time")}</ul>'),
+        ('Kako velike so tipske montažne hiše?',
+         f'<p>Od {round(areas[0])} do {round(areas[-1])} m². Največ, {len(mid)} od {len(areas)}, jih ima med 120 in 160 m² bivalne površine.</p>'
+         f'<p><a href="{PLANS}/">Tlorisi montažnih hiš po velikosti</a></p>'),
+        ('Ali so montažne hiše energijsko varčne?', f'<p>Proizvajalci navajajo energijski razred in toplotno prehodnost zunanje stene (U v W/m²K, nižja je boljša):</p><ul>{by("energy_class")}</ul>'),
+        ('Kaj običajno ni vključeno v ceno?',
+         '<p>Zemljišče, projektna dokumentacija in gradbeno dovoljenje, komunalni prispevek in priključki, zemeljska dela ter zunanja ureditev.' +
+         (f' {and_join(no_slab)} v ceno {"ne vključuje" if len(no_slab) == 1 else "ne vključujeta" if len(no_slab) == 2 else "ne vključujejo"} temeljne plošče.' if no_slab else '') + ' Preverite popis del v ponudbi.</p>'),
+        ('Kakšno garancijo dajejo proizvajalci?',
+         f'<p>Na konstrukcijo od {warranties[0]} do {warranties[-1]} let, odvisno od proizvajalca. Garancijo za instalacije in opremo preverite v ponudbi.</p>'),
+    ]
+    return ('<div class="eyebrow">Vprašanja</div><h2 class="display">Montažne hiše: pogosta vprašanja</h2><div class="faq-grid">' +
+            ''.join(f'<article><h3>{q}</h3>{a}</article>' for q, a in qa) + '</div>')
+
+
+src = re.sub(r'(<!-- faq -->).*?(<!-- /faq -->)', lambda mo: mo.group(1) + home_faq() + mo.group(2), src, flags=re.S)
 open('index.html', 'w', encoding='utf-8').write(src)
 
 locs = [SITE, SITE + GUIDE + '/', SITE + PLANS + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
