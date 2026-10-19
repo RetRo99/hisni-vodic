@@ -43,11 +43,13 @@
     '.cmp-tray .cmp-clear { font: inherit; font-size: 13px; border: 0; background: none; color: var(--mist); cursor: pointer; padding: 12px 8px; }' +
     '.cmp-msg { flex: 1 1 100%; order: -1; margin: 0; padding: 2px 4px 0; font-size: 13px; color: var(--glow); }' +
     '.cmp-msg[hidden] { display: none; }' +
-    'body.has-tray { padding-bottom: 96px; }' +
     // phones: one row (thumbs, Primerjaj, Počisti), at most 64 px tall
     '@media (max-width: 480px) { .cmp-tray { padding: 8px 8px 8px 12px; gap: 6px 8px; width: calc(100% - 32px); }' +
     ' .cmp-tray .cmp-n { display: none; } .cmp-thumbs { flex: 1; min-width: 0; gap: 6px; } .cmp-th { width: 42px; height: 32px; }' +
-    ' .cmp-tray .btn { padding: 10px 14px; } .cmp-tray .cmp-clear { padding: 12px 4px; } body.has-tray { padding-bottom: 84px; } }';
+    ' .cmp-tray .btn { padding: 10px 14px; } .cmp-tray .cmp-clear { padding: 12px 4px; } }' +
+    // desktop: a compact bar in the bottom-right corner, clear of centred form inputs
+    '@media (min-width: 1024px) { .cmp-tray { left: auto; right: 24px; transform: none; width: auto; max-width: 460px; flex-wrap: nowrap; padding: 8px 8px 8px 12px; gap: 10px; }' +
+    ' .cmp-tray .cmp-n { flex: 1 1 auto; line-height: 1.2; } .cmp-th { width: 44px; height: 32px; } .cmp-tray .cmp-n small { display: none; } .cmp-tray .btn { padding: 10px 16px; } .cmp-msg { position: absolute; bottom: 100%; right: 0; width: 100%; margin-bottom: 8px; padding: 8px 12px; border-radius: 12px; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); } }';
   document.head.appendChild(style);
 
   var tray = document.createElement('div');
@@ -65,6 +67,10 @@
       if (r.height && r.top < innerHeight && r.bottom > innerHeight - 48) off = Math.round(innerHeight - r.top);
     }
     tray.style.bottom = off ? (off + 8) + 'px' : '';
+    // sticky bar counted whenever it is shown, so the padding does not jump as it toggles
+    var sh = sb && !sb.hidden ? sb.getBoundingClientRect().height : 0; // 0 too when CSS hides it (desktop)
+    if (sh) sh += 8;
+    document.body.style.paddingBottom = tray.hidden ? '' : Math.ceil(tray.getBoundingClientRect().height + (sh || 16) + 16) + 'px';
   }
   var placing = 0;
   function schedule() { if (!placing) placing = requestAnimationFrame(function () { placing = 0; place(); }); }
@@ -72,7 +78,7 @@
   window.addEventListener('resize', schedule);
   // the bar may show or hide without a scroll (e.g. toggled by an IntersectionObserver)
   var sticky = document.querySelector('[data-sticky-bottom]');
-  if (sticky && window.ResizeObserver) new ResizeObserver(schedule).observe(sticky);
+  if (window.ResizeObserver) { var ro = new ResizeObserver(schedule); ro.observe(tray); if (sticky) ro.observe(sticky); }
 
   function refresh() {
     var buttons = document.querySelectorAll('button.cmp[data-slug]');
@@ -90,7 +96,7 @@
     document.body.classList.toggle('has-tray', !tray.hidden);
     tray.innerHTML = '<p class="cmp-msg" role="status"' + (note ? '' : ' hidden') + '>' + esc(note) + '</p>' +
       '<div class="cmp-thumbs">' + picks.map(function (s) {
-        return '<span class="cmp-th" title="' + esc(label(s)) + '">' + (names[s] && names[s].x ? '' : '<img src="/img/' + s + '.jpg" alt="" data-s="' + s + '">') +
+        return '<span class="cmp-th" title="' + esc(label(s)) + '">' + (names[s] && names[s].x ? '' : '<img src="/img/thumb/' + s + '.jpg" alt="" data-s="' + s + '">') +
           '<button type="button" class="cmp-rm" data-rm="' + s + '" aria-label="Odstrani iz primerjave: ' + esc(label(s)) + '">×</button></span>';
       }).join('') + '</div>' +
       '<span class="cmp-n"><b>' + n + '</b> ' + (n === 1 ? 'hiša' : n === 2 ? 'hiši' : 'hiše') + ' v primerjavi' +
@@ -128,7 +134,10 @@
   });
   tray.addEventListener('error', function (e) {
     var s = e.target.getAttribute && e.target.getAttribute('data-s');
-    if (s) { e.target.remove(); names[s] = { n: label(s), x: 1 }; save(); }
+    if (!s) return;
+    // no 320 px thumbnail: try the full photo once, then drop the image
+    if (e.target.src.indexOf('/img/thumb/') >= 0) { e.target.src = '/img/' + s + '.jpg'; return; }
+    e.target.remove(); names[s] = { n: label(s), x: 1 }; save();
   }, true);
   window.addEventListener('storage', function (e) { if (e.key === KEY || e.key === NAMES) { picks = read(); names = readNames(); refresh(); } });
 
