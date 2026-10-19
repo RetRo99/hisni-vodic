@@ -96,7 +96,20 @@ footer nav a:hover { color: var(--ink); }
 .head .prov { color: var(--mist); margin-top: 10px; }
 .photo { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); aspect-ratio: 600 / 315; }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+@media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
+.specs dt { font-size: 11px; }
+.na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
+abbr[title] { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+sub { font-size: max(12px, .75em); }
+.gloss { border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); padding: 14px 18px; color: #c9d3e6; font-size: 14px; max-width: 60em; }
+.gloss summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+.gloss dl { display: grid; gap: 8px; margin: 12px 0 0; }
+.gloss dt { display: inline; font-weight: 600; color: var(--ink); }
+.gloss dt::after { content: ": "; }
+.gloss dd { display: inline; margin: 0; }
+.basis { color: var(--mist); font-size: 14px; margin: 10px 0 0; max-width: 60em; }
+.basis a, .basis b { color: var(--ink); }
 .lede { color: #c9d3e6; font-size: 18px; max-width: 44em; margin: 0; }
 .lede p { margin: 0 0 10px; }
 h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12px; }
@@ -142,20 +155,19 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
       <div class="price"><b>145.990 €</b><span>osnovni model SmartHouse z DDV</span></div>
     </div>
   </div>
-  
-  <dl class="specs"><div><dt>Etaže</dt><dd>P + 1</dd></div><div><dt>Površina</dt><dd>93 m²</dd></div><div><dt>Spalnice</dt><dd>—</dd></div><div><dt>Kopalnice</dt><dd>—</dd></div><div><dt>Streha</dt><dd>—</dd></div></dl>
-  <div class="lede"><p>Žiher hiše SmartHouse L je dvoetažna montažna hiša (pritličje in nadstropje) s površino 93 m² proizvajalca Žiher hiše. Arhitekturni slog: moderna.</p><p>Cena po podatkih proizvajalca: 145.990 € – osnovni model SmartHouse z DDV. Opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
+  <dl class="specs"><div><dt>Etaže</dt><dd>P + 1</dd></div><div><dt>Površina</dt><dd>93 m²</dd></div><div><dt>Spalnice</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Kopalnice</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Streha</dt><dd><span class="na">ni podatka</span></dd></div></dl>
   <div class="actions">
-    <a class="btn glow" href="https://hisomer.si/#kviz">Ali vam pristaja? Rešite kviz <span class="arrow">→</span></a>
+    <a class="btn glow" href="../koliko-stane-gradnja-hise/#h=ziher-smarthouse-l">Izračunaj celotne stroške gradnje <span class="arrow">→</span></a><button type="button" class="btn line cmp" data-slug="ziher-smarthouse-l" data-name="Žiher hiše SmartHouse L" aria-label="Dodaj Žiher hiše SmartHouse L v primerjavo">+ Primerjaj</button><a class="btn line" href="https://hisomer.si/#kviz">Ali vam pristaja? Rešite kviz</a>
     <a class="btn line" href="https://www.smarthouse-slovenia.com/hisa-l-mobile" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
-    <button type="button" class="btn line cmp" data-slug="ziher-smarthouse-l">+ Primerjaj</button><a class="btn line" href="../koliko-stane-gradnja-hise/#h=ziher-smarthouse-l">Izračunaj celotne stroške gradnje</a>
   </div>
-  <section><h2>Tloris</h2><div class="plans"><a href="../img/tloris/ziher-smarthouse-l-1.jpg"><img src="../img/tloris/ziher-smarthouse-l-1.jpg" alt="Tloris – Žiher hiše SmartHouse L, 93 m²" loading="lazy"></a></div><p class="credit-line">Tloris: Žiher hiše, <a href="https://www.smarthouse-slovenia.com/hisa-l-mobile" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a> · <a href="../tlorisi-montaznih-his/">Vsi tlorisi</a></p></section>
+  
+  <div class="lede"><p>Žiher hiše SmartHouse L je dvoetažna montažna hiša (pritličje in nadstropje) s površino 93 m² proizvajalca Žiher hiše. Arhitekturni slog: moderna.</p><p>Cena po podatkih proizvajalca: 145.990 € – osnovni model SmartHouse z DDV. Opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
+  <section><h2>Tloris</h2><div class="plans"><a href="../img/tloris/ziher-smarthouse-l-1.jpg"><img src="../img/tloris/thumb/ziher-smarthouse-l-1.jpg" width="600" height="810" alt="Tloris – Žiher hiše SmartHouse L, 93 m²" loading="lazy"></a></div><p class="credit-line">Tloris: Žiher hiše, <a href="https://www.smarthouse-slovenia.com/hisa-l-mobile" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a> · <a href="../tlorisi-montaznih-his/">Vsi tlorisi</a></p></section>
   <div class="two">
     <section class="maker-info"><h2>O proizvajalcu Žiher hiše</h2><p>Družinsko podjetje iz Gorišnice z več kot 40 leti izkušenj in lastno žago. Ponuja tudi manjše hiše SmartHouse s fiksno ceno.</p><p><a href="https://ziher-hise.si" target="_blank" rel="noopener">ziher-hise.si ↗</a></p></section>
     <div class="edge"><div class="eyebrow">Prednost proizvajalca Žiher hiše</div>Slovenski les iz lastne predelave in hitre hiše SmartHouse s fiksno objavljeno ceno.<ul class="facts"><li>Konstrukcija: lesena okvirna konstrukcija</li><li>Gradnja: SmartHouse: vselitev v okoli 3 mesecih</li><li>Garancija na konstrukcijo: 30 let</li></ul></div>
   </div>
-  <section><h2>Podobne hiše drugih proizvajalcev</h2><div class="sim"><a href="../noah-kubo-97/"><div class="pic"><img src="../img/noah-kubo-97.jpg" alt="" loading="lazy"></div><span><b>NOAH KUBO 97</b>97 m² · P + 1 · 173.435 €</span></a><a href="../jelovica-prima-93/"><div class="pic"><img src="../img/jelovica-prima-93.jpg" alt="" loading="lazy"></div><span><b>Jelovica Prima 93</b>93 m² · pritličje · 190.990 €</span></a><a href="../marles-pure-vista-lux-113/"><div class="pic"><img src="../img/marles-pure-vista-lux-113.jpg" alt="" loading="lazy"></div><span><b>Marles Pure Vista Lux 113</b>113 m² · P + 1 · 195.840 €</span></a><a href="../rihter-hisa-114-4/"><div class="pic"><img src="../img/rihter-hisa-114-4.jpg" alt="" loading="lazy"></div><span><b>Rihter Hiša 114/4</b>114 m² · P + 1 · 206.830 €</span></a></div></section>
+  <section><h2>Podobne hiše drugih proizvajalcev</h2><div class="sim"><a href="../noah-kubo-97/"><div class="pic"><img src="../img/thumb/noah-kubo-97.jpg" width="320" height="180" alt="" loading="lazy"></div><span><b>NOAH KUBO 97</b>97 m² · P + 1 · 173.435 €</span></a><a href="../jelovica-prima-93/"><div class="pic"><img src="../img/thumb/jelovica-prima-93.jpg" width="320" height="240" alt="" loading="lazy"></div><span><b>Jelovica Prima 93</b>93 m² · pritličje · 190.990 €</span></a><a href="../marles-pure-vista-lux-113/"><div class="pic"><img src="../img/thumb/marles-pure-vista-lux-113.jpg" width="320" height="168" alt="" loading="lazy"></div><span><b>Marles Pure Vista Lux 113</b>113 m² · P + 1 · 195.840 €</span></a><a href="../rihter-hisa-114-4/"><div class="pic"><img src="../img/thumb/rihter-hisa-114-4.jpg" width="320" height="183" alt="" loading="lazy"></div><span><b>Rihter Hiša 114/4</b>114 m² · P + 1 · 206.830 €</span></a></div></section>
   <section><h2>Druge hiše proizvajalca Žiher hiše</h2><ul class="siblings"><li><a href="../ziher-vivat-70/">Vivat 70</a></li><li><a href="../ziher-vivat-80/">Vivat 80</a></li><li><a href="../ziher-vivat-90/">Vivat 90</a></li><li><a href="../ziher-petovia-90/">Petovia 90</a></li><li><a href="../ziher-petovia-115/">Petovia 115</a></li><li><a href="../ziher-livia/">Livia</a></li><li><a href="../ziher-cubus-atrium/">Cubus Atrium</a></li><li><a href="../ziher-smart-107/">Smart 107</a></li><li><a href="../ziher-smart-120/">Smart 120</a></li><li><a href="../ziher-smart-140/">Smart 140</a></li><li><a href="../ziher-cubus-classic/">Cubus Classic</a></li><li><a href="../ziher-romula/">Romula</a></li><li><a href="../ziher-celeia/">Celeia</a></li><li><a href="../ziher-aurora/">Aurora</a></li><li><a href="../ziher-smarthouse-s/">SmartHouse S</a></li><li><a href="../ziher-smarthouse-m/">SmartHouse M</a></li></ul></section>
 </main>
 <footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../cena-montazne-hise/">Cene montažnih hiš</a><a href="../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../majhne-montazne-hise/">Majhne hiše</a><a href="../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../komunalni-prispevek/">Komunalni prispevek</a><a href="../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../tlorisi-montaznih-his/">Tlorisi</a><a href="../primerjava/">Primerjava</a></nav></div></footer>

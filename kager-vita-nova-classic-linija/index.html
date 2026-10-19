@@ -96,7 +96,20 @@ footer nav a:hover { color: var(--ink); }
 .head .prov { color: var(--mist); margin-top: 10px; }
 .photo { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); aspect-ratio: 600 / 315; }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+@media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
+.specs dt { font-size: 11px; }
+.na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
+abbr[title] { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+sub { font-size: max(12px, .75em); }
+.gloss { border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); padding: 14px 18px; color: #c9d3e6; font-size: 14px; max-width: 60em; }
+.gloss summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+.gloss dl { display: grid; gap: 8px; margin: 12px 0 0; }
+.gloss dt { display: inline; font-weight: 600; color: var(--ink); }
+.gloss dt::after { content: ": "; }
+.gloss dd { display: inline; margin: 0; }
+.basis { color: var(--mist); font-size: 14px; margin: 10px 0 0; max-width: 60em; }
+.basis a, .basis b { color: var(--ink); }
 .lede { color: #c9d3e6; font-size: 18px; max-width: 44em; margin: 0; }
 .lede p { margin: 0 0 10px; }
 h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12px; }
@@ -142,14 +155,13 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
       <div class="price"><b>Na povpraševanje</b><span>Proizvajalec cene ne objavlja.</span></div>
     </div>
   </div>
-  <figure class="photo"><img src="../img/kager-vita-nova-classic-family.jpg" srcset="../img/kager-vita-nova-classic-family.jpg 720w, ../img/large/kager-vita-nova-classic-family.jpg 1400w" sizes="(min-width: 1240px) 1208px, 100vw" alt="Kager VITA NOVA Classic (linija)"><figcaption>Foto: Kager</figcaption></figure>
-  <dl class="specs"><div><dt>Etaže</dt><dd>—</dd></div><div><dt>Površina</dt><dd>—</dd></div><div><dt>Spalnice</dt><dd>—</dd></div><div><dt>Kopalnice</dt><dd>—</dd></div><div><dt>Streha</dt><dd>dvokapna</dd></div></dl>
-  <div class="lede"><p>Kager VITA NOVA Classic (linija) je montažna hiša proizvajalca Kager. Streha je dvokapna. Arhitekturni slog: klasična, les in steklo.</p><p>Proizvajalec cene za ta model ne objavlja, ponudbo dobite na povpraševanje. Tloris, opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
+  <dl class="specs"><div><dt>Etaže</dt><dd>—</dd></div><div><dt>Površina</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Spalnice</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Kopalnice</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Streha</dt><dd>dvokapna</dd></div></dl>
   <div class="actions">
-    <a class="btn glow" href="https://hisomer.si/#kviz">Ali vam pristaja? Rešite kviz <span class="arrow">→</span></a>
+    <button type="button" class="btn line cmp" data-slug="kager-vita-nova-classic-linija" data-name="Kager VITA NOVA Classic (linija)" aria-label="Dodaj Kager VITA NOVA Classic (linija) v primerjavo">+ Primerjaj</button><a class="btn glow" href="https://hisomer.si/#kviz">Ali vam pristaja? Rešite kviz <span class=arrow>→</span></a>
     <a class="btn line" href="https://kager.si/tip-hise/vita-nova-classic/" target="_blank" rel="noopener">Tloris in podrobnosti pri proizvajalcu ↗</a>
-    <button type="button" class="btn line cmp" data-slug="kager-vita-nova-classic-linija">+ Primerjaj</button>
   </div>
+  <figure class="photo"><img src="../img/kager-vita-nova-classic-family.jpg" srcset="../img/kager-vita-nova-classic-family.jpg 720w, ../img/large/kager-vita-nova-classic-family.jpg 1400w" sizes="(min-width: 1240px) 1208px, 100vw" alt="Kager VITA NOVA Classic (linija)"><figcaption>Foto: Kager</figcaption></figure>
+  <div class="lede"><p>Kager VITA NOVA Classic (linija) je montažna hiša proizvajalca Kager. Streha je dvokapna. Arhitekturni slog: klasična, les in steklo.</p><p>Proizvajalec cene za ta model ne objavlja, ponudbo dobite na povpraševanje. Tloris, opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
   
   <div class="two">
     <section class="maker-info"><h2>O proizvajalcu Kager</h2><p>Družinsko podjetje s Ptuja, ki gradi hiše iz lesa in stekla na vidnem lepljenem lesenem skeletu. Večinoma individualni projekti.</p><p><a href="https://kager.si" target="_blank" rel="noopener">kager.si ↗</a></p></section>

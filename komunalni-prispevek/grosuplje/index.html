@@ -96,7 +96,20 @@ footer nav a:hover { color: var(--ink); }
 .head .prov { color: var(--mist); margin-top: 10px; }
 .photo { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); aspect-ratio: 600 / 315; }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+@media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
+.specs dt { font-size: 11px; }
+.na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
+abbr[title] { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+sub { font-size: max(12px, .75em); }
+.gloss { border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); padding: 14px 18px; color: #c9d3e6; font-size: 14px; max-width: 60em; }
+.gloss summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+.gloss dl { display: grid; gap: 8px; margin: 12px 0 0; }
+.gloss dt { display: inline; font-weight: 600; color: var(--ink); }
+.gloss dt::after { content: ": "; }
+.gloss dd { display: inline; margin: 0; }
+.basis { color: var(--mist); font-size: 14px; margin: 10px 0 0; max-width: 60em; }
+.basis a, .basis b { color: var(--ink); }
 .lede { color: #c9d3e6; font-size: 18px; max-width: 44em; margin: 0; }
 .lede p { margin: 0 0 10px; }
 h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12px; }
@@ -134,13 +147,16 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
 .tbl th, .tbl td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .tbl tr:last-child > * { border-bottom: 0; }
-.tbl thead th { font: 500 10px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
+.tbl thead th { font: 500 11px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
 .tbl tbody th { font-weight: 600; white-space: nowrap; }
 .tbl .n { font-family: var(--font-data); font-size: 14px; white-space: nowrap; }
 .tbl .stage { color: var(--mist); font-size: 13px; min-width: 260px; }
 .tbl td:first-child { min-width: 170px; }
 .tbl a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
 .tbl a:hover { color: var(--glow); }
+.tbl .n small { display: block; min-width: 13em; max-width: 18em; white-space: normal; font: 400 12.5px/1.4 var(--font-body); color: var(--mist); margin-top: 3px; }
+.tbl .hth { display: flex; align-items: center; gap: 12px; }
+.tbl .hth img { width: 72px; height: auto; border-radius: 8px; flex: none; background: var(--slate); }
 .points { margin: 0; padding-left: 20px; color: #c9d3e6; display: grid; gap: 10px; max-width: 48em; }
 .points b { color: var(--ink); }
 
@@ -149,7 +165,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 @media (min-width: 960px) { .calc { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; } }
 .form { display: grid; gap: 16px; background: var(--dusk); border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); padding: 20px; min-width: 0; }
 .form label, .form .f { display: grid; gap: 6px; font-size: 14px; color: var(--mist); min-width: 0; }
-.form select, .form input[type=number] { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
+.form select, .form input[type=text] { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
 .form label.ck { display: flex; gap: 10px; align-items: flex-start; color: var(--ink); cursor: pointer; }
 .form .ck input { margin: 4px 0 0; accent-color: var(--glow); flex: none; }
 .form small { font-size: 12.5px; line-height: 1.45; color: var(--mist); }
@@ -163,6 +179,29 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .lines th small { display: block; font-weight: 400; color: var(--mist); font-size: 12.5px; margin-top: 2px; }
 .lines .cmp { margin-left: 6px; }
 .lines td { text-align: right; }
+@media (min-width: 641px) { .lines td { width: 1%; white-space: nowrap; } }
+.lines th small.src { font-size: 12px; overflow-wrap: anywhere; }
+.lines th small.src a { color: var(--mist); text-decoration: none; }
+.lines th small.src a:hover { color: var(--ink); }
+.total .likely { font-size: 15px; color: var(--ink); }
+.total .likely strong { color: var(--glow); font-variant-numeric: tabular-nums; }
+.stack { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 14px; background: var(--line); }
+.stack i { display: block; height: 100%; }
+.legend { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--mist); }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.legend i.neg { background: #7fd1a8; }
+.legend span { color: var(--ink); font-variant-numeric: tabular-nums; }
+.stotal { display: none; }
+@media (max-width: 959px) {
+  .stotal { display: flex; position: fixed; z-index: 29; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); justify-content: space-between; align-items: center; gap: 12px;
+    padding: 12px 18px; border-radius: 18px; background: var(--dusk); box-shadow: inset 0 0 0 1px var(--glow), 0 12px 40px rgba(0,0,0,.5); color: var(--ink); text-decoration: none; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .stotal[hidden] { display: none; }
+  .stotal small { display: block; font: 500 11px/1.2 var(--font-data); letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
+  .stotal .go { color: var(--glow); font-size: 14px; white-space: nowrap; }
+  body.has-tray .stotal { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+  .calc { padding-bottom: 72px; }
+}
 .lines td small { display: block; font-size: 12px; color: var(--mist); white-space: nowrap; margin-top: 4px; }
 .lines td small a { color: var(--mist); }
 .share { display: block; height: 4px; border-radius: 4px; background: var(--line); margin-top: 8px; overflow: hidden; }
@@ -188,7 +227,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 <main class="wrap page">
   <div>
     <div class="eyebrow crumbs"><a href="../../">Hišni vodič</a> / <a href="../../komunalni-prispevek/">Komunalni prispevek</a> / Grosuplje</div>
-    <div class="head"><div><h1 class="display">Komunalni prispevek Grosuplje 2026</h1><div class="prov">Parcela 600 m², hiša 200 m² BTP</div></div></div>
+    <div class="head"><div><h1 class="display">Komunalni prispevek Grosuplje 2026</h1><div class="prov">Parcela 600 m², hiša 200 m² <abbr title="bruto tlorisna površina: površina vseh etaž, merjena po zunanjih merah sten">BTP</abbr></div></div></div>
   </div>
   <div class="total"><span class="eyebrow">Komunalni prispevek za primer</span><b>22.873 €</b><p>Zanesljivost: okvirno. Znesek je izračun zasebnega portala, ne občine, in ni preverjen v odloku.</p></div>
   <div class="lede"><p>Izračun portala vsevem.si za parcelo 600 m² in 200 m² BTP z vso komunalno opremo, podatki z dne 12. 6. 2026 <a href="#vir-kp-vsevem">[1]</a>. Odloka nismo preračunali, zato koeficientov ne navajamo; za manjšo hišo ali brez priključka na vso opremo bo znesek nižji.</p></div>
@@ -203,6 +242,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   </div>
   <section><h2>Komunalni prispevek v drugih občinah</h2><ul class="siblings"><li><a href="../../komunalni-prispevek/brezice/">Brežice</a> · 4.901 €</li><li><a href="../../komunalni-prispevek/celje/">Celje</a> · 14.229 €</li><li><a href="../../komunalni-prispevek/domzale/">Domžale</a> · 13.861 €</li><li><a href="../../komunalni-prispevek/kamnik/">Kamnik</a> · 9.535 €</li><li><a href="../../komunalni-prispevek/koper/">Koper</a> · 22.426 € – 28.075 €</li><li><a href="../../komunalni-prispevek/kranj/">Kranj</a> · 14.010 €</li><li><a href="../../komunalni-prispevek/krsko/">Krško</a> · 5.765 €</li><li><a href="../../komunalni-prispevek/ljubljana/">Ljubljana</a> · 18.755 €</li><li><a href="../../komunalni-prispevek/maribor/">Maribor</a> · 15.217 € – 16.542 €</li><li><a href="../../komunalni-prispevek/murska-sobota/">Murska Sobota</a> · 9.234 €</li><li><a href="../../komunalni-prispevek/novo-mesto/">Novo mesto</a> · 11.042 €</li><li><a href="../../komunalni-prispevek/ptuj/">Ptuj</a> · 6.930 €</li><li><a href="../../komunalni-prispevek/skofja-loka/">Škofja Loka</a> · 9.003 €</li></ul></section>
   <section class="prose"><h2>Viri</h2><ol class="viri"><li id="vir-kp-vsevem"><a href="https://vsevem.si/komunalni-prispevek/" target="_blank" rel="noopener">Kalkulator komunalnega prispevka po občinah</a> <span>· Vsevem.si</span></li></ol></section>
+<details class="gloss"><summary>Kaj pomenijo izrazi na tej strani?</summary><dl><div><dt>BTP</dt><dd>bruto tlorisna površina: površina vseh etaž, merjena po zunanjih merah sten</dd></div></dl></details>
 </main>
 <footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../../cena-montazne-hise/">Cene montažnih hiš</a><a href="../../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../../majhne-montazne-hise/">Majhne hiše</a><a href="../../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../../komunalni-prispevek/">Komunalni prispevek</a><a href="../../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../../tlorisi-montaznih-his/">Tlorisi</a><a href="../../primerjava/">Primerjava</a></nav></div></footer>
 <script src="../../compare.js"></script>

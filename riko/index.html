@@ -96,7 +96,20 @@ footer nav a:hover { color: var(--ink); }
 .head .prov { color: var(--mist); margin-top: 10px; }
 .photo { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); aspect-ratio: 600 / 315; }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+@media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
+.specs dt { font-size: 11px; }
+.na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
+abbr[title] { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+sub { font-size: max(12px, .75em); }
+.gloss { border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); padding: 14px 18px; color: #c9d3e6; font-size: 14px; max-width: 60em; }
+.gloss summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+.gloss dl { display: grid; gap: 8px; margin: 12px 0 0; }
+.gloss dt { display: inline; font-weight: 600; color: var(--ink); }
+.gloss dt::after { content: ": "; }
+.gloss dd { display: inline; margin: 0; }
+.basis { color: var(--mist); font-size: 14px; margin: 10px 0 0; max-width: 60em; }
+.basis a, .basis b { color: var(--ink); }
 .lede { color: #c9d3e6; font-size: 18px; max-width: 44em; margin: 0; }
 .lede p { margin: 0 0 10px; }
 h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12px; }
@@ -134,13 +147,16 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
 .tbl th, .tbl td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .tbl tr:last-child > * { border-bottom: 0; }
-.tbl thead th { font: 500 10px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
+.tbl thead th { font: 500 11px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
 .tbl tbody th { font-weight: 600; white-space: nowrap; }
 .tbl .n { font-family: var(--font-data); font-size: 14px; white-space: nowrap; }
 .tbl .stage { color: var(--mist); font-size: 13px; min-width: 260px; }
 .tbl td:first-child { min-width: 170px; }
 .tbl a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
 .tbl a:hover { color: var(--glow); }
+.tbl .n small { display: block; min-width: 13em; max-width: 18em; white-space: normal; font: 400 12.5px/1.4 var(--font-body); color: var(--mist); margin-top: 3px; }
+.tbl .hth { display: flex; align-items: center; gap: 12px; }
+.tbl .hth img { width: 72px; height: auto; border-radius: 8px; flex: none; background: var(--slate); }
 .points { margin: 0; padding-left: 20px; color: #c9d3e6; display: grid; gap: 10px; max-width: 48em; }
 .points b { color: var(--ink); }
 </style></head>
@@ -159,7 +175,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   </div>
   <figure class="photo"><img src="../img/riko-mila.jpg" srcset="../img/riko-mila.jpg 720w, ../img/large/riko-mila.jpg 1400w" sizes="(min-width: 1240px) 1208px, 100vw" alt="Montažna hiša Riko hiše"><figcaption>Foto: Riko hiše</figcaption></figure>
   <div class="lede"><p>Proizvajalec iz Ribnice z močnim izvozom. Ne prodaja tipskih hiš, ampak gradi po arhitektovem projektu. Spodaj so njihove idejne zasnove.</p><p>Cen tipskih hiš ne objavlja; ponudbo dobite na povpraševanje. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
-  <section><h2>Vse hiše proizvajalca Riko hiše</h2><div class="scroll"><table class="tbl"><thead><tr><th scope="col">Hiša</th><th scope="col">Površina</th><th scope="col">Spalnice</th><th scope="col">Streha</th><th scope="col">Cena</th><th scope="col">Na m²</th><th scope="col"><span class="sr-only">Primerjava</span></th></tr></thead><tbody><tr><td><a href="../riko-minima-s/">Minima S</a></td><td class="n">78 m²</td><td class="n">—</td><td>ravna</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-minima-s">+ Primerjaj</button></td></tr><tr><td><a href="../riko-minima-m/">Minima M</a></td><td class="n">94 m²</td><td class="n">—</td><td>ravna</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-minima-m">+ Primerjaj</button></td></tr><tr><td><a href="../riko-minima-l/">Minima L</a></td><td class="n">118 m²</td><td class="n">—</td><td>ravna</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-minima-l">+ Primerjaj</button></td></tr><tr><td><a href="../riko-lavaldia/">Lavaldia</a></td><td class="n">—</td><td class="n">—</td><td>—</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-lavaldia">+ Primerjaj</button></td></tr><tr><td><a href="../riko-mila/">Mila</a></td><td class="n">—</td><td class="n">—</td><td>—</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-mila">+ Primerjaj</button></td></tr><tr><td><a href="../riko-carna/">Čarna</a></td><td class="n">—</td><td class="n">—</td><td>—</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-carna">+ Primerjaj</button></td></tr></tbody></table></div></section>
+  <section><h2>Vse hiše proizvajalca Riko hiše</h2><div class="scroll"><table class="tbl"><thead><tr><th scope="col">Hiša</th><th scope="col">Površina</th><th scope="col">Spalnice</th><th scope="col">Streha</th><th scope="col">Cena</th><th scope="col">Na m²</th><th scope="col"><span class="sr-only">Primerjava</span></th></tr></thead><tbody><tr><td><a href="../riko-minima-s/">Minima S</a></td><td class="n">78 m²</td><td class="n">—</td><td>ravna</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-minima-s" data-name="Riko hiše Minima S" aria-label="Dodaj Riko hiše Minima S v primerjavo">+ Primerjaj</button></td></tr><tr><td><a href="../riko-minima-m/">Minima M</a></td><td class="n">94 m²</td><td class="n">—</td><td>ravna</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-minima-m" data-name="Riko hiše Minima M" aria-label="Dodaj Riko hiše Minima M v primerjavo">+ Primerjaj</button></td></tr><tr><td><a href="../riko-minima-l/">Minima L</a></td><td class="n">118 m²</td><td class="n">—</td><td>ravna</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-minima-l" data-name="Riko hiše Minima L" aria-label="Dodaj Riko hiše Minima L v primerjavo">+ Primerjaj</button></td></tr><tr><td><a href="../riko-lavaldia/">Lavaldia</a></td><td class="n">—</td><td class="n">—</td><td>—</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-lavaldia" data-name="Riko hiše Lavaldia" aria-label="Dodaj Riko hiše Lavaldia v primerjavo">+ Primerjaj</button></td></tr><tr><td><a href="../riko-mila/">Mila</a></td><td class="n">—</td><td class="n">—</td><td>—</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-mila" data-name="Riko hiše Mila" aria-label="Dodaj Riko hiše Mila v primerjavo">+ Primerjaj</button></td></tr><tr><td><a href="../riko-carna/">Čarna</a></td><td class="n">—</td><td class="n">—</td><td>—</td><td class="n">na povpraševanje</td><td class="n">—</td><td><button type="button" class="cmp sm" data-slug="riko-carna" data-name="Riko hiše Čarna" aria-label="Dodaj Riko hiše Čarna v primerjavo">+ Primerjaj</button></td></tr></tbody></table></div></section>
   <div class="two">
     <div class="edge"><div class="eyebrow">Prednost proizvajalca Riko hiše</div>Individualne arhitekturne hiše s fiksno ceno ob podpisu pogodbe in urejanjem subvencije Eko sklada.<ul class="facts"><li>Konstrukcija: lesena okvirna ali masivna konstrukcija</li><li>Energija: stena U 0,15 (Riko Plus)</li><li>Garancija na konstrukcijo: 30 let</li></ul></div>
     <section class="maker-info"><h2>Spletna stran</h2><p><a href="https://www.riko-hise.si" target="_blank" rel="noopener">riko-hise.si ↗</a></p><h2>Drugi proizvajalci</h2><ul class="siblings"><li><a href="../marles/">Marles</a></li><li><a href="../lumar/">Lumar</a></li><li><a href="../kager/">Kager</a></li><li><a href="../rihter/">Rihter</a></li><li><a href="../jelovica/">Jelovica</a></li><li><a href="../noah/">NOAH</a></li><li><a href="../ziher/">Žiher hiše</a></li></ul></section>

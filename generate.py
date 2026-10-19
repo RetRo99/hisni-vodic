@@ -2,7 +2,7 @@
 """Writes one static page per house model (/<maker>-<model>/index.html), the price guide
 (/cena-montazne-hise/), the house links in the catalog of index.html, and sitemap.xml, all from the
 JSON embedded in index.html. Run after editing that JSON:  python3 generate.py"""
-import collections, datetime, glob, html, json, os, re, statistics, unicodedata
+import collections, datetime, glob, html, json, os, re, shutil, statistics, struct, subprocess, unicodedata
 
 SITE = 'https://hisomer.si/'
 GUIDE = 'cena-montazne-hise'
@@ -53,6 +53,127 @@ for p, m in models:
 slugs = [m['slug'] for _, m in models]
 assert len(set(slugs)) == len(slugs), 'duplicate slug'
 
+COST = json.load(open('data/stroski.json', encoding='utf-8'))
+SLAB = next(i for i in COST['items'] if i['key'] == 'temeljna_plosca_m2')['value']
+SLAB_MID = (SLAB['min'] + SLAB['max']) / 2
+
+
+def num_sl(v):
+    return f'{v:g}'.replace('.', ',')
+
+
+# Comparable price: the maker's price plus the slab estimate where the price leaves the slab out, with the calculator's
+# footprint rule (net m² / floors × 1,15) at the middle of temeljna_plosca_m2. Subsidy-deducted prices are only flagged.
+for p, m in models:
+    for k in ('price_cmp', 'cmp_note', 'thumb'):  # popped and set again in this order, so the JSON is the same on every run
+        m.pop(k, None)
+    if m['price_eur'] is None:
+        continue
+    st = (m['price_stage'] or '').lower()
+    no_slab = 'brez temeljne plošče' in st
+    add = int(round(m['area_m2'] / m['floors'] * 1.15 * SLAB_MID, -2)) if no_slab and m['area_m2'] else 0
+    notes = ([f'+ ocena temeljne plošče (~{eur(add)})'] if add else ['brez temeljne plošče, površina ni znana'] if no_slab else []) + \
+        (['cena že po odbitku subvencije Eko sklada' if 'eko sklad' in st else 'cena že po odbitku subvencij in popustov'] if 'subvencij' in st else []) + \
+        (['osnovni paket'] if 'osnovni model' in st else [])
+    m['price_cmp'] = m['price_eur'] + add
+    if notes:
+        m['cmp_note'] = ', '.join(notes)
+CMP_EXPLAIN = (f'<b>Primerljiva cena</b> je cena proizvajalca, ki ji pri hišah brez temeljne plošče prištejemo oceno plošče: tloris pritličja '
+               f'(neto površina, deljena s številom etaž, in 15 % za stene) × {num_sl(SLAB_MID)} €/m², sredina razpona {SLAB["min"]}–{SLAB["max"]} €/m² iz '
+               f'<a href="../{COSTS}/">kalkulatorja stroškov</a>. Cen, ki so že zmanjšane za subvencijo Eko sklada ali popuste, ne popravljamo, ampak jih označimo.')
+
+
+def jpeg_size(path):
+    """(width, height) from a JPEG's SOF header."""
+    b = open(path, 'rb').read()
+    i = 2
+    while i + 9 < len(b):
+        if b[i] != 0xFF:
+            i += 1
+            continue
+        mk = b[i + 1]
+        if 0xC0 <= mk <= 0xCF and mk not in (0xC4, 0xC8, 0xCC):
+            h, w = struct.unpack('>HH', b[i + 5:i + 9])
+            return w, h
+        i += 1 if mk == 0xFF else 2 if mk in (0xD8, 0x01) or 0xD0 <= mk <= 0xD7 else 2 + struct.unpack('>H', b[i + 2:i + 4])[0]
+    raise ValueError(path)
+
+
+SIPS = shutil.which('sips')
+
+
+def thumb(src, width):
+    """A `width` px wide copy of img/.../x.jpg at img/.../thumb/x.jpg, made once with macOS sips; the original if it can't be made."""
+    out = os.path.join(os.path.dirname(src), 'thumb', os.path.basename(src))
+    if not os.path.isfile(out) and SIPS and os.path.isfile(src) and jpeg_size(src)[0] > width:
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        subprocess.run([SIPS, '--resampleWidth', str(width), '-s', 'formatOptions', '72', src, '--out', out], capture_output=True)
+    return out if os.path.isfile(out) else src
+
+
+def img_tag(src, width, alt=''):
+    """A lazy <img> of the thumbnail with its real width and height."""
+    t = thumb(src, width)
+    w, h = jpeg_size(t)
+    return f'<img src="../{esc(t)}" width="{w}" height="{h}" alt="{esc(alt)}" loading="lazy">'
+
+
+for p, m in models:
+    if m.get('image'):
+        m['thumb'] = thumb(m['image'], 320)
+
+# Jargon: the first match on each page gets an <abbr title>, and the page ends with a short list of what they mean.
+GLOSS = [
+    (r'\bBTP\b', 'BTP', 'bruto tlorisna površina: površina vseh etaž, merjena po zunanjih merah sten'),
+    (r'\bpsz\b', 'psz', 'prispevna stopnja zavezanca: delež stroškov komunalne opreme, ki ga plača investitor'),
+    (r'\bCpo\b', 'Cpo', 'cena komunalne opreme na m² parcele, določi jo občinski odlok'),
+    (r'\bCto\b', 'Cto', 'cena komunalne opreme na m² bruto tlorisne površine, določi jo občinski odlok'),
+    (r'\bDpo\b', 'Dpo', 'delež parcele v izračunu komunalnega prispevka'),
+    (r'\bDto\b', 'Dto', 'delež površine objekta v izračunu komunalnega prispevka'),
+    (r'\bFn\b', 'Fn', 'faktor namembnosti: utež za vrsto stavbe, za stanovanjske hiše jo določi odlok'),
+    (r'\bQH\b', 'QH', 'letna potreba po toploti za ogrevanje na m² ogrevane površine (kWh/m²a)'),
+    (r'\bQK\b', 'QK', 'letna potreba po hladu za hlajenje na m² (kWh/m²a)'),
+    (r'\bn50\b', 'n50', 'zrakotesnost: kolikokrat se zrak v hiši izmenja v eni uri pri tlačni razliki 50 Pa; manjša številka je boljša'),
+    (r'\bPHPP\b', 'PHPP', 'program za izračun energijske bilance pasivne hiše (Passivhaus Projektierungspaket)'),
+    (r'\bIDZ\b', 'IDZ', 'idejna zasnova, prvi korak projekta'),
+    (r'\bDGD\b', 'DGD', 'dokumentacija za pridobitev gradbenega dovoljenja'),
+    (r'\bPZI\b', 'PZI', 'projekt za izvedbo, po katerem se hiša gradi'),
+    (r'\bPID\b', 'PID', 'projekt izvedenih del, ki opiše hišo, kot je bila zgrajena'),
+    (r'\bIII\. faza\b', 'III. faza', 'stopnja gradnje: zunaj dokončana hiša; kaj točno vključuje, določi proizvajalec v popisu del'),
+    (r'\bIV\. (?:gradbena )?faza\b', 'IV. faza', 'stopnja gradnje: zunaj dokončana hiša z delom notranjih del; natančen obseg je v popisu del proizvajalca'),
+    (r'sNES[+⁺]', 'sNES+', 'skoraj ničenergijska stavba po pogojih Eko sklada, pogoj za subvencijo za novo hišo'),
+    (r'(?i:\bdelni ključ\b)', 'delni ključ', 'hiša z instalacijami in delom notranjih del, brez dela končne opreme; obseg določi proizvajalec'),
+    (r'(?i:\bna ključ\b)', 'na ključ', 'vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje'),
+]
+GLOSS_SKIP = {'script', 'style', 'title', 'select', 'option', 'textarea', 'abbr', 'button', 'summary', 'dialog'}
+
+
+def gloss(page_html):
+    a, b = page_html.find('<main'), page_html.rfind('</main>')
+    if a < 0 or b < 0:
+        return page_html
+    parts, seen, skip, keep = re.split(r'(<[^>]+>)', page_html[a:b]), [], 0, []
+    for i, part in enumerate(parts):
+        if part.startswith('<'):
+            t = re.match(r'</?([a-zA-Z0-9]+)', part)
+            if t and t.group(1).lower() in GLOSS_SKIP and not part.endswith('/>'):
+                skip += -1 if part.startswith('</') else 1
+            continue
+        if skip:
+            continue
+        for pat, term, tip in GLOSS:
+            if term in seen:
+                continue
+            mo = re.search(pat, part)
+            if mo:
+                seen.append(term)
+                keep.append(f'<abbr title="{esc(tip)}">{mo.group(0)}</abbr>')
+                part = part[:mo.start()] + f'\x00{len(keep) - 1}\x00' + part[mo.end():]  # placeholder, so later terms can't match inside the title
+        parts[i] = re.sub('\x00(\\d+)\x00', lambda mo: keep[int(mo.group(1))], part)
+    box = ('<details class="gloss"><summary>Kaj pomenijo izrazi na tej strani?</summary><dl>' +
+           ''.join(f'<div><dt>{esc(t)}</dt><dd>{esc(tip)}</dd></div>' for _, t, tip in GLOSS if t in seen) + '</dl></details>\n') if seen else ''
+    return page_html[:a] + ''.join(parts) + box + page_html[b:]
+
 # Shared look: tokens, base, top bar and the result-card pieces, lifted straight from index.html's <style>.
 css = re.search(r'<style>(.*?)</style>', src, re.S).group(1)
 CSS = css[css.index(':root {'):css.index('/* ---------- hero')] + '\n'.join(
@@ -68,7 +189,20 @@ CSS = css[css.index(':root {'):css.index('/* ---------- hero')] + '\n'.join(
 .head .prov { color: var(--mist); margin-top: 10px; }
 .photo { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); aspect-ratio: 600 / 315; }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+@media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
+.specs dt { font-size: 11px; }
+.na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
+abbr[title] { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+sub { font-size: max(12px, .75em); }
+.gloss { border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); padding: 14px 18px; color: #c9d3e6; font-size: 14px; max-width: 60em; }
+.gloss summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+.gloss dl { display: grid; gap: 8px; margin: 12px 0 0; }
+.gloss dt { display: inline; font-weight: 600; color: var(--ink); }
+.gloss dt::after { content: ": "; }
+.gloss dd { display: inline; margin: 0; }
+.basis { color: var(--mist); font-size: 14px; margin: 10px 0 0; max-width: 60em; }
+.basis a, .basis b { color: var(--ink); }
 .lede { color: #c9d3e6; font-size: 18px; max-width: 44em; margin: 0; }
 .lede p { margin: 0 0 10px; }
 h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12px; }
@@ -132,6 +266,14 @@ def head(title, og_title, desc, url, image, ld):
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{ld_json}</script>
 {HEAD_END}</head>'''
+
+
+NA = '<span class="na">ni podatka</span>'
+
+
+def cmp_btn(p, m, cls='cmp sm'):
+    name = esc(f"{p['name']} {m['name']}")
+    return f'<button type="button" class="{cls}" data-slug="{m["slug"]}" data-name="{name}" aria-label="Dodaj {name} v primerjavo">+ Primerjaj</button>'
 
 
 def figure(img, alt, maker):
@@ -208,7 +350,7 @@ def page(p, m):
     maker_link, facts_html = maker_bits(p)
     sim = similar(p, m)
     sim_html = (f'<section><h2>Podobne hiše drugih proizvajalcev</h2><div class="sim">' + ''.join(
-        f'<a href="../{o["slug"]}/"><div class="pic">' + (f'<img src="../{esc(o["image"])}" alt="" loading="lazy">' if o.get('image') else '') +
+        f'<a href="../{o["slug"]}/"><div class="pic">' + (img_tag(o['image'], 320) if o.get('image') else '') +
         f'</div><span><b>{esc(op["name"])} {esc(o["name"])}</b>{round(o["area_m2"])} m² · {FLOORS.get(o["floors"], ("—",))[0]} · '
         f'{eur(o["price_eur"]) if o["price_eur"] else "cena na povpraševanje"}</span></a>' for op, o in sim) + '</div></section>') if sim else ''
     sib_html = (f'<section><h2>Druge hiše proizvajalca {esc(p["name"])}</h2><ul class="siblings">' +
@@ -216,11 +358,14 @@ def page(p, m):
     note = ' Opomba: ' + esc(', '.join(m['flags'])) + '.' if m['flags'] else ''
     stage = esc(m['price_stage']) if price else 'Proizvajalec cene ne objavlja.'
     plans_html = ('<section><h2>Tloris</h2><div class="plans">' + ''.join(
-        f'<a href="../{f}"><img src="../{f}" alt="{esc(plan_alt(m, name, i, len(plans)))}" loading="lazy"></a>'
+        f'<a href="../{f}">{img_tag(f, 600, plan_alt(m, name, i, len(plans)))}</a>'
         for i, f in enumerate(plans, 1)) + f'</div><p class="credit-line">Tloris: {esc(p["name"])}, '
         f'<a href="{esc(m["url"])}" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a> · <a href="../{PLANS}/">Vsi tlorisi</a></p></section>') if plans else ''
     title = f"{name} – cena, tloris, m² · Hišni vodič"
-    costs_link = f'<a class="btn line" href="../{COSTS}/#h={m["slug"]}">Izračunaj celotne stroške gradnje</a>' if price else ''
+    calc = bool(price and area)  # the calculator lists only houses with a price and an area
+    quiz = f'<a class="btn {"line" if calc else "glow"}" href="{SITE}#kviz">Ali vam pristaja? Rešite kviz{"" if calc else " <span class=arrow>→</span>"}</a>'
+    costs_link = f'<a class="btn glow" href="../{COSTS}/#h={m["slug"]}">Izračunaj celotne stroške gradnje <span class="arrow">→</span></a>' if calc else ''
+    cmp_note = f'<br>Primerljiva cena: {eur(m["price_cmp"])} ({esc(m["cmp_note"])}).' if price and m.get('cmp_note') and m['price_cmp'] != m['price_eur'] else ''
     return f'''{head(title, name + ' – cena in lastnosti', desc, url, image_abs, ld)}
 <body>
 {BAR}
@@ -229,17 +374,16 @@ def page(p, m):
     <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../#katalog">Katalog</a> / <a href="../{p['id']}/">{esc(p['name'])}</a></div>
     <div class="head">
       <div><h1 class="display">{esc(name)}</h1><div class="prov">Montažna hiša · {esc(p['name'])}</div></div>
-      <div class="price"><b>{price or 'Na povpraševanje'}</b><span>{stage}</span></div>
+      <div class="price"><b>{price or 'Na povpraševanje'}</b><span>{stage}{cmp_note}</span></div>
     </div>
   </div>
-  {photo}
-  <dl class="specs">{cell('Etaže', floor_short)}{cell('Površina', f'{area} m²' if area else '—')}{cell('Spalnice', bed or '—')}{cell('Kopalnice', bath or '—')}{cell('Streha', roof or '—')}</dl>
-  <div class="lede"><p>{esc(s1)} {esc(s2)}</p><p>{esc(s3)}{note} {'Opis' if plans else 'Tloris, opis'} in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../{GUIDE}/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
+  <dl class="specs">{cell('Etaže', floor_short)}{cell('Površina', f'{area} m²' if area else NA)}{cell('Spalnice', bed or NA)}{cell('Kopalnice', bath or NA)}{cell('Streha', roof or NA)}</dl>
   <div class="actions">
-    <a class="btn glow" href="{SITE}#kviz">Ali vam pristaja? Rešite kviz <span class="arrow">→</span></a>
+    {costs_link}{cmp_btn(p, m, 'btn line cmp')}{quiz}
     <a class="btn line" href="{esc(m['url'])}" target="_blank" rel="noopener">{'Podrobnosti' if plans else 'Tloris in podrobnosti'} pri proizvajalcu ↗</a>
-    <button type="button" class="btn line cmp" data-slug="{m['slug']}">+ Primerjaj</button>{costs_link}
   </div>
+  {photo}
+  <div class="lede"><p>{esc(s1)} {esc(s2)}</p><p>{esc(s3)}{note} {'Opis' if plans else 'Tloris, opis'} in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../{GUIDE}/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
   {plans_html}
   <div class="two">
     <section class="maker-info"><h2>O proizvajalcu {esc(p['name'])}</h2><p>{esc(p.get('description', ''))}</p>{maker_link}</section>
@@ -260,13 +404,16 @@ TABLE_CSS = '''
 .tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
 .tbl th, .tbl td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .tbl tr:last-child > * { border-bottom: 0; }
-.tbl thead th { font: 500 10px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
+.tbl thead th { font: 500 11px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
 .tbl tbody th { font-weight: 600; white-space: nowrap; }
 .tbl .n { font-family: var(--font-data); font-size: 14px; white-space: nowrap; }
 .tbl .stage { color: var(--mist); font-size: 13px; min-width: 260px; }
 .tbl td:first-child { min-width: 170px; }
 .tbl a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
 .tbl a:hover { color: var(--glow); }
+.tbl .n small { display: block; min-width: 13em; max-width: 18em; white-space: normal; font: 400 12.5px/1.4 var(--font-body); color: var(--mist); margin-top: 3px; }
+.tbl .hth { display: flex; align-items: center; gap: 12px; }
+.tbl .hth img { width: 72px; height: auto; border-radius: 8px; flex: none; background: var(--slate); }
 .points { margin: 0; padding-left: 20px; color: #c9d3e6; display: grid; gap: 10px; max-width: 48em; }
 .points b { color: var(--ink); }
 '''
@@ -274,6 +421,23 @@ TABLE_CSS = '''
 
 def thead(*cols):
     return '<thead><tr>' + ''.join(f'<th scope="col">{c}</th>' for c in cols) + '</tr></thead>'
+
+
+def cmp_cell(m):
+    """The comparable price with its note, for tables ranked by it."""
+    return f'<td class="n">{eur(m["price_cmp"])}' + (f'<small>{esc(m["cmp_note"])}</small>' if m.get('cmp_note') else '') + '</td>'
+
+
+def cmp_text(m):
+    """The comparable price for running text: with the maker's price when they differ, else with the note."""
+    return eur(m['price_cmp']) + (f'; cena proizvajalca {eur(m["price_eur"])}' if m['price_cmp'] != m['price_eur'] else
+                                  f'; {esc(m["cmp_note"])}' if m.get('cmp_note') else '')
+
+
+def thumb_link(p, m):
+    """The house name with a small photo, for tables."""
+    return (f'<div class="hth">{img_tag(m["image"], 320) if m.get("image") else ""}'
+            f'<a href="../{m["slug"]}/">{esc(p["name"])} {esc(m["name"])}</a></div>')
 
 
 YEAR = re.search(r'\d{4}', data['collected']).group(0)
@@ -314,8 +478,9 @@ def guide():
         if ms:
             bands.append(f'<tr><th scope="row">{label}</th>{n(len(ms))}{n(eur(min(m["price_eur"] for m in ms)))}'
                          f'{n(eur(round(statistics.median(m["price_eur"] for m in ms))))}{n(eur(round(statistics.median(per_m2(m) for m in ms))) + "/m²")}</tr>')
-    cheapest = ''.join(f'<tr><td>{link(p, m)}</td>{n(str(round(m["area_m2"])) + " m²")}{n(eur(m["price_eur"]))}{n(eur(round(per_m2(m))) + "/m²")}</tr>'
-                       for p, m in sorted(priced, key=lambda pm: pm[1]['price_eur'])[:10])
+    by_cmp = sorted(priced, key=lambda pm: pm[1]['price_cmp'])
+    cheapest = ''.join(f'<tr><td>{thumb_link(p, m)}</td>{n(str(round(m["area_m2"])) + " m²")}{n(eur(m["price_eur"]))}{cmp_cell(m)}'
+                       f'{n(eur(round(m["price_cmp"] / m["area_m2"])) + "/m²")}</tr>' for p, m in by_cmp[:10])
 
     verb = lambda names, one, two, many: one if len(names) == 1 else two if len(names) == 2 else many
     pick = lambda *keys: [k for k, s in stages.items() if any(x in s for x in keys)]
@@ -350,12 +515,14 @@ def guide():
     <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / Cene</div>
     <div class="head"><div><h1 class="display">{h1}</h1><div class="prov">Primerjava cen tipskih hiš · podatki: {esc(data['collected'])}</div></div></div>
   </div>
-  <div class="lede"><p>Med {len(priced)} tipskimi montažnimi hišami slovenskih proizvajalcev z objavljeno ceno je najcenejša {link(*lo)} ({eur(lo[1]['price_eur'])}),
-    najdražja pa {link(*hi)} ({eur(hi[1]['price_eur'])}). Srednja cena (mediana) je <b>{med_m2}</b> bivalne površine.</p>
-    <p>Cene niso neposredno primerljive, ker jih proizvajalci navajajo za različne pakete. V tabeli je za vsakega navedeno, kaj cena vključuje.</p></div>
+  <div class="lede"><p>Med {len(priced)} tipskimi montažnimi hišami slovenskih proizvajalcev z objavljeno ceno ima najnižjo ceno proizvajalca {link(*lo)} ({eur(lo[1]['price_eur'])}),
+    najvišjo pa {link(*hi)} ({eur(hi[1]['price_eur'])}). Mediana cene je <b>{med_m2}</b> bivalne površine.</p>
+    <p>Cene niso neposredno primerljive, ker jih proizvajalci navajajo za različne pakete. V tabeli je za vsakega navedeno, kaj cena vključuje.
+    Po primerljivi ceni (s temeljno ploščo) je najcenejša {link(*by_cmp[0])} ({cmp_text(by_cmp[0][1])}).</p></div>
   <section><h2>Cene po proizvajalcih</h2><div class="scroll"><table class="tbl">{thead('Proizvajalec', 'Hiš s ceno', 'Od', 'Do', 'Mediana na m²', 'Kaj cena vključuje')}<tbody>{''.join(rows)}</tbody></table></div></section>
   <section><h2>Cena glede na velikost</h2><div class="scroll"><table class="tbl">{thead('Površina', 'Hiš', 'Najcenejša', 'Mediana', 'Mediana na m²')}<tbody>{''.join(bands)}</tbody></table></div></section>
-  <section><h2>Najcenejše montažne hiše</h2><div class="scroll"><table class="tbl">{thead('Hiša', 'Površina', 'Cena', 'Na m²')}<tbody>{cheapest}</tbody></table></div></section>
+  <section><h2>Najcenejše montažne hiše</h2><div class="scroll"><table class="tbl">{thead('Hiša', 'Površina', 'Cena proizvajalca', 'Primerljiva cena', 'Primerljiva na m²')}<tbody>{cheapest}</tbody></table></div>
+    <p class="basis">Razvrščeno po primerljivi ceni. {CMP_EXPLAIN}</p></section>
   <section><h2>Na kaj paziti pri primerjavi cen</h2><ul class="points">{''.join(points)}</ul></section>
   <div class="actions">
     <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
@@ -385,7 +552,7 @@ def maker(p):
         price = eur(m['price_eur']) if m['price_eur'] else 'na povpraševanje'
         m2 = eur(round(m['price_eur'] / m['area_m2'])) + '/m²' if m['price_eur'] and m['area_m2'] else '—'
         rows.append(f'<tr><td><a href="../{m["slug"]}/">{esc(m["name"])}</a></td>{n(area)}{n(m["bedrooms"] or "—")}'
-                    f'<td>{ROOF.get(m["roof"], "—")}</td>{n(price)}{n(m2)}<td><button type="button" class="cmp sm" data-slug="{m["slug"]}">+ Primerjaj</button></td></tr>')
+                    f'<td>{ROOF.get(m["roof"], "—")}</td>{n(price)}{n(m2)}<td>{cmp_btn(p, m)}</td></tr>')
     others = ''.join(f'<li><a href="../{o["id"]}/">{esc(o["name"])}</a></li>' for o in data['providers'] if o is not p)
     maker_link, facts_html = maker_bits(p)
     desc = (f'{name}: {count}' + (f', cene od {eur(lo)} do {eur(hi)}' if priced else ', cene na povpraševanje') +
@@ -441,7 +608,6 @@ PLANS_CSS = '''
 
 def plans_page():
     url = SITE + PLANS + '/'
-    # shortcut: shows each house's full-size ground-floor plan, lazy-loaded; make thumbnails if the page gets slow.
     houses = sorted(((p, m, house_plans(m)) for p, m in models if house_plans(m)), key=lambda t: (t[1]['area_m2'] or 10 ** 4, t[1]['name']))
     bands = [(0, 80, 'do 80 m²'), (80, 100, '80–100 m²'), (100, 120, '100–120 m²'), (120, 140, '120–140 m²'), (140, 160, '140–160 m²'), (160, 10 ** 4, '160 m² in več')]
     sections, jump = [], []
@@ -456,7 +622,7 @@ def plans_page():
             bits = [f"{round(m['area_m2'])} m²" if m['area_m2'] else '', FLOORS.get(m['floors'], ('',))[0],
                     f"{m['bedrooms']} {plural(m['bedrooms'], 'spalnica', 'spalnici', 'spalnice', 'spalnic')}" if m['bedrooms'] else '',
                     eur(m['price_eur']) if m['price_eur'] else '']
-            cards.append(f'<a class="card" href="../{m["slug"]}/"><div class="pic"><img src="../{plans[0]}" alt="{esc(plan_alt(m, name, 1, len(plans)))}" loading="lazy"></div>'
+            cards.append(f'<a class="card" href="../{m["slug"]}/"><div class="pic">{img_tag(plans[0], 600, plan_alt(m, name, 1, len(plans)))}</div>'
                          f'<span><b>{esc(name)}</b>{" · ".join(x for x in bits if x)}</span></a>')
         jump.append(f'<a href="#{anchor}">{label}</a>')
         sections.append(f'<section id="{anchor}"><h2>Tlorisi hiš {label} <small class="eyebrow">{len(group)}</small></h2><div class="plan-grid">{"".join(cards)}</div></section>')
@@ -492,8 +658,10 @@ def plans_page():
 
 COMPARE_CSS = '''
 .page > * { min-width: 0; }
+#cmp { position: relative; }
 .cmp-tbl { table-layout: fixed; min-width: 640px; }
-.cmp-tbl th:first-child, .cmp-tbl td:first-child { width: 150px; min-width: 0; position: sticky; left: 0; background: var(--night); z-index: 1; }
+.cmp-tbl col.lab { width: 150px; }
+.cmp-tbl th:first-child, .cmp-tbl td:first-child { min-width: 0; position: sticky; left: 0; background: var(--night); z-index: 1; }
 .cmp-tbl thead th { text-transform: none; letter-spacing: 0; font: inherit; color: var(--ink); white-space: normal; vertical-align: bottom; }
 .cmp-tbl .pic { aspect-ratio: 600 / 340; border-radius: 12px; overflow: hidden; background: var(--dusk); margin-bottom: 10px; }
 .cmp-tbl .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -501,19 +669,36 @@ COMPARE_CSS = '''
 .cmp-tbl thead small { display: block; color: var(--mist); margin: 2px 0 8px; }
 .cmp-tbl .rm { font: inherit; font-size: 13px; border: 0; background: none; color: var(--mist); padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .cmp-tbl tbody th { color: var(--mist); font-weight: 500; font-size: 13px; white-space: normal; }
-.cmp-tbl td { font-size: 15px; }
+.cmp-tbl td { font-size: 15px; overflow-wrap: anywhere; }
 .cmp-tbl td.small { font-size: 13px; color: var(--mist); }
+.cmp-tbl td small { display: block; font-size: 12.5px; color: var(--mist); margin-top: 4px; }
 .cmp-tbl .best { color: var(--glow); }
-.cmp-tbl .best::after { content: "najnižja"; display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px; font: 500 10px/1.4 var(--font-data); letter-spacing: .08em; text-transform: uppercase; box-shadow: inset 0 0 0 1px var(--glow); }
-.cmp-tbl .plan { display: block; background: #fff; border-radius: 10px; overflow: hidden; }
+.cmp-tbl .best::after { content: "najnižja"; display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px; font: 500 11px/1.4 var(--font-data); letter-spacing: .08em; text-transform: uppercase; box-shadow: inset 0 0 0 1px var(--glow); }
+.cmp-tbl .plan { display: block; background: #fff; border-radius: 10px; overflow: hidden; cursor: zoom-in; }
 .cmp-tbl .plan img { width: 100%; height: auto; display: block; }
+#cmp.diff tr.same { display: none; }
+.sn { position: sticky; top: 0; z-index: 5; height: 0; }
+.sn-in { overflow: hidden; background: var(--night); box-shadow: 0 1px 0 var(--line), 0 10px 24px -12px rgba(0,0,0,.6); border-radius: 0 0 12px 12px; visibility: hidden; }
+.sn.on .sn-in { visibility: visible; }
+.sn .cmp-tbl thead th { padding-block: 10px; vertical-align: middle; }
+.sn .cmp-tbl thead a { font-size: 15px; text-decoration: none; color: var(--ink); }
 .tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .tools select { font: inherit; color: var(--ink); background: var(--dusk); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 999px; padding: 12px 18px; max-width: 100%; }
+.tools .ck { display: inline-flex; gap: 10px; align-items: center; cursor: pointer; color: var(--ink); font-size: 15px; padding: 10px 4px; }
+.tools .ck input { width: 18px; height: 18px; margin: 0; accent-color: var(--glow); }
+.tools .ck[hidden] { display: none; }
+#zoom { width: min(1100px, 96vw); max-height: 94vh; padding: 12px; border: 0; border-radius: var(--r); background: #fff; color: #0a1220; }
+#zoom::backdrop { background: rgba(5,9,16,.82); }
+#zoom img { display: block; max-width: 100%; max-height: calc(94vh - 90px); margin: 10px auto 0; height: auto; }
+#zoom button { font: 600 15px/1 var(--font-body); color: #0a1220; background: #eef2f9; border: 0; border-radius: 999px; padding: 12px 18px; cursor: pointer; }
+#zoom p { margin: 0 0 0 4px; display: inline; font-size: 14px; }
 @media (max-width: 640px) {
-  .cmp-tbl { min-width: 500px; }
-  .cmp-tbl th:first-child, .cmp-tbl td:first-child { width: 92px; }
+  #sc, .sn-in { container-type: inline-size; }
+  .cmp-tbl { min-width: 0; width: calc(92px + var(--n) * (100vw - 32px - 92px) / 2); width: calc(92px + var(--n) * (100cqw - 92px) / 2); }
+  .cmp-tbl col.lab { width: 92px; }
   .cmp-tbl th, .cmp-tbl td { padding: 10px; }
   .cmp-tbl thead a { font-size: 15px; }
+  .sn .cmp-tbl thead a { font-size: 13px; }
   .cmp-tbl .best::after { display: block; width: max-content; margin: 4px 0 0; }
 }
 .empty { padding: 28px; border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); color: #c9d3e6; }
@@ -526,44 +711,71 @@ COMPARE_JS = r'''
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   // by hand: sl-SI number formatting leaves 4-digit numbers ungrouped (1655), the rest of the site writes 1.655
   const eur = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' €';
-  const perM2 = h => h.price && h.area ? Math.round(h.price / h.area) : null;
+  const NA = '<span class="na">ni podatka</span>';
+  const perM2 = h => h.cmp && h.area ? Math.round(h.cmp / h.area) : null;
   const fromHash = decodeURIComponent(location.hash.slice(1)).split(',').filter(s => bySlug[s]).slice(0, 3);
   let picks = fromHash.length ? fromHash : window.HVCompare.get().filter(s => bySlug[s]);
+  let io = null;
   function lowest(fn) { const v = picks.map(s => fn(bySlug[s])).filter(x => x != null); return v.length > 1 ? Math.min(...v) : null; }
   function render() {
     window.HVCompare.set(picks);
     history.replaceState(null, '', picks.length ? '#' + picks.join(',') : location.pathname);
     for (const o of $('add').options) o.disabled = !!o.value && picks.includes(o.value);
     $('add').hidden = picks.length >= 3;
-    $('copy').hidden = picks.length < 2;
+    $('copy').hidden = $('difflab').hidden = picks.length < 2;
+    if (io) io.disconnect();
     if (picks.length < 2) {
       $('cmp').innerHTML = `<div class="empty">${picks.length ? `Izbrana je <b>${esc(bySlug[picks[0]].name)}</b>. Dodajte še eno ali dve hiši.` : 'Izberite dve ali tri hiše.'}
         Dodate jih z izbirnikom zgoraj ali z gumbom »+ Primerjaj« v <a href="../#katalog">katalogu</a> in na straneh hiš.</div>`;
       return;
     }
     const hs = picks.map(s => bySlug[s]);
-    const lowPrice = lowest(h => h.price), lowM2 = lowest(perM2);
+    const lowCmp = lowest(h => h.cmp), lowM2 = lowest(perM2);
     const rows = [
-      ['Cena', h => h.price ? `<span class="${h.price === lowPrice ? 'best' : ''}">${eur(h.price)}</span>` : 'na povpraševanje'],
+      ['Cena proizvajalca', h => h.price ? eur(h.price) : 'na povpraševanje'],
+      ['Primerljiva cena', h => h.cmp ? `<span class="${h.cmp === lowCmp ? 'best' : ''}">${eur(h.cmp)}</span>${h.note ? `<small>${esc(h.note)}</small>` : ''}` : NA],
       ['Kaj cena vključuje', h => h.price ? esc(h.stage) : 'Proizvajalec cene ne objavlja.', 'small'],
-      ['Površina', h => h.area ? h.area + ' m²' : '—'],
-      ['Cena na m²', h => perM2(h) ? `<span class="${perM2(h) === lowM2 ? 'best' : ''}">${eur(perM2(h))}/m²</span>` : '—'],
+      ['Celotni stroški', h => h.calc ? `<a href="../koliko-stane-gradnja-hise/#h=${h.slug}">Izračunaj v kalkulatorju →</a>` : NA],
+      ['Površina', h => h.area ? h.area + ' m²' : NA],
+      ['Primerljiva cena na m²', h => perM2(h) ? `<span class="${perM2(h) === lowM2 ? 'best' : ''}">${eur(perM2(h))}/m²</span>` : NA],
       ['Etaže', h => esc(h.floors)],
-      ['Spalnice', h => h.bed ?? '—'],
-      ['Kopalnice', h => h.bath ?? '—'],
-      ['Streha', h => esc(h.roof)],
+      ['Spalnice', h => h.bed ?? NA],
+      ['Kopalnice', h => h.bath ?? NA],
+      ['Streha', h => h.roof ? esc(h.roof) : NA],
       ['Konstrukcija', h => esc(h.construction), 'small'],
       ['Energija', h => esc(h.energy), 'small'],
       ['Gradnja', h => esc(h.build), 'small'],
-      ['Garancija', h => h.warranty ? h.warranty + ' let' : '—'],
-      ['Tloris', h => h.plan ? `<a class="plan" href="../${esc(h.plan)}"><img src="../${esc(h.plan)}" alt="Tloris – ${esc(h.name)}" loading="lazy"></a>` : '—'],
+      ['Garancija', h => h.warranty ? h.warranty + ' let' : NA],
+      ['Tloris', h => h.plan ? `<a class="plan" href="../${esc(h.planFull)}"><img src="../${esc(h.plan)}" width="${h.planWH[0]}" height="${h.planWH[1]}" alt="Tloris – ${esc(h.name)}" loading="lazy"></a>` : NA],
     ];
-    $('cmp').innerHTML = `<div class="scroll"><table class="tbl cmp-tbl"><thead><tr><th><span class="sr-only">Lastnost</span></th>${hs.map(h => `<th scope="col">
-        <div class="pic">${h.image ? `<img src="../${esc(h.image)}" alt="${esc(h.name)}">` : ''}</div>
+    const cols = `<colgroup><col class="lab">${hs.map(() => '<col>').join('')}</colgroup>`;
+    const tbl = `class="tbl cmp-tbl" style="--n:${hs.length}"`;
+    $('cmp').innerHTML = `<div class="sn" aria-hidden="true"><div class="sn-in" id="sn"><table ${tbl}>${cols}<thead><tr><th></th>${hs.map(h =>
+        `<th><a tabindex="-1" href="../${h.slug}/">${esc(h.name)}</a></th>`).join('')}</tr></thead></table></div></div>
+      <div class="scroll" id="sc"><table ${tbl}>${cols}<thead><tr><th><span class="sr-only">Lastnost</span></th>${hs.map(h => `<th scope="col">
+        <div class="pic">${h.image ? `<img src="../${esc(h.image)}" width="${h.imageWH[0]}" height="${h.imageWH[1]}" alt="${esc(h.name)}">` : ''}</div>
         <a href="../${h.slug}/">${esc(h.name)}</a><small>${esc(h.maker)}</small><button type="button" class="rm" data-rm="${h.slug}">Odstrani</button></th>`).join('')}</tr></thead>
-      <tbody>${rows.map(([label, f, cls]) => `<tr><th scope="row">${label}</th>${hs.map(h => `<td${cls ? ` class="${cls}"` : ''}>${f(h) || '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+      <tbody>${rows.map(([label, f, cls]) => {
+        const cells = hs.map(h => f(h) || NA);
+        return `<tr${cells.every(c => c === cells[0]) ? ' class="same"' : ''}><th scope="row">${label}</th>${cells.map(c => `<td${cls ? ` class="${cls}"` : ''}>${c}</td>`).join('')}</tr>`;
+      }).join('')}</tbody></table></div>`;
+    const sc = $('sc'), sn = $('sn'), head = sc.querySelector('thead');
+    sc.addEventListener('scroll', () => { sn.scrollLeft = sc.scrollLeft; });
+    io = new IntersectionObserver(([e]) => sn.parentNode.classList.toggle('on', !e.isIntersecting && e.boundingClientRect.top < 0));
+    io.observe(head);
   }
-  $('cmp').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (b) { picks = picks.filter(s => s !== b.dataset.rm); render(); } });
+  $('cmp').addEventListener('click', e => {
+    const b = e.target.closest('[data-rm]');
+    if (b) { picks = picks.filter(s => s !== b.dataset.rm); render(); return; }
+    const a = e.target.closest('a.plan');
+    if (a && $('zoom').showModal) {
+      e.preventDefault();
+      $('zimg').src = a.href; $('zimg').alt = a.querySelector('img').alt; $('zcap').textContent = a.querySelector('img').alt;
+      $('zoom').showModal();
+    }
+  });
+  $('zoom').addEventListener('click', e => { if (e.target === $('zoom') || e.target.closest('#zclose')) $('zoom').close(); });
+  $('diff').addEventListener('change', e => $('cmp').classList.toggle('diff', e.target.checked));
   $('add').addEventListener('change', e => { if (e.target.value && picks.length < 3) picks = picks.concat(e.target.value); e.target.value = ''; render(); });
   $('copy').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(location.href); $('copy').textContent = 'Povezava kopirana ✓'; setTimeout(() => { $('copy').textContent = 'Kopiraj povezavo'; }, 2500); }
@@ -580,10 +792,14 @@ def compare_page():
     rows = []
     for p, m in models:
         plans = house_plans(m)
+        plan = thumb(plans[0], 600) if plans else None
         rows.append({'slug': m['slug'], 'name': f"{p['name']} {m['name']}", 'maker': p['name'], 'price': m['price_eur'], 'stage': m['price_stage'],
+                     'cmp': m.get('price_cmp'), 'note': m.get('cmp_note'), 'calc': bool(m['price_eur'] and m['area_m2']),
                      'area': round(m['area_m2']) if m['area_m2'] else None, 'floors': FLOORS.get(m['floors'], ('—',))[0],
-                     'bed': m['bedrooms'], 'bath': m['bathrooms'], 'roof': ROOF.get(m['roof'], '—'), 'image': m.get('image'),
-                     'plan': plans[0] if plans else None, 'construction': p.get('construction'), 'energy': p.get('energy_class'),
+                     'bed': m['bedrooms'], 'bath': m['bathrooms'], 'roof': ROOF.get(m['roof']), 'image': m.get('thumb'),
+                     'imageWH': jpeg_size(m['thumb']) if m.get('thumb') else None,
+                     'plan': plan, 'planFull': plans[0] if plans else None, 'planWH': jpeg_size(plan) if plan else None,
+                     'construction': p.get('construction'), 'energy': p.get('energy_class'),
                      'build': p.get('build_time'), 'warranty': p.get('warranty_years')})
     options = ''.join(f'<optgroup label="{esc(p["name"])}">' + ''.join(f'<option value="{m["slug"]}">{esc(m["name"])}</option>' for m in p['models']) + '</optgroup>'
                       for p in data['providers'])
@@ -602,14 +818,17 @@ def compare_page():
   </div>
   <div class="tools">
     <select id="add" aria-label="Dodaj hišo v primerjavo"><option value="">+ Dodaj hišo …</option>{options}</select>
+    <label class="ck" id="difflab" hidden><input type="checkbox" id="diff"> Pokaži samo razlike</label>
     <button type="button" class="btn line" id="copy" hidden>Kopiraj povezavo</button>
   </div>
   <div id="cmp"></div>
+  <p class="basis">Oznaka »najnižja« velja za primerljivo ceno. {CMP_EXPLAIN}</p>
   <div class="actions">
     <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
     <a class="btn line" href="../#katalog">Vse hiše v katalogu</a>
   </div>
 </main>
+<dialog id="zoom" aria-labelledby="zcap"><button type="button" id="zclose">Zapri</button><p id="zcap"></p><img id="zimg" alt=""></dialog>
 {FOOT}
 <script type="application/json" id="cmp-data">{data_json}</script>
 <script>{COMPARE_JS}</script>
@@ -621,29 +840,25 @@ def compare_page():
 CMP_TH = '<span class="sr-only">Primerjava</span>'
 
 
-def cmp_btn(m):
-    return f'<button type="button" class="cmp sm" data-slug="{m["slug"]}">+ Primerjaj</button>'
-
-
 def house_link(p, m):
     return f'<a href="../{m["slug"]}/">{esc(p["name"])} {esc(m["name"])}</a>'
 
 
 def cheap_page():
     url = SITE + CHEAP + '/'
-    per_m2 = lambda m: m['price_eur'] / m['area_m2']
+    per_m2 = lambda m: m['price_cmp'] / m['area_m2']
     priced = [(p, m) for p, m in models if m['price_eur']]
     sized = [(p, m) for p, m in priced if m['area_m2']]
     turnkey = [(p, m) for p, m in priced if 'na ključ' in m['price_stage'].lower()]
     n = lambda v: f'<td class="n">{v}</td>'
 
     def table(rows):
-        body = ''.join(f'<tr><td>{house_link(p, m)}</td>{n(str(round(m["area_m2"])) + " m²" if m["area_m2"] else "—")}{n(eur(m["price_eur"]))}'
-                       f'{n(eur(round(per_m2(m))) + "/m²" if m["area_m2"] else "—")}<td class="stage">{esc(m["price_stage"])}</td><td>{cmp_btn(m)}</td></tr>'
+        body = ''.join(f'<tr><td>{thumb_link(p, m)}</td>{n(str(round(m["area_m2"])) + " m²" if m["area_m2"] else "—")}{n(eur(m["price_eur"]))}{cmp_cell(m)}'
+                       f'{n(eur(round(per_m2(m))) + "/m²" if m["area_m2"] else "—")}<td class="stage">{esc(m["price_stage"])}</td><td>{cmp_btn(p, m)}</td></tr>'
                        for p, m in rows)
-        return f'<div class="scroll"><table class="tbl">{thead("Hiša", "Površina", "Cena", "Na m²", "Kaj cena vključuje", CMP_TH)}<tbody>{body}</tbody></table></div>'
+        return f'<div class="scroll"><table class="tbl">{thead("Hiša", "Površina", "Cena proizvajalca", "Primerljiva cena", "Primerljiva na m²", "Kaj cena vključuje", CMP_TH)}<tbody>{body}</tbody></table></div>'
 
-    by_price = lambda rows: sorted(rows, key=lambda pm: pm[1]['price_eur'])[:12]
+    by_price = lambda rows: sorted(rows, key=lambda pm: pm[1]['price_cmp'])[:12]
     lo, lo_key, lo_m2 = by_price(priced)[0], by_price(turnkey)[0], min(sized, key=lambda pm: per_m2(pm[1]))
     key_makers = {p['name'] for p, _ in turnkey}
     other = [p['name'] for p in data['providers'] if p['name'] not in key_makers and any(m['price_eur'] for m in p['models'])]
@@ -654,7 +869,7 @@ def cheap_page():
         (f'{and_join(unpublished)} {verb(unpublished, "cen ne objavlja", "cen ne objavljata", "cen ne objavljajo")}' if unpublished else '')
     rest_html = f'<p class="note">{esc(rest)}. <a href="../{GUIDE}/">Kaj vključujejo cene posameznih proizvajalcev</a></p>' if rest else ''
 
-    desc = (f'Najcenejše montažne hiše na ključ od {eur(lo_key[1]["price_eur"])}, najnižja cena na m² {eur(round(per_m2(lo_m2[1])))}. '
+    desc = (f'Najcenejše montažne hiše na ključ od {eur(lo_key[1]["price_cmp"])} s temeljno ploščo, najnižja primerljiva cena na m² {eur(round(per_m2(lo_m2[1])))}. '
             f'Primerjava {len(priced)} tipskih hiš slovenskih proizvajalcev z objavljeno ceno in kaj cena vključuje.')
     image = SITE + (lo_key[1]['image'].replace('img/', 'img/large/') if lo_key[1].get('image') else 'img/large/riko-mila.jpg')
     ld = {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': 'Najcenejše montažne hiše', 'url': url, 'description': desc,
@@ -667,12 +882,14 @@ def cheap_page():
     <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../{GUIDE}/">Cene</a> / Najcenejše hiše</div>
     <div class="head"><div><h1 class="display">Najcenejše montažne hiše</h1><div class="prov">{len(priced)} tipskih hiš z objavljeno ceno · podatki: {esc(data['collected'])}</div></div></div>
   </div>
-  <div class="lede"><p>Najcenejša montažna hiša z objavljeno ceno je {house_link(*lo)} ({eur(lo[1]['price_eur'])}), najcenejša na ključ {house_link(*lo_key)}
-    ({eur(lo_key[1]['price_eur'])}). Najnižjo ceno na m² ima {house_link(*lo_m2)} ({eur(round(per_m2(lo_m2[1])))}/m²).</p>
+  <div class="lede"><p>Po primerljivi ceni je najcenejša montažna hiša {house_link(*lo)} ({cmp_text(lo[1])}), najcenejša na ključ {house_link(*lo_key)}
+    ({cmp_text(lo_key[1])}). Najnižjo primerljivo ceno na m² ima {house_link(*lo_m2)} ({round(lo_m2[1]['area_m2'])} m², {eur(round(per_m2(lo_m2[1])))}/m²);
+    večje hiše imajo praviloma nižjo ceno na m², zato je ta podatek uporaben predvsem za primerjavo hiš podobne velikosti.</p>
     <p>Proizvajalci navajajo cene za različne pakete, zato pred primerjavo preverite, kaj cena vključuje. <a href="../{GUIDE}/">Primerjava cen po proizvajalcih</a></p></div>
+  <p class="basis">Vse tabele so razvrščene po primerljivi ceni. {CMP_EXPLAIN}</p>
   <section><h2>Najcenejše montažne hiše na ključ</h2>{table(by_price(turnkey))}{rest_html}</section>
-  <section><h2>Najcenejše po ceni</h2>{table(by_price(priced))}</section>
-  <section><h2>Najnižja cena na m²</h2>{table(sorted(sized, key=lambda pm: per_m2(pm[1]))[:12])}</section>
+  <section><h2>Najcenejše po primerljivi ceni</h2>{table(by_price(priced))}</section>
+  <section><h2>Najnižja primerljiva cena na m²</h2>{table(sorted(sized, key=lambda pm: per_m2(pm[1]))[:12])}</section>
   <div class="actions">
     <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
     <a class="btn line" href="../{GUIDE}/">Primerjava cen</a>
@@ -705,7 +922,7 @@ def small_page():
     url = SITE + SMALL + '/'
     houses = sorted(((p, m) for p, m in models if m['area_m2'] and m['area_m2'] <= 100), key=lambda pm: (pm[1]['area_m2'], pm[1]['name']))
     priced = [(p, m) for p, m in houses if m['price_eur']]
-    lo = min(priced, key=lambda pm: pm[1]['price_eur'])
+    lo = min(priced, key=lambda pm: pm[1]['price_cmp'])
     areas = [round(m['area_m2']) for _, m in houses]
     sections = []
     for a, b, h2 in ((0, 60, 'Majhne montažne hiše do 60 m²'), (60, 80, 'Montažne hiše od 60 do 80 m²'), (80, 100, 'Montažne hiše od 80 do 100 m²')):
@@ -715,15 +932,15 @@ def small_page():
             bits = [f"{round(m['area_m2'])} m²", FLOORS.get(m['floors'], ('',))[0],
                     f"{m['bedrooms']} {plural(m['bedrooms'], 'spalnica', 'spalnici', 'spalnice', 'spalnic')}" if m['bedrooms'] else '',
                     eur(m['price_eur']) if m['price_eur'] else 'cena na povpraševanje']
-            pic = f'<img src="../{esc(m["image"])}" alt="" loading="lazy">' if m.get('image') else ''
+            pic = img_tag(m['image'], 320) if m.get('image') else ''
             plan = f'<a href="../{plans[0]}">Tloris</a>' if plans else ''
             cards.append(f'<div class="hc"><a href="../{m["slug"]}/"><div class="pic">{pic}</div><span><b>{esc(p["name"])} {esc(m["name"])}</b>'
-                         f'{" · ".join(x for x in bits if x)}</span></a><div class="hc-act">{plan}{cmp_btn(m)}</div></div>')
+                         f'{" · ".join(x for x in bits if x)}</span></a><div class="hc-act">{plan}{cmp_btn(p, m)}</div></div>')
         if cards:
             sections.append(f'<section><h2>{h2} <small class="eyebrow">{len(cards)}</small></h2><div class="hgrid">{"".join(cards)}</div></section>')
     count = f"{len(houses)} {plural(len(houses), 'tipska montažna hiša', 'tipski montažni hiši', 'tipske montažne hiše', 'tipskih montažnih hiš')}"
     desc = (f'Majhne montažne hiše do 100 m²: {count} slovenskih proizvajalcev od {min(areas)} do {max(areas)} m², '
-            f'cene od {eur(lo[1]["price_eur"])}, tlorisi in kaj cena vključuje.')
+            f'cene od {eur(min(m["price_eur"] for _, m in priced))}, tlorisi in kaj cena vključuje.')
     image = SITE + (lo[1]['image'].replace('img/', 'img/large/') if lo[1].get('image') else 'img/large/riko-mila.jpg')
     ld = {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': 'Majhne montažne hiše', 'url': url, 'description': desc,
           'inLanguage': 'sl', 'image': image}
@@ -736,8 +953,9 @@ def small_page():
     <div class="head"><div><h1 class="display">Majhne montažne hiše</h1><div class="prov">{count} do 100 m² · podatki: {esc(data['collected'])}</div></div></div>
   </div>
   <div class="lede"><p>V vodiču je {count} do 100 m² bivalne površine, od {min(areas)} do {max(areas)} m². Ceno proizvajalec objavlja za {len(priced)} od njih;
-    najcenejša je {house_link(*lo)} ({eur(lo[1]['price_eur'])}, {round(lo[1]['area_m2'])} m², {esc(lo[1]['price_stage'])}).</p>
+    po primerljivi ceni je najcenejša {house_link(*lo)} ({eur(lo[1]['price_cmp'])}{'; cena proizvajalca ' + eur(lo[1]['price_eur']) if lo[1]['price_cmp'] != lo[1]['price_eur'] else ''}, {round(lo[1]['area_m2'])} m², {esc(lo[1]['price_stage'])}).</p>
     <p>Za ostale je cena na povpraševanje. Proizvajalci navajajo cene za različne pakete. <a href="../{GUIDE}/">Kaj cena vključuje pri posameznem proizvajalcu</a></p></div>
+  <p class="basis">{CMP_EXPLAIN}</p>
   {''.join(sections)}
   <div class="actions">
     <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
@@ -758,7 +976,7 @@ COSTS_CSS = '''
 @media (min-width: 960px) { .calc { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; } }
 .form { display: grid; gap: 16px; background: var(--dusk); border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); padding: 20px; min-width: 0; }
 .form label, .form .f { display: grid; gap: 6px; font-size: 14px; color: var(--mist); min-width: 0; }
-.form select, .form input[type=number] { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
+.form select, .form input[type=text] { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
 .form label.ck { display: flex; gap: 10px; align-items: flex-start; color: var(--ink); cursor: pointer; }
 .form .ck input { margin: 4px 0 0; accent-color: var(--glow); flex: none; }
 .form small { font-size: 12.5px; line-height: 1.45; color: var(--mist); }
@@ -772,6 +990,29 @@ COSTS_CSS = '''
 .lines th small { display: block; font-weight: 400; color: var(--mist); font-size: 12.5px; margin-top: 2px; }
 .lines .cmp { margin-left: 6px; }
 .lines td { text-align: right; }
+@media (min-width: 641px) { .lines td { width: 1%; white-space: nowrap; } }
+.lines th small.src { font-size: 12px; overflow-wrap: anywhere; }
+.lines th small.src a { color: var(--mist); text-decoration: none; }
+.lines th small.src a:hover { color: var(--ink); }
+.total .likely { font-size: 15px; color: var(--ink); }
+.total .likely strong { color: var(--glow); font-variant-numeric: tabular-nums; }
+.stack { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 14px; background: var(--line); }
+.stack i { display: block; height: 100%; }
+.legend { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--mist); }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.legend i.neg { background: #7fd1a8; }
+.legend span { color: var(--ink); font-variant-numeric: tabular-nums; }
+.stotal { display: none; }
+@media (max-width: 959px) {
+  .stotal { display: flex; position: fixed; z-index: 29; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); justify-content: space-between; align-items: center; gap: 12px;
+    padding: 12px 18px; border-radius: 18px; background: var(--dusk); box-shadow: inset 0 0 0 1px var(--glow), 0 12px 40px rgba(0,0,0,.5); color: var(--ink); text-decoration: none; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .stotal[hidden] { display: none; }
+  .stotal small { display: block; font: 500 11px/1.2 var(--font-data); letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
+  .stotal .go { color: var(--glow); font-size: 14px; white-space: nowrap; }
+  body.has-tray .stotal { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+  .calc { padding-bottom: 72px; }
+}
 .lines td small { display: block; font-size: 12px; color: var(--mist); white-space: nowrap; margin-top: 4px; }
 .lines td small a { color: var(--mist); }
 .share { display: block; height: 4px; border-radius: 4px; background: var(--line); margin-top: 8px; overflow: hidden; }
@@ -796,10 +1037,15 @@ COSTS_JS = r'''
   const rng = k => { const v = I[k].value; return typeof v === 'object' ? [v.min, v.max] : [v, v]; };
   const RANK = { low: 0, medium: 1, high: 2 }, TAG = { high: 'uradni podatek', medium: 'okvirno', low: 'zelo okvirno' };
   const houses = Object.fromEntries(D.houses.map(h => [h.slug, h]));
-  const num = id => Math.max(0, parseFloat($(id).value) || 0);
+  // amounts are typed as 185000 or 185.000 (thousands with dots, decimals with a comma) and shown grouped after editing
+  const num = id => Math.max(0, parseFloat($(id).value.replace(/[\s.€]/g, '').replace(',', '.')) || 0);
+  const group = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const NUMS = ['cp', 'ca', 'plot'];
+  const fmt = id => { const n = num(id); if (n && Number.isInteger(n)) $(id).value = group(n); };
   const FIELDS = ['h', 'cp', 'ca', 'cf', 'cs', 'plot', 'kp', 'kw', 'san', 'pd', 'zem', 'zu', 'snes', 'tier'];
   const CUSTOM = ['cp', 'ca', 'cf', 'cs'];
-  const val = id => $(id).type === 'checkbox' ? ($(id).checked ? '1' : '0') : $(id).value;
+  const COLORS = ['#ffc477', '#ff9d4d', '#9fe0b5', '#8fb8ff', '#c9a7ff', '#ff9d8a', '#e8d98a', '#93a3c0'];
+  const val = id => $(id).type === 'checkbox' ? ($(id).checked ? '1' : '0') : NUMS.includes(id) ? String(num(id) || '') : $(id).value;
 
   // Several items in one line: sum the ranges, keep the weakest confidence and all sources.
   function sum(label, keys, note) {
@@ -842,6 +1088,9 @@ COSTS_JS = r'''
       const byArea = rate * Math.min(h.area, e.max_area_m2), cap = Math.min(e.max_eur, 0.3 * 0.5 * h.price), s = h.sub ? 0 : Math.min(byArea, cap);
       out.push({ ...sum('Subvencija Eko sklada', ['eko_sklad_snes']), lo: -s, hi: -s, note: h.sub ? 'cena te hiše že upošteva subvencijo, zato je ne odštejemo še enkrat'
         : `${rate} €/m² × ${Math.round(Math.min(h.area, e.max_area_m2))} m²` + (cap < byArea ? `, omejeno na ${cap === e.max_eur ? 'najvišji znesek' : '15 % cene hiše'}` : '') });
+      // no sourced figure for the upgrade, so it is named, not priced
+      out.push({ label: 'Nadgradnja na sNES+', lo: 0, hi: 0, txt: 'ni vključena', tag: 'ni v izračunu',
+        note: 'Nadgradnja na standard sNES+ (PHPP, rekuperacija, sončna elektrarna …) ni vključena – zahtevajte ponudbo.' });
     }
     return out;
   }
@@ -857,19 +1106,30 @@ COSTS_JS = r'''
     if (!h.price || !h.area) {
       $('total').innerHTML = '<span class="eyebrow">Skupaj</span><b>—</b><p>Vpišite ceno in neto površino hiše.</p>';
       $('lines').innerHTML = '';
+      $('stotal').innerHTML = '<span>Vpišite ceno in površino hiše</span>';
       return;
     }
     const ls = lines(h), lo = ls.reduce((a, l) => a + l.lo, 0), hi = ls.reduce((a, l) => a + l.hi, 0);
     const mids = ls.map(l => (l.lo + l.hi) / 2), mid = mids.reduce((a, b) => a + b, 0);
-    $('total').innerHTML = `<span class="eyebrow">Skupaj</span><b>${Math.round(lo) === Math.round(hi) ? 'približno ' + eur(lo) : 'od ' + eur(lo) + ' do ' + eur(hi)}</b>
-      <p>${esc(h.name)}, ${Math.round(h.area)} m² neto · na m² od ${eur(lo / h.area)} do ${eur(hi / h.area)}</p>`;
+    const costs = mids.reduce((a, v) => a + Math.max(0, v), 0), pctOf = v => costs > 0 ? v / costs * 100 : 0;
+    const color = [], parts = [];
+    ls.forEach((l, i) => { if (mids[i] > 0) { color[i] = COLORS[parts.length % COLORS.length]; parts.push(i); } });
+    const exact = Math.round(lo) === Math.round(hi), sub = ls.find(l => l.lo < 0);
+    $('total').innerHTML = `<span class="eyebrow">Skupaj</span><b>${exact ? 'približno ' + eur(lo) : 'od ' + eur(lo) + ' do ' + eur(hi)}</b>
+      ${exact ? '' : `<p class="likely">Najverjetneje okoli <strong>${eur(Math.round(mid / 100) * 100)}</strong> (sredina razpona vsake postavke)</p>`}
+      <p>${esc(h.name)}, ${Math.round(h.area)} m² neto · na m² od ${eur(lo / h.area)} do ${eur(hi / h.area)}</p>
+      <div class="stack" role="img" aria-label="Kam gre denar: ${parts.map(i => `${ls[i].label} ${Math.round(pctOf(mids[i]))} %`).join(', ')}">${parts.map(i =>
+        `<i style="width:${pctOf(mids[i]).toFixed(2)}%;background:${color[i]}"></i>`).join('')}</div>
+      <ul class="legend" aria-hidden="true">${parts.map(i => `<li><i style="background:${color[i]}"></i>${ls[i].label} <span>${Math.round(pctOf(mids[i]))} %</span></li>`).join('')}${sub
+        ? `<li><i class="neg"></i>${sub.label} <span>${eur(sub.lo)}</span></li>` : ''}</ul>`;
+    $('stotal').innerHTML = `<span><small>Skupaj</small> ${exact ? eur(lo) : eur(lo) + ' – ' + eur(hi)}</span><span class="go">Razčlenitev ↓</span>`;
     $('lines').innerHTML = `<table class="tbl lines"><thead><tr><th scope="col">Postavka</th><th scope="col" style="text-align:right">Znesek</th></tr></thead><tbody>${ls.map((l, i) => {
-      const name = l.house && l.house.slug ? `<a href="../${l.house.slug}/">${esc(l.house.name)}</a><button type="button" class="cmp sm" data-slug="${l.house.slug}">+ Primerjaj</button>` : '';
+      const name = l.house && l.house.slug ? `<a href="../${l.house.slug}/">${esc(l.house.name)}</a><button type="button" class="cmp sm" data-slug="${l.house.slug}" data-name="${esc(l.house.name)}" aria-label="Dodaj ${esc(l.house.name)} v primerjavo">+ Primerjaj</button>` : '';
       const src = (l.src || []).map(s => `<a href="#vir-${s}">[${D.srcNum[s]}]</a>`).join('');
-      const pct = mid > 0 ? Math.min(100, Math.abs(mids[i]) / mid * 100) : 0;
-      return `<tr><th scope="row">${l.label}${name ? '<small>' + name + '</small>' : ''}${l.note ? `<small>${esc(l.note)}</small>` : ''}
-        <span class="share" title="${Math.round(pct)} % skupaj"><i class="${mids[i] < 0 ? 'neg' : ''}" style="width:${pct.toFixed(1)}%"></i></span></th>
-        <td class="n">${span(l.lo, l.hi)}<small>${l.tag || TAG[l.conf]} ${src}</small></td></tr>`;
+      const pct = Math.min(100, pctOf(Math.abs(mids[i])));
+      return `<tr><th scope="row">${l.label}${name ? '<small>' + name + '</small>' : ''}${l.note ? `<small>${esc(l.note)}</small>` : ''}${src ? `<small class="src">Viri: ${src}</small>` : ''}
+        ${mids[i] ? `<span class="share" title="${Math.round(pct)} % stroškov"><i class="${mids[i] < 0 ? 'neg' : ''}" style="width:${pct.toFixed(1)}%${color[i] ? ';background:' + color[i] : ''}"></i></span>` : ''}</th>
+        <td class="n">${l.txt || span(l.lo, l.hi)}<small>${l.tag || TAG[l.conf]}</small></td></tr>`;
     }).join('')}</tbody></table>`;
     window.HVCompare.refresh();
   }
@@ -884,6 +1144,9 @@ COSTS_JS = r'''
     else { el.value = q.get(id); if (el.tagName === 'SELECT' && !el.value) el.value = before; }
   }
   if (!q.has('pd')) $('pd').checked = docsIn();
+  NUMS.forEach(id => { fmt(id); $(id).addEventListener('blur', () => fmt(id)); });
+  // mobile: a bar with the total while the form is on screen, gone once the result itself is in view
+  if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { $('stotal').hidden = e.isIntersecting; }).observe($('res'));
   $('h').addEventListener('change', () => { $('pd').checked = docsIn(); });
   $('calc').addEventListener('input', render);
   $('calc').addEventListener('change', render);
@@ -968,7 +1231,8 @@ def costs_page():
 
     snes = items['eko_sklad_snes']
     tiers = [{'rate': t[q], 'label': f'Skupina {t[0]} ({SNES_GROUP[t[0]]}), QH ≤ {10 if q == 1 else 15} kWh/m²a: {t[q]} €/m²'} for q in (1, 2) for t in snes_tiers(snes)]
-    tier_opts = ''.join(f'<option value="{i}">{esc(t["label"])}</option>' for i, t in enumerate(tiers))
+    low_tier = min(range(len(tiers)), key=lambda i: tiers[i]['rate'])  # the most cautious rate by default
+    tier_opts = ''.join(f'<option value="{i}"{" selected" if i == low_tier else ""}>{esc(t["label"])}</option>' for i, t in enumerate(tiers))
 
     def stage_has(m, *keys):
         return any(k in m['price_stage'].lower() for k in keys)
@@ -981,7 +1245,7 @@ def costs_page():
     default = plain[len(plain) // 2]['slug']  # a mid-priced house whose price is not already cut by a subsidy
     house_opts = ''.join(f'<optgroup label="{esc(p["name"])}">' + ''.join(
         f'<option value="{m["slug"]}"{" selected" if m["slug"] == default else ""}>{esc(m["name"])} · {eur(m["price_eur"])}</option>'
-        for m in p['models'] if m['price_eur'] and m['area_m2']) + '</optgroup>' for p in data['providers'] if any(m['price_eur'] and m['area_m2'] for m in p['models'])) + \
+        for m in sorted((m for m in p['models'] if m['price_eur'] and m['area_m2']), key=lambda m: (m['area_m2'], m['name']))) + '</optgroup>' for p in data['providers'] if any(m['price_eur'] and m['area_m2'] for m in p['models'])) + \
         '<option value="lastna">Lastna ponudba</option>'
 
     calc_json = json.dumps({'houses': houses, 'items': items, 'kp': kps, 'tiers': tiers, 'srcNum': src_num}, ensure_ascii=False).replace('</', '<\\/')
@@ -1028,12 +1292,12 @@ def costs_page():
     <form class="form" id="calc" onsubmit="return false">
       <label>Hiša<select id="h">{house_opts}</select></label>
       <div class="sub" id="custom" hidden>
-        <label>Cena hiše (€)<input type="number" id="cp" inputmode="numeric" min="0" step="1000"></label>
-        <label>Neto površina (m²)<input type="number" id="ca" inputmode="numeric" min="0" step="1"></label>
+        <label>Cena hiše (€)<input type="text" id="cp" inputmode="numeric" autocomplete="off" placeholder="npr. 185.000"></label>
+        <label>Neto površina (m²)<input type="text" id="ca" inputmode="numeric" autocomplete="off" placeholder="npr. 120"></label>
         <label>Etaže<select id="cf"><option value="1">pritličje</option><option value="1.5">z mansardo</option><option value="2">pritličje in nadstropje</option></select></label>
         <label class="ck"><input type="checkbox" id="cs"> Temeljna plošča je vključena v ceno</label>
       </div>
-      <label>Zemljišče (€)<input type="number" id="plot" inputmode="numeric" min="0" step="1000" placeholder="0"><small>Neobvezno; pustite prazno, če parcelo že imate.</small></label>
+      <label>Zemljišče (€)<input type="text" id="plot" inputmode="numeric" autocomplete="off" placeholder="0"><small>Neobvezno; pustite prazno, če parcelo že imate.</small></label>
       <label>Občina (komunalni prispevek)<select id="kp">{kp_opts}</select>
         <small>Ocena za tipičen primer: parcela okoli 600 m² in hiša okoli 150 m² neto, s cenami iz občinskega odloka. Dejanska odmera je odvisna od cone in olajšav.</small></label>
       <label>Priključna moč elektrike<select id="kw"><option value="11">11 kW (3 × 16 A)</option><option value="17" selected>17 kW (3 × 25 A), s toplotno črpalko</option><option value="22">22 kW (3 × 32 A)</option></select></label>
@@ -1043,20 +1307,22 @@ def costs_page():
       <small>{and_join(docs_makers)} {verb(docs_makers, 'navaja', 'navajata', 'navajajo')}, da sta projekta DGD in PZI vključena v ceno, zato je pri {verb(docs_makers, 'njegovih', 'njunih', 'njihovih')} hišah polje že označeno {cite(*cost['docs_included']['source_ids'])}. Spremenite ga, če vaša ponudba pravi drugače.</small>
       <label>Zemeljska dela<select id="zem"><option value="l">Lahek teren</option><option value="n" selected>Ne vem</option><option value="t">Zahteven teren (skala)</option></select></label>
       <label class="ck"><input type="checkbox" id="zu" checked> Zunanja ureditev (dovoz, tlakovanje, ograja, zelenica)</label>
-      <label class="ck"><input type="checkbox" id="snes"> Gradil bom po standardu sNES+ (Eko sklad)</label>
+      <label class="ck"><input type="checkbox" id="snes"> <span>Hiša že izpolnjuje pogoje sNES+ (skoraj ničenergijska hiša), odštej subvencijo Eko sklada</span></label>
       <div class="sub" id="tierbox" hidden>
         <label>Izolacija in potreba po toploti<select id="tier">{tier_opts}</select></label>
         <small>Hiša mora biti skoraj pasivna: izračun PHPP, potreba po toploti in hladu največ 15 kWh/m²a, zrakotesnost n50 ≤ 0,6, rekuperacija z izkoristkom vsaj 80 %,
-          zbiralnik deževnice vsaj 6 m³ in sončna elektrarna. Mnoge tipske hiše teh pogojev brez nadgradenj ne izpolnjujejo.</small>
+          zbiralnik deževnice vsaj 6 m³ in sončna elektrarna. Mnoge tipske hiše teh pogojev brez nadgradenj ne izpolnjujejo. Označite le, če proizvajalec potrdi, da hiša pogoje že izpolnjuje:
+          cene nadgradnje nimamo, zato je kalkulator ne prišteje. Privzeta je najnižja stopnja subvencije.</small>
       </div>
     </form>
-    <div class="res">
+    <div class="res" id="res">
       <div class="total" id="total" aria-live="polite"></div>
       <div class="scroll" id="lines"></div>
       <p class="credit-line">Večina tržnih cen ne navaja, ali vključujejo DDV. Za hišo z uporabno površino do 250 m² velja {pct(ddv['reduced'])} DDV, če gradnjo izvajalec obračuna neposredno investitorju kot gradbeno storitev, sicer {pct(ddv['general'])}.</p>
       <div class="tools"><button type="button" class="btn line" id="copy">Kopiraj povezavo</button></div>
     </div>
   </div>
+  <a class="stotal" id="stotal" href="#lines" hidden></a>
   <section class="prose"><h2>Komunalni prispevek po občinah</h2>
     <p>Komunalni prispevek plačate občini pred izdajo gradbenega dovoljenja. Izračuna se iz površine parcele in bruto tlorisne površine hiše (BTP) ter cen komunalne opreme
       (ceste, vodovod, kanalizacija, javne površine) iz občinskega odloka: KP = Σ (A<sub>parcela</sub> × Cpo × Dpo + A<sub>BTP</sub> × Cto × Dto × Fn) × psz {cite(*kp['source_ids'][:3])}.
@@ -1133,7 +1399,6 @@ def costs_page():
 '''
 
 
-COST = json.load(open('data/stroski.json', encoding='utf-8'))
 KPD = COST['komunalni_prispevek']
 GUIDE_CSS = TABLE_CSS + COSTS_CSS + '''
 .prose ul { color: #c9d3e6; padding-left: 20px; margin: 0 0 10px; display: grid; gap: 6px; }
@@ -1423,7 +1688,7 @@ def moved(new):
 
 def write(folder, html_):
     os.makedirs(folder, exist_ok=True)
-    open(os.path.join(folder, 'index.html'), 'w', encoding='utf-8').write(html_)
+    open(os.path.join(folder, 'index.html'), 'w', encoding='utf-8').write(gloss(html_))
 
 
 # shortcut: pages of models removed from the JSON are not deleted; delete their folders by hand.
@@ -1465,14 +1730,15 @@ def home_faq():
     qa = [
         ('Koliko stane montažna hiša?',
          f'<p>Med {len(priced)} tipskimi montažnimi hišami slovenskih proizvajalcev z objavljeno ceno je najcenejša {eur(min(m["price_eur"] for m in priced))}, '
-         f'najdražja {eur(max(m["price_eur"] for m in priced))}. Srednja cena je {med_m2} na m² bivalne površine.</p>'
+         f'najdražja {eur(max(m["price_eur"] for m in priced))}. Mediana cene je {med_m2} na m² bivalne površine.</p>'
          f'<p>Cene niso neposredno primerljive, ker proizvajalci navajajo cene za različne pakete. <a href="{GUIDE}/">Primerjava cen po proizvajalcih</a></p>'),
         ('Kateri so slovenski proizvajalci montažnih hiš?',
          f'<p>V vodiču je {len(models)} tipskih hiš {len(provs)} proizvajalcev:</p><ul>' +
          ''.join(f'<li><a href="{p["id"]}/">{esc(p["name"])}</a>, {len(p["models"])} {plural(len(p["models"]), "hiša", "hiši", "hiše", "hiš")}</li>' for p in provs) + '</ul>'),
         ('Koliko časa traja gradnja montažne hiše?', f'<p>Proizvajalci, ki čas gradnje objavljajo, navajajo:</p><ul>{by("build_time")}</ul>'),
         ('Kako velike so tipske montažne hiše?',
-         f'<p>Od {round(areas[0])} do {round(areas[-1])} m². Največ, {len(mid)} od {len(areas)}, jih ima med 120 in 160 m² bivalne površine.</p>'
+         f'<p>Od {round(areas[0])} do {round(areas[-1])} m². Površino proizvajalci navajajo za {len(areas)} od {len(models)} hiš v vodiču; '
+         f'od teh jih ima {len(mid)} med 120 in 160 m² bivalne površine.</p>'
          f'<p><a href="{PLANS}/">Tlorisi montažnih hiš po velikosti</a></p>'),
         ('Ali so montažne hiše energijsko varčne?', f'<p>Proizvajalci navajajo energijski razred in toplotno prehodnost zunanje stene (U v W/m²K, nižja je boljša):</p><ul>{by("energy_class")}</ul>'),
         ('Kaj običajno ni vključeno v ceno?',

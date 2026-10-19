@@ -96,7 +96,20 @@ footer nav a:hover { color: var(--ink); }
 .head .prov { color: var(--mist); margin-top: 10px; }
 .photo { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); aspect-ratio: 600 / 315; }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+@media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
+.specs dt { font-size: 11px; }
+.na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
+abbr[title] { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+sub { font-size: max(12px, .75em); }
+.gloss { border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); padding: 14px 18px; color: #c9d3e6; font-size: 14px; max-width: 60em; }
+.gloss summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+.gloss dl { display: grid; gap: 8px; margin: 12px 0 0; }
+.gloss dt { display: inline; font-weight: 600; color: var(--ink); }
+.gloss dt::after { content: ": "; }
+.gloss dd { display: inline; margin: 0; }
+.basis { color: var(--mist); font-size: 14px; margin: 10px 0 0; max-width: 60em; }
+.basis a, .basis b { color: var(--ink); }
 .lede { color: #c9d3e6; font-size: 18px; max-width: 44em; margin: 0; }
 .lede p { margin: 0 0 10px; }
 h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12px; }
@@ -134,13 +147,16 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
 .tbl th, .tbl td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .tbl tr:last-child > * { border-bottom: 0; }
-.tbl thead th { font: 500 10px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
+.tbl thead th { font: 500 11px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
 .tbl tbody th { font-weight: 600; white-space: nowrap; }
 .tbl .n { font-family: var(--font-data); font-size: 14px; white-space: nowrap; }
 .tbl .stage { color: var(--mist); font-size: 13px; min-width: 260px; }
 .tbl td:first-child { min-width: 170px; }
 .tbl a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
 .tbl a:hover { color: var(--glow); }
+.tbl .n small { display: block; min-width: 13em; max-width: 18em; white-space: normal; font: 400 12.5px/1.4 var(--font-body); color: var(--mist); margin-top: 3px; }
+.tbl .hth { display: flex; align-items: center; gap: 12px; }
+.tbl .hth img { width: 72px; height: auto; border-radius: 8px; flex: none; background: var(--slate); }
 .points { margin: 0; padding-left: 20px; color: #c9d3e6; display: grid; gap: 10px; max-width: 48em; }
 .points b { color: var(--ink); }
 
@@ -149,7 +165,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 @media (min-width: 960px) { .calc { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; } }
 .form { display: grid; gap: 16px; background: var(--dusk); border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); padding: 20px; min-width: 0; }
 .form label, .form .f { display: grid; gap: 6px; font-size: 14px; color: var(--mist); min-width: 0; }
-.form select, .form input[type=number] { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
+.form select, .form input[type=text] { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
 .form label.ck { display: flex; gap: 10px; align-items: flex-start; color: var(--ink); cursor: pointer; }
 .form .ck input { margin: 4px 0 0; accent-color: var(--glow); flex: none; }
 .form small { font-size: 12.5px; line-height: 1.45; color: var(--mist); }
@@ -163,6 +179,29 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .lines th small { display: block; font-weight: 400; color: var(--mist); font-size: 12.5px; margin-top: 2px; }
 .lines .cmp { margin-left: 6px; }
 .lines td { text-align: right; }
+@media (min-width: 641px) { .lines td { width: 1%; white-space: nowrap; } }
+.lines th small.src { font-size: 12px; overflow-wrap: anywhere; }
+.lines th small.src a { color: var(--mist); text-decoration: none; }
+.lines th small.src a:hover { color: var(--ink); }
+.total .likely { font-size: 15px; color: var(--ink); }
+.total .likely strong { color: var(--glow); font-variant-numeric: tabular-nums; }
+.stack { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 14px; background: var(--line); }
+.stack i { display: block; height: 100%; }
+.legend { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--mist); }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.legend i.neg { background: #7fd1a8; }
+.legend span { color: var(--ink); font-variant-numeric: tabular-nums; }
+.stotal { display: none; }
+@media (max-width: 959px) {
+  .stotal { display: flex; position: fixed; z-index: 29; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); justify-content: space-between; align-items: center; gap: 12px;
+    padding: 12px 18px; border-radius: 18px; background: var(--dusk); box-shadow: inset 0 0 0 1px var(--glow), 0 12px 40px rgba(0,0,0,.5); color: var(--ink); text-decoration: none; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .stotal[hidden] { display: none; }
+  .stotal small { display: block; font: 500 11px/1.2 var(--font-data); letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
+  .stotal .go { color: var(--glow); font-size: 14px; white-space: nowrap; }
+  body.has-tray .stotal { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+  .calc { padding-bottom: 72px; }
+}
 .lines td small { display: block; font-size: 12px; color: var(--mist); white-space: nowrap; margin-top: 4px; }
 .lines td small a { color: var(--mist); }
 .share { display: block; height: 4px; border-radius: 4px; background: var(--line); margin-top: 8px; overflow: hidden; }
@@ -191,40 +230,42 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     Pri vsaki postavki je naveden vir in kako zanesljiva je številka.</p></div>
   <div class="calc">
     <form class="form" id="calc" onsubmit="return false">
-      <label>Hiša<select id="h"><optgroup label="Marles"><option value="marles-pure-joy-91">Pure Joy 91 · 150.582 €</option><option value="marles-pure-sky-lux-95">Pure Sky Lux 95 · 163.244 €</option><option value="marles-pure-pulse-scape-126">Pure Pulse Scape 126 · 201.366 €</option><option value="marles-pure-vista-lux-113">Pure Vista Lux 113 · 195.840 €</option><option value="marles-pure-lumniya-lux-125">Pure Lumniya Lux 125 · 205.182 €</option><option value="marles-pure-serenity-136">Pure Serenity 136 · 217.397 €</option><option value="marles-prime-skyglow-147">Prime SkyGlow 147 · 234.645 €</option><option value="marles-prime-seabreeze-179">Prime SeaBreeze 179 · 290.414 €</option><option value="marles-prime-waterfall-265">Prime WaterFall 265 · 341.873 €</option><option value="marles-prime-sunshine-333">Prime SunShine 333 · 444.015 €</option><option value="marles-tiny-pixel-48">Tiny Pixel 48 · 113.846 €</option><option value="marles-pure-lumniya-haven-135">Pure Lumniya Haven 135 · 206.337 €</option><option value="marles-pure-lumniya-haven-124">Pure Lumniya Haven 124 · 202.596 €</option><option value="marles-pure-lumniya-haven-146">Pure Lumniya Haven 146 · 220.781 €</option><option value="marles-pure-lumniya-lux-149">Pure Lumniya Lux 149 · 234.179 €</option><option value="marles-lumniya-villa-149">Lumniya Villa 149 · 243.382 €</option><option value="marles-lumniya-villa-125">Lumniya Villa 125 · 212.853 €</option><option value="marles-starlight-134">StarLight 134 · 236.673 €</option></optgroup><optgroup label="Lumar"><option value="lumar-gea-105">Gea 105 · 173.990 €</option><option value="lumar-vivus-144">Vivus 144 · 250.990 €</option><option value="lumar-primus-d-126">Primus-D 126 · 206.990 €</option><option value="lumar-stratos-163">Stratos 163 · 346.970 €</option></optgroup><optgroup label="Rihter"><option value="rihter-hisa-087">Hiša 087 · 166.300 €</option><option value="rihter-hisa-100">Hiša 100 · 198.310 €</option><option value="rihter-hisa-113-2">Hiša 113/2 · 194.930 €</option><option value="rihter-hisa-126">Hiša 126 · 217.110 €</option><option value="rihter-hisa-136">Hiša 136 · 251.560 €</option><option value="rihter-hisa-153">Hiša 153 · 275.820 €</option><option value="rihter-hisa-185">Hiša 185 · 306.310 €</option><option value="rihter-hisa-106">Hiša 106 · 247.260 €</option><option value="rihter-hisa-114-3">Hiša 114/3 · 233.990 €</option><option value="rihter-hisa-122">Hiša 122 · 246.880 €</option><option value="rihter-hisa-138">Hiša 138 · 254.060 €</option><option value="rihter-hisa-149">Hiša 149 · 271.710 €</option><option value="rihter-hisa-162">Hiša 162 · 280.530 €</option><option value="rihter-hisa-183">Hiša 183 · 338.470 €</option><option value="rihter-hisa-101">Hiša 101 · 169.700 €</option><option value="rihter-hisa-105-2">Hiša 105/2 · 209.890 €</option><option value="rihter-hisa-114-4">Hiša 114/4 · 206.830 €</option><option value="rihter-hisa-116">Hiša 116 · 206.350 €</option><option value="rihter-hisa-127">Hiša 127 · 210.600 €</option><option value="rihter-hisa-131">Hiša 131 · 250.130 €</option><option value="rihter-hisa-135-1">Hiša 135/1 · 227.720 €</option><option value="rihter-hisa-137-1">Hiša 137/1 · 250.420 €</option><option value="rihter-hisa-139-1">Hiša 139/1 · 261.530 €</option><option value="rihter-hisa-141">Hiša 141 · 256.960 €</option><option value="rihter-hisa-143-1">Hiša 143/1 · 239.160 €</option><option value="rihter-hisa-171">Hiša 171 · 331.340 €</option><option value="rihter-hisa-174">Hiša 174 · 296.570 €</option><option value="rihter-hisa-116-1">Hiša 116/1 · 243.820 €</option><option value="rihter-hisa-116-3">Hiša 116/3 · 237.070 €</option><option value="rihter-hisa-132">Hiša 132 · 293.810 €</option><option value="rihter-hisa-133">Hiša 133 · 278.350 €</option><option value="rihter-hisa-133-1">Hiša 133/1 · 226.090 €</option><option value="rihter-hisa-144-1">Hiša 144/1 · 250.090 €</option><option value="rihter-hisa-147">Hiša 147 · 296.840 €</option><option value="rihter-hisa-152">Hiša 152 · 261.430 €</option><option value="rihter-hisa-152-1">Hiša 152/1 · 279.100 €</option><option value="rihter-hisa-154">Hiša 154 · 260.280 €</option><option value="rihter-hisa-155-1">Hiša 155/1 · 292.660 €</option><option value="rihter-hisa-155">Hiša 155 · 259.230 €</option><option value="rihter-hisa-168">Hiša 168 · 293.590 €</option><option value="rihter-hisa-173">Hiša 173 · 322.560 €</option><option value="rihter-hisa-175-1">Hiša 175/1 · 308.910 €</option></optgroup><optgroup label="Jelovica"><option value="jelovica-prima-93">Prima 93 · 190.990 €</option><option value="jelovica-trend-s-120">Trend S 120 · 213.990 €</option><option value="jelovica-klasik-s-120">Klasik S 120 · 213.990 €</option><option value="jelovica-kubus-b-126">Kubus B 126 · 228.990 €</option><option value="jelovica-trend-b-126">Trend B 126 · 224.990 €</option><option value="jelovica-klasik-b-126">Klasik B 126 · 224.990 €</option><option value="jelovica-trend-d-141">Trend D 141 · 266.990 €</option><option value="jelovica-klasik-c-145">Klasik C 145 · 254.990 €</option><option value="jelovica-trend-c-145">Trend C 145 · 255.990 €</option><option value="jelovica-klasik-g-146">Klasik G 146 · 244.990 €</option><option value="jelovica-trend-g-146">Trend G 146 · 245.990 €</option><option value="jelovica-trend-h-147">Trend H 147 · 250.990 €</option><option value="jelovica-klasik-h-147">Klasik H 147 · 251.990 €</option><option value="jelovica-trend-a-148">Trend A 148 · 269.990 €</option><option value="jelovica-kubus-j-166">Kubus J 166 · 280.990 €</option><option value="jelovica-trend-j-166">Trend J 166 · 279.990 €</option></optgroup><optgroup label="NOAH"><option value="noah-klasik-115">KLASIK 115 · 186.327 €</option><option value="noah-line-176">LINE 176 · 262.715 €</option><option value="noah-noe-167">NOE 167 · 244.046 €</option><option value="noah-noah-159">NOAH 159 · 265.712 €</option><option value="noah-neo-146">NEO 146 · 222.000 €</option><option value="noah-prizma-x-144">PRIZMA X 144 · 218.046 €</option><option value="noah-lukas-x-144">LUKAS X 144 · 220.232 €</option><option value="noah-prizma-r-124">PRIZMA R 124 · 198.377 €</option><option value="noah-linda-x-122">LINDA X 122 · 211.062 €</option><option value="noah-box-121">BOX 121 · 189.479 €</option><option value="noah-nano-r-115">NANO R 115 · 187.289 €</option><option value="noah-noah-113">NOAH 113 · 197.353 €</option><option value="noah-kubo-97">KUBO 97 · 173.435 €</option><option value="noah-one-95-1">ONE 95/1 · 154.964 €</option><option value="noah-eva-v-81">EVA V 81 · 153.593 €</option><option value="noah-neli-v-70">NELI V 70 · 134.146 €</option><option value="noah-nano-v-64-dvokapnica">NANO V 64 (dvokapnica) · 131.687 €</option><option value="noah-nano-r-64-ravna-streha">NANO R 64 (ravna streha) · 140.356 €</option><option value="noah-mini-60">MINI 60 · 130.552 €</option><option value="noah-duo-190-dvostanovanjska">DUO 190 (dvostanovanjska) · 264.528 €</option><option value="noah-lina-v-62">LINA V 62 · 134.707 €</option><option value="noah-one-95-2">ONE 95/2 · 153.333 €</option><option value="noah-nano-v-115">NANO V 115 · 179.823 €</option><option value="noah-nano-x-115">NANO X 115 · 188.042 €</option><option value="noah-prizma-v-124">PRIZMA V 124 · 192.167 €</option><option value="noah-nano-v-125">NANO V 125 · 183.545 €</option><option value="noah-klasik-b-130">KLASIK B 130 · 200.143 €</option><option value="noah-line-136" selected>LINE 136 · 221.767 €</option><option value="noah-nova-141">NOVA 141 · 213.993 €</option><option value="noah-prizma-v-144">PRIZMA V 144 · 209.183 €</option><option value="noah-duo-163-dvostanovanjska">DUO 163 (dvostanovanjska) · 229.723 €</option><option value="noah-lux-168">LUX 168 · 265.797 €</option></optgroup><optgroup label="Žiher hiše"><option value="ziher-smarthouse-s">SmartHouse S · 87.990 €</option><option value="ziher-smarthouse-m">SmartHouse M · 109.990 €</option><option value="ziher-smarthouse-l">SmartHouse L · 145.990 €</option></optgroup><option value="lastna">Lastna ponudba</option></select></label>
+      <label>Hiša<select id="h"><optgroup label="Marles"><option value="marles-tiny-pixel-48">Tiny Pixel 48 · 113.846 €</option><option value="marles-pure-joy-91">Pure Joy 91 · 150.582 €</option><option value="marles-pure-sky-lux-95">Pure Sky Lux 95 · 163.244 €</option><option value="marles-pure-vista-lux-113">Pure Vista Lux 113 · 195.840 €</option><option value="marles-pure-lumniya-haven-124">Pure Lumniya Haven 124 · 202.596 €</option><option value="marles-lumniya-villa-125">Lumniya Villa 125 · 212.853 €</option><option value="marles-pure-lumniya-lux-125">Pure Lumniya Lux 125 · 205.182 €</option><option value="marles-pure-pulse-scape-126">Pure Pulse Scape 126 · 201.366 €</option><option value="marles-starlight-134">StarLight 134 · 236.673 €</option><option value="marles-pure-lumniya-haven-135">Pure Lumniya Haven 135 · 206.337 €</option><option value="marles-pure-serenity-136">Pure Serenity 136 · 217.397 €</option><option value="marles-pure-lumniya-haven-146">Pure Lumniya Haven 146 · 220.781 €</option><option value="marles-prime-skyglow-147">Prime SkyGlow 147 · 234.645 €</option><option value="marles-lumniya-villa-149">Lumniya Villa 149 · 243.382 €</option><option value="marles-pure-lumniya-lux-149">Pure Lumniya Lux 149 · 234.179 €</option><option value="marles-prime-seabreeze-179">Prime SeaBreeze 179 · 290.414 €</option><option value="marles-prime-waterfall-265">Prime WaterFall 265 · 341.873 €</option><option value="marles-prime-sunshine-333">Prime SunShine 333 · 444.015 €</option></optgroup><optgroup label="Lumar"><option value="lumar-gea-105">Gea 105 · 173.990 €</option><option value="lumar-primus-d-126">Primus-D 126 · 206.990 €</option><option value="lumar-vivus-144">Vivus 144 · 250.990 €</option><option value="lumar-stratos-163">Stratos 163 · 346.970 €</option></optgroup><optgroup label="Rihter"><option value="rihter-hisa-087">Hiša 087 · 166.300 €</option><option value="rihter-hisa-100">Hiša 100 · 198.310 €</option><option value="rihter-hisa-101">Hiša 101 · 169.700 €</option><option value="rihter-hisa-105-2">Hiša 105/2 · 209.890 €</option><option value="rihter-hisa-106">Hiša 106 · 247.260 €</option><option value="rihter-hisa-113-2">Hiša 113/2 · 194.930 €</option><option value="rihter-hisa-114-3">Hiša 114/3 · 233.990 €</option><option value="rihter-hisa-114-4">Hiša 114/4 · 206.830 €</option><option value="rihter-hisa-116-1">Hiša 116/1 · 243.820 €</option><option value="rihter-hisa-116">Hiša 116 · 206.350 €</option><option value="rihter-hisa-116-3">Hiša 116/3 · 237.070 €</option><option value="rihter-hisa-122">Hiša 122 · 246.880 €</option><option value="rihter-hisa-126">Hiša 126 · 217.110 €</option><option value="rihter-hisa-127">Hiša 127 · 210.600 €</option><option value="rihter-hisa-131">Hiša 131 · 250.130 €</option><option value="rihter-hisa-132">Hiša 132 · 293.810 €</option><option value="rihter-hisa-133">Hiša 133 · 278.350 €</option><option value="rihter-hisa-133-1">Hiša 133/1 · 226.090 €</option><option value="rihter-hisa-135-1">Hiša 135/1 · 227.720 €</option><option value="rihter-hisa-138">Hiša 138 · 254.060 €</option><option value="rihter-hisa-136">Hiša 136 · 251.560 €</option><option value="rihter-hisa-137-1">Hiša 137/1 · 250.420 €</option><option value="rihter-hisa-139-1">Hiša 139/1 · 261.530 €</option><option value="rihter-hisa-141">Hiša 141 · 256.960 €</option><option value="rihter-hisa-143-1">Hiša 143/1 · 239.160 €</option><option value="rihter-hisa-144-1">Hiša 144/1 · 250.090 €</option><option value="rihter-hisa-147">Hiša 147 · 296.840 €</option><option value="rihter-hisa-149">Hiša 149 · 271.710 €</option><option value="rihter-hisa-152-1">Hiša 152/1 · 279.100 €</option><option value="rihter-hisa-152">Hiša 152 · 261.430 €</option><option value="rihter-hisa-153">Hiša 153 · 275.820 €</option><option value="rihter-hisa-154">Hiša 154 · 260.280 €</option><option value="rihter-hisa-155">Hiša 155 · 259.230 €</option><option value="rihter-hisa-155-1">Hiša 155/1 · 292.660 €</option><option value="rihter-hisa-162">Hiša 162 · 280.530 €</option><option value="rihter-hisa-168">Hiša 168 · 293.590 €</option><option value="rihter-hisa-171">Hiša 171 · 331.340 €</option><option value="rihter-hisa-173">Hiša 173 · 322.560 €</option><option value="rihter-hisa-174">Hiša 174 · 296.570 €</option><option value="rihter-hisa-175-1">Hiša 175/1 · 308.910 €</option><option value="rihter-hisa-183">Hiša 183 · 338.470 €</option><option value="rihter-hisa-185">Hiša 185 · 306.310 €</option></optgroup><optgroup label="Jelovica"><option value="jelovica-prima-93">Prima 93 · 190.990 €</option><option value="jelovica-klasik-s-120">Klasik S 120 · 213.990 €</option><option value="jelovica-trend-s-120">Trend S 120 · 213.990 €</option><option value="jelovica-klasik-b-126">Klasik B 126 · 224.990 €</option><option value="jelovica-kubus-b-126">Kubus B 126 · 228.990 €</option><option value="jelovica-trend-b-126">Trend B 126 · 224.990 €</option><option value="jelovica-trend-d-141">Trend D 141 · 266.990 €</option><option value="jelovica-klasik-c-145">Klasik C 145 · 254.990 €</option><option value="jelovica-trend-c-145">Trend C 145 · 255.990 €</option><option value="jelovica-klasik-g-146">Klasik G 146 · 244.990 €</option><option value="jelovica-trend-g-146">Trend G 146 · 245.990 €</option><option value="jelovica-klasik-h-147">Klasik H 147 · 251.990 €</option><option value="jelovica-trend-h-147">Trend H 147 · 250.990 €</option><option value="jelovica-trend-a-148">Trend A 148 · 269.990 €</option><option value="jelovica-kubus-j-166">Kubus J 166 · 280.990 €</option><option value="jelovica-trend-j-166">Trend J 166 · 279.990 €</option></optgroup><optgroup label="NOAH"><option value="noah-mini-60">MINI 60 · 130.552 €</option><option value="noah-lina-v-62">LINA V 62 · 134.707 €</option><option value="noah-nano-r-64-ravna-streha">NANO R 64 (ravna streha) · 140.356 €</option><option value="noah-nano-v-64-dvokapnica">NANO V 64 (dvokapnica) · 131.687 €</option><option value="noah-neli-v-70">NELI V 70 · 134.146 €</option><option value="noah-eva-v-81">EVA V 81 · 153.593 €</option><option value="noah-one-95-1">ONE 95/1 · 154.964 €</option><option value="noah-one-95-2">ONE 95/2 · 153.333 €</option><option value="noah-kubo-97">KUBO 97 · 173.435 €</option><option value="noah-noah-113">NOAH 113 · 197.353 €</option><option value="noah-klasik-115">KLASIK 115 · 186.327 €</option><option value="noah-nano-v-115">NANO V 115 · 179.823 €</option><option value="noah-nano-r-115">NANO R 115 · 187.289 €</option><option value="noah-nano-x-115">NANO X 115 · 188.042 €</option><option value="noah-box-121">BOX 121 · 189.479 €</option><option value="noah-linda-x-122">LINDA X 122 · 211.062 €</option><option value="noah-prizma-r-124">PRIZMA R 124 · 198.377 €</option><option value="noah-prizma-v-124">PRIZMA V 124 · 192.167 €</option><option value="noah-nano-v-125">NANO V 125 · 183.545 €</option><option value="noah-klasik-b-130">KLASIK B 130 · 200.143 €</option><option value="noah-line-136" selected>LINE 136 · 221.767 €</option><option value="noah-nova-141">NOVA 141 · 213.993 €</option><option value="noah-lukas-x-144">LUKAS X 144 · 220.232 €</option><option value="noah-prizma-v-144">PRIZMA V 144 · 209.183 €</option><option value="noah-prizma-x-144">PRIZMA X 144 · 218.046 €</option><option value="noah-neo-146">NEO 146 · 222.000 €</option><option value="noah-noah-159">NOAH 159 · 265.712 €</option><option value="noah-duo-163-dvostanovanjska">DUO 163 (dvostanovanjska) · 229.723 €</option><option value="noah-noe-167">NOE 167 · 244.046 €</option><option value="noah-lux-168">LUX 168 · 265.797 €</option><option value="noah-line-176">LINE 176 · 262.715 €</option><option value="noah-duo-190-dvostanovanjska">DUO 190 (dvostanovanjska) · 264.528 €</option></optgroup><optgroup label="Žiher hiše"><option value="ziher-smarthouse-s">SmartHouse S · 87.990 €</option><option value="ziher-smarthouse-m">SmartHouse M · 109.990 €</option><option value="ziher-smarthouse-l">SmartHouse L · 145.990 €</option></optgroup><option value="lastna">Lastna ponudba</option></select></label>
       <div class="sub" id="custom" hidden>
-        <label>Cena hiše (€)<input type="number" id="cp" inputmode="numeric" min="0" step="1000"></label>
-        <label>Neto površina (m²)<input type="number" id="ca" inputmode="numeric" min="0" step="1"></label>
+        <label>Cena hiše (€)<input type="text" id="cp" inputmode="numeric" autocomplete="off" placeholder="npr. 185.000"></label>
+        <label>Neto površina (m²)<input type="text" id="ca" inputmode="numeric" autocomplete="off" placeholder="npr. 120"></label>
         <label>Etaže<select id="cf"><option value="1">pritličje</option><option value="1.5">z mansardo</option><option value="2">pritličje in nadstropje</option></select></label>
         <label class="ck"><input type="checkbox" id="cs"> Temeljna plošča je vključena v ceno</label>
       </div>
-      <label>Zemljišče (€)<input type="number" id="plot" inputmode="numeric" min="0" step="1000" placeholder="0"><small>Neobvezno; pustite prazno, če parcelo že imate.</small></label>
+      <label>Zemljišče (€)<input type="text" id="plot" inputmode="numeric" autocomplete="off" placeholder="0"><small>Neobvezno; pustite prazno, če parcelo že imate.</small></label>
       <label>Občina (komunalni prispevek)<select id="kp"><option value="brezice">Brežice (4.901 €)</option><option value="celje">Celje (14.229 €)</option><option value="domzale">Domžale (13.861 €)</option><option value="grosuplje">Grosuplje (22.873 €)</option><option value="kamnik">Kamnik (9.535 €)</option><option value="koper">Koper (22.426 € – 28.075 €)</option><option value="kranj">Kranj (14.010 €)</option><option value="krsko">Krško (5.765 €)</option><option value="ljubljana">Ljubljana (18.755 €)</option><option value="maribor">Maribor (15.217 € – 16.542 €)</option><option value="murska-sobota">Murska Sobota (9.234 €)</option><option value="novo-mesto">Novo mesto (11.042 €)</option><option value="ptuj">Ptuj (6.930 €)</option><option value="skofja-loka">Škofja Loka (9.003 €)</option><option value="druga" selected>Druga občina (slovensko povprečje) (8.028 €)</option></select>
         <small>Ocena za tipičen primer: parcela okoli 600 m² in hiša okoli 150 m² neto, s cenami iz občinskega odloka. Dejanska odmera je odvisna od cone in olajšav.</small></label>
       <label>Priključna moč elektrike<select id="kw"><option value="11">11 kW (3 × 16 A)</option><option value="17" selected>17 kW (3 × 25 A), s toplotno črpalko</option><option value="22">22 kW (3 × 32 A)</option></select></label>
       <label>Odpadne vode<select id="san"><option value="kan">Javna kanalizacija (priključek)</option><option value="mkcn">Mala čistilna naprava (MKČN)</option></select>
         <small>Pri MKČN je upoštevana vgrajena naprava: naprava, izkop, vgradnja in ponikovalnica.</small></label>
       <label class="ck"><input type="checkbox" id="pd"> Projektna dokumentacija je že vključena v ceno hiše</label>
-      <small>Lumar in Jelovica navajata, da sta projekta DGD in PZI vključena v ceno, zato je pri njunih hišah polje že označeno <a href="#vir-lumar-vkljuceno">[52]</a><a href="#vir-jelovica-paket">[53]</a>. Spremenite ga, če vaša ponudba pravi drugače.</small>
+      <small>Lumar in Jelovica navajata, da sta projekta <abbr title="dokumentacija za pridobitev gradbenega dovoljenja">DGD</abbr> in <abbr title="projekt za izvedbo, po katerem se hiša gradi">PZI</abbr> vključena v ceno, zato je pri njunih hišah polje že označeno <a href="#vir-lumar-vkljuceno">[52]</a><a href="#vir-jelovica-paket">[53]</a>. Spremenite ga, če vaša ponudba pravi drugače.</small>
       <label>Zemeljska dela<select id="zem"><option value="l">Lahek teren</option><option value="n" selected>Ne vem</option><option value="t">Zahteven teren (skala)</option></select></label>
       <label class="ck"><input type="checkbox" id="zu" checked> Zunanja ureditev (dovoz, tlakovanje, ograja, zelenica)</label>
-      <label class="ck"><input type="checkbox" id="snes"> Gradil bom po standardu sNES+ (Eko sklad)</label>
+      <label class="ck"><input type="checkbox" id="snes"> <span>Hiša že izpolnjuje pogoje <abbr title="skoraj ničenergijska stavba po pogojih Eko sklada, pogoj za subvencijo za novo hišo">sNES+</abbr> (skoraj ničenergijska hiša), odštej subvencijo Eko sklada</span></label>
       <div class="sub" id="tierbox" hidden>
-        <label>Izolacija in potreba po toploti<select id="tier"><option value="0">Skupina I (naravna izolacija in lesena okna), QH ≤ 10 kWh/m²a: 170 €/m²</option><option value="1">Skupina II (mineralna izolacija), QH ≤ 10 kWh/m²a: 130 €/m²</option><option value="2">Skupina III (sintetična izolacija), QH ≤ 10 kWh/m²a: 100 €/m²</option><option value="3">Skupina I (naravna izolacija in lesena okna), QH ≤ 15 kWh/m²a: 150 €/m²</option><option value="4">Skupina II (mineralna izolacija), QH ≤ 15 kWh/m²a: 110 €/m²</option><option value="5">Skupina III (sintetična izolacija), QH ≤ 15 kWh/m²a: 90 €/m²</option></select></label>
-        <small>Hiša mora biti skoraj pasivna: izračun PHPP, potreba po toploti in hladu največ 15 kWh/m²a, zrakotesnost n50 ≤ 0,6, rekuperacija z izkoristkom vsaj 80 %,
-          zbiralnik deževnice vsaj 6 m³ in sončna elektrarna. Mnoge tipske hiše teh pogojev brez nadgradenj ne izpolnjujejo.</small>
+        <label>Izolacija in potreba po toploti<select id="tier"><option value="0">Skupina I (naravna izolacija in lesena okna), QH ≤ 10 kWh/m²a: 170 €/m²</option><option value="1">Skupina II (mineralna izolacija), QH ≤ 10 kWh/m²a: 130 €/m²</option><option value="2">Skupina III (sintetična izolacija), QH ≤ 10 kWh/m²a: 100 €/m²</option><option value="3">Skupina I (naravna izolacija in lesena okna), QH ≤ 15 kWh/m²a: 150 €/m²</option><option value="4">Skupina II (mineralna izolacija), QH ≤ 15 kWh/m²a: 110 €/m²</option><option value="5" selected>Skupina III (sintetična izolacija), QH ≤ 15 kWh/m²a: 90 €/m²</option></select></label>
+        <small>Hiša mora biti skoraj pasivna: izračun <abbr title="program za izračun energijske bilance pasivne hiše (Passivhaus Projektierungspaket)">PHPP</abbr>, potreba po toploti in hladu največ 15 kWh/m²a, zrakotesnost <abbr title="zrakotesnost: kolikokrat se zrak v hiši izmenja v eni uri pri tlačni razliki 50 Pa; manjša številka je boljša">n50</abbr> ≤ 0,6, rekuperacija z izkoristkom vsaj 80 %,
+          zbiralnik deževnice vsaj 6 m³ in sončna elektrarna. Mnoge tipske hiše teh pogojev brez nadgradenj ne izpolnjujejo. Označite le, če proizvajalec potrdi, da hiša pogoje že izpolnjuje:
+          cene nadgradnje nimamo, zato je kalkulator ne prišteje. Privzeta je najnižja stopnja subvencije.</small>
       </div>
     </form>
-    <div class="res">
+    <div class="res" id="res">
       <div class="total" id="total" aria-live="polite"></div>
       <div class="scroll" id="lines"></div>
       <p class="credit-line">Večina tržnih cen ne navaja, ali vključujejo DDV. Za hišo z uporabno površino do 250 m² velja 9,5 % DDV, če gradnjo izvajalec obračuna neposredno investitorju kot gradbeno storitev, sicer 22 %.</p>
       <div class="tools"><button type="button" class="btn line" id="copy">Kopiraj povezavo</button></div>
     </div>
   </div>
+  <a class="stotal" id="stotal" href="#lines" hidden></a>
   <section class="prose"><h2>Komunalni prispevek po občinah</h2>
-    <p>Komunalni prispevek plačate občini pred izdajo gradbenega dovoljenja. Izračuna se iz površine parcele in bruto tlorisne površine hiše (BTP) ter cen komunalne opreme
-      (ceste, vodovod, kanalizacija, javne površine) iz občinskega odloka: KP = Σ (A<sub>parcela</sub> × Cpo × Dpo + A<sub>BTP</sub> × Cto × Dto × Fn) × psz <a href="#vir-kp-koper">[1]</a><a href="#vir-kp-ptuj">[2]</a><a href="#vir-kp-tolmin">[3]</a>.
+    <p>Komunalni prispevek plačate občini pred izdajo gradbenega dovoljenja. Izračuna se iz površine parcele in bruto tlorisne površine hiše (<abbr title="bruto tlorisna površina: površina vseh etaž, merjena po zunanjih merah sten">BTP</abbr>) ter cen komunalne opreme
+      (ceste, vodovod, kanalizacija, javne površine) iz občinskega odloka: KP = Σ (A<sub>parcela</sub> × <abbr title="cena komunalne opreme na m² parcele, določi jo občinski odlok">Cpo</abbr> × <abbr title="delež parcele v izračunu komunalnega prispevka">Dpo</abbr> + A<sub>BTP</sub> × <abbr title="cena komunalne opreme na m² bruto tlorisne površine, določi jo občinski odlok">Cto</abbr> × <abbr title="delež površine objekta v izračunu komunalnega prispevka">Dto</abbr> × <abbr title="faktor namembnosti: utež za vrsto stavbe, za stanovanjske hiše jo določi odlok">Fn</abbr>) × <abbr title="prispevna stopnja zavezanca: delež stroškov komunalne opreme, ki ga plača investitor">psz</abbr> <a href="#vir-kp-koper">[1]</a><a href="#vir-kp-ptuj">[2]</a><a href="#vir-kp-tolmin">[3]</a>.
       Po izračunu vsevem.si za 204 od 212 občin (parcela 600 m², 200 m² BTP) je povprečje 8.028 €, najmanj 1.584 € (Kobilje), največ 35.341 € (Piran) <a href="#vir-kp-vsevem">[5]</a>.
       Odmera se računa s cenami iz veljavnega odloka. Preverjeni odloki (Ljubljana, Koper, Celje, Kranj, Novo mesto, Ptuj) nimajo določbe o indeksaciji, prav tako je nimata zakon ZUreP-3 in nova uredba (Ur. l. RS 53/26, velja od 28. 3. 2026),
       ki za tipično novo hišo pravil odmere ne spreminja <a href="#vir-kp-uredba-53-26">[33]</a>. Kalkulator uporablja zneske iz prvega stolpca, kjer jih imamo, sicer izračun vsevem.si; za druge občine povprečje 8.028 €.
@@ -233,7 +274,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   </section>
   <section class="prose"><h2>Koliko stane projektna dokumentacija za hišo?</h2>
     <p>Za gradbeno dovoljenje potrebujete projekt DGD (3.500 € – 8.000 €) <a href="#vir-marh-cenik">[40]</a><a href="#vir-2amv-cenik">[41]</a><a href="#vir-gh-omisli-2026">[25]</a>, za gradnjo še projekt za izvedbo PZI (3.000 € – 7.000 €),
-      pred tem idejno zasnovo (1.000 € – 2.500 €) <a href="#vir-marh-cenik">[40]</a><a href="#vir-pd-omisli">[12]</a>. Celotna dokumentacija (IDZ, DGD, PZI, PID) stane 9.000 € – 18.000 € <a href="#vir-pd-omisli">[12]</a><a href="#vir-gh-omisli-2026">[25]</a><a href="#vir-marh-cenik">[40]</a><a href="#vir-mhe-noah">[51]</a>.
+      pred tem idejno zasnovo (1.000 € – 2.500 €) <a href="#vir-marh-cenik">[40]</a><a href="#vir-pd-omisli">[12]</a>. Celotna dokumentacija (<abbr title="idejna zasnova, prvi korak projekta">IDZ</abbr>, DGD, PZI, <abbr title="projekt izvedenih del, ki opiše hišo, kot je bila zgrajena">PID</abbr>) stane 9.000 € – 18.000 € <a href="#vir-pd-omisli">[12]</a><a href="#vir-gh-omisli-2026">[25]</a><a href="#vir-marh-cenik">[40]</a><a href="#vir-mhe-noah">[51]</a>.
       Lumar in Jelovica navajata, da sta DGD in PZI vključena v ceno hiše; Jelovica ju ovrednoti na do 15.000 € <a href="#vir-lumar-vkljuceno">[52]</a><a href="#vir-jelovica-paket">[53]</a>.
       Projekt izvedenih del (PID) stane okoli petino DGD, 1.000 € – 1.800 € <a href="#vir-marh-cenik">[40]</a>.</p>
     <p>Posebej plačate geodetski načrt (500 € – 850 €) <a href="#vir-geometri-cenik">[43]</a><a href="#vir-jkplog-cenik">[44]</a>, geološko-geomehansko poročilo s sondažnim izkopom (400 € – 800 €, na zahtevnem terenu lahko precej več) <a href="#vir-mm-geomeh">[49]</a>,
@@ -268,7 +309,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   <section class="prose"><h2>Subvencija Eko sklada za novogradnjo</h2>
     <p>Eko sklad po javnem pozivu 105SUB-sNESOB23 subvencionira skoraj ničenergijske hiše (sNES+): 170, 150, 130, 110, 100 ali 90 € na m² neto ogrevane površine,
       odvisno od vrste izolacije in potrebe po toploti, za največ 150 m² samostoječe hiše, torej do 25.500 € <a href="#vir-eko-105">[26]</a>.
-      Subvencija je največ 30 % upravičenih stroškov, ti pa so pri gradnji na ključ največ polovica pogodbene vrednosti, torej največ 15 % cene hiše.
+      Subvencija je največ 30 % upravičenih stroškov, ti pa so pri gradnji <abbr title="vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje">na ključ</abbr> največ polovica pogodbene vrednosti, torej največ 15 % cene hiše.
       Projekt, nadzor, zunanja ureditev in sončna elektrarna niso upravičeni stroški.</p>
     <p>Pogoji so strogi: izračun PHPP, potreba po toploti in hladu največ 15 kWh/m²a, zrakotesnost n50 ≤ 0,6, rekuperacija vsaj 80 %, zbiralnik deževnice vsaj 6 m³, sončna elektrarna in vsaj 70 % obnovljivih virov. Brez sončne elektrarne do subvencije niste upravičeni; 10 €/m² manj dobite le, če distributer priključitev elektrarne zavrne <a href="#vir-eko-105-cistopis">[30]</a>.
       Lumar in Jelovica navajata ceno, ki že upošteva subvencijo, zato je kalkulator pri teh hišah ne odšteje še enkrat.
@@ -289,6 +330,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     <a class="btn line" href="../cena-montazne-hise/">Primerjava cen</a>
     <a class="btn line" href="../primerjava/">Primerjava hiš</a>
   </div>
+<details class="gloss"><summary>Kaj pomenijo izrazi na tej strani?</summary><dl><div><dt>BTP</dt><dd>bruto tlorisna površina: površina vseh etaž, merjena po zunanjih merah sten</dd></div><div><dt>psz</dt><dd>prispevna stopnja zavezanca: delež stroškov komunalne opreme, ki ga plača investitor</dd></div><div><dt>Cpo</dt><dd>cena komunalne opreme na m² parcele, določi jo občinski odlok</dd></div><div><dt>Cto</dt><dd>cena komunalne opreme na m² bruto tlorisne površine, določi jo občinski odlok</dd></div><div><dt>Dpo</dt><dd>delež parcele v izračunu komunalnega prispevka</dd></div><div><dt>Dto</dt><dd>delež površine objekta v izračunu komunalnega prispevka</dd></div><div><dt>Fn</dt><dd>faktor namembnosti: utež za vrsto stavbe, za stanovanjske hiše jo določi odlok</dd></div><div><dt>n50</dt><dd>zrakotesnost: kolikokrat se zrak v hiši izmenja v eni uri pri tlačni razliki 50 Pa; manjša številka je boljša</dd></div><div><dt>PHPP</dt><dd>program za izračun energijske bilance pasivne hiše (Passivhaus Projektierungspaket)</dd></div><div><dt>IDZ</dt><dd>idejna zasnova, prvi korak projekta</dd></div><div><dt>DGD</dt><dd>dokumentacija za pridobitev gradbenega dovoljenja</dd></div><div><dt>PZI</dt><dd>projekt za izvedbo, po katerem se hiša gradi</dd></div><div><dt>PID</dt><dd>projekt izvedenih del, ki opiše hišo, kot je bila zgrajena</dd></div><div><dt>sNES+</dt><dd>skoraj ničenergijska stavba po pogojih Eko sklada, pogoj za subvencijo za novo hišo</dd></div><div><dt>na ključ</dt><dd>vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje</dd></div></dl></details>
 </main>
 <footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../cena-montazne-hise/">Cene montažnih hiš</a><a href="../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../majhne-montazne-hise/">Majhne hiše</a><a href="../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../komunalni-prispevek/">Komunalni prispevek</a><a href="../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../tlorisi-montaznih-his/">Tlorisi</a><a href="../primerjava/">Primerjava</a></nav></div></footer>
 <script src="../compare.js"></script>
@@ -304,10 +346,15 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   const rng = k => { const v = I[k].value; return typeof v === 'object' ? [v.min, v.max] : [v, v]; };
   const RANK = { low: 0, medium: 1, high: 2 }, TAG = { high: 'uradni podatek', medium: 'okvirno', low: 'zelo okvirno' };
   const houses = Object.fromEntries(D.houses.map(h => [h.slug, h]));
-  const num = id => Math.max(0, parseFloat($(id).value) || 0);
+  // amounts are typed as 185000 or 185.000 (thousands with dots, decimals with a comma) and shown grouped after editing
+  const num = id => Math.max(0, parseFloat($(id).value.replace(/[\s.€]/g, '').replace(',', '.')) || 0);
+  const group = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const NUMS = ['cp', 'ca', 'plot'];
+  const fmt = id => { const n = num(id); if (n && Number.isInteger(n)) $(id).value = group(n); };
   const FIELDS = ['h', 'cp', 'ca', 'cf', 'cs', 'plot', 'kp', 'kw', 'san', 'pd', 'zem', 'zu', 'snes', 'tier'];
   const CUSTOM = ['cp', 'ca', 'cf', 'cs'];
-  const val = id => $(id).type === 'checkbox' ? ($(id).checked ? '1' : '0') : $(id).value;
+  const COLORS = ['#ffc477', '#ff9d4d', '#9fe0b5', '#8fb8ff', '#c9a7ff', '#ff9d8a', '#e8d98a', '#93a3c0'];
+  const val = id => $(id).type === 'checkbox' ? ($(id).checked ? '1' : '0') : NUMS.includes(id) ? String(num(id) || '') : $(id).value;
 
   // Several items in one line: sum the ranges, keep the weakest confidence and all sources.
   function sum(label, keys, note) {
@@ -350,6 +397,9 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
       const byArea = rate * Math.min(h.area, e.max_area_m2), cap = Math.min(e.max_eur, 0.3 * 0.5 * h.price), s = h.sub ? 0 : Math.min(byArea, cap);
       out.push({ ...sum('Subvencija Eko sklada', ['eko_sklad_snes']), lo: -s, hi: -s, note: h.sub ? 'cena te hiše že upošteva subvencijo, zato je ne odštejemo še enkrat'
         : `${rate} €/m² × ${Math.round(Math.min(h.area, e.max_area_m2))} m²` + (cap < byArea ? `, omejeno na ${cap === e.max_eur ? 'najvišji znesek' : '15 % cene hiše'}` : '') });
+      // no sourced figure for the upgrade, so it is named, not priced
+      out.push({ label: 'Nadgradnja na sNES+', lo: 0, hi: 0, txt: 'ni vključena', tag: 'ni v izračunu',
+        note: 'Nadgradnja na standard sNES+ (PHPP, rekuperacija, sončna elektrarna …) ni vključena – zahtevajte ponudbo.' });
     }
     return out;
   }
@@ -365,19 +415,30 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     if (!h.price || !h.area) {
       $('total').innerHTML = '<span class="eyebrow">Skupaj</span><b>—</b><p>Vpišite ceno in neto površino hiše.</p>';
       $('lines').innerHTML = '';
+      $('stotal').innerHTML = '<span>Vpišite ceno in površino hiše</span>';
       return;
     }
     const ls = lines(h), lo = ls.reduce((a, l) => a + l.lo, 0), hi = ls.reduce((a, l) => a + l.hi, 0);
     const mids = ls.map(l => (l.lo + l.hi) / 2), mid = mids.reduce((a, b) => a + b, 0);
-    $('total').innerHTML = `<span class="eyebrow">Skupaj</span><b>${Math.round(lo) === Math.round(hi) ? 'približno ' + eur(lo) : 'od ' + eur(lo) + ' do ' + eur(hi)}</b>
-      <p>${esc(h.name)}, ${Math.round(h.area)} m² neto · na m² od ${eur(lo / h.area)} do ${eur(hi / h.area)}</p>`;
+    const costs = mids.reduce((a, v) => a + Math.max(0, v), 0), pctOf = v => costs > 0 ? v / costs * 100 : 0;
+    const color = [], parts = [];
+    ls.forEach((l, i) => { if (mids[i] > 0) { color[i] = COLORS[parts.length % COLORS.length]; parts.push(i); } });
+    const exact = Math.round(lo) === Math.round(hi), sub = ls.find(l => l.lo < 0);
+    $('total').innerHTML = `<span class="eyebrow">Skupaj</span><b>${exact ? 'približno ' + eur(lo) : 'od ' + eur(lo) + ' do ' + eur(hi)}</b>
+      ${exact ? '' : `<p class="likely">Najverjetneje okoli <strong>${eur(Math.round(mid / 100) * 100)}</strong> (sredina razpona vsake postavke)</p>`}
+      <p>${esc(h.name)}, ${Math.round(h.area)} m² neto · na m² od ${eur(lo / h.area)} do ${eur(hi / h.area)}</p>
+      <div class="stack" role="img" aria-label="Kam gre denar: ${parts.map(i => `${ls[i].label} ${Math.round(pctOf(mids[i]))} %`).join(', ')}">${parts.map(i =>
+        `<i style="width:${pctOf(mids[i]).toFixed(2)}%;background:${color[i]}"></i>`).join('')}</div>
+      <ul class="legend" aria-hidden="true">${parts.map(i => `<li><i style="background:${color[i]}"></i>${ls[i].label} <span>${Math.round(pctOf(mids[i]))} %</span></li>`).join('')}${sub
+        ? `<li><i class="neg"></i>${sub.label} <span>${eur(sub.lo)}</span></li>` : ''}</ul>`;
+    $('stotal').innerHTML = `<span><small>Skupaj</small> ${exact ? eur(lo) : eur(lo) + ' – ' + eur(hi)}</span><span class="go">Razčlenitev ↓</span>`;
     $('lines').innerHTML = `<table class="tbl lines"><thead><tr><th scope="col">Postavka</th><th scope="col" style="text-align:right">Znesek</th></tr></thead><tbody>${ls.map((l, i) => {
-      const name = l.house && l.house.slug ? `<a href="../${l.house.slug}/">${esc(l.house.name)}</a><button type="button" class="cmp sm" data-slug="${l.house.slug}">+ Primerjaj</button>` : '';
+      const name = l.house && l.house.slug ? `<a href="../${l.house.slug}/">${esc(l.house.name)}</a><button type="button" class="cmp sm" data-slug="${l.house.slug}" data-name="${esc(l.house.name)}" aria-label="Dodaj ${esc(l.house.name)} v primerjavo">+ Primerjaj</button>` : '';
       const src = (l.src || []).map(s => `<a href="#vir-${s}">[${D.srcNum[s]}]</a>`).join('');
-      const pct = mid > 0 ? Math.min(100, Math.abs(mids[i]) / mid * 100) : 0;
-      return `<tr><th scope="row">${l.label}${name ? '<small>' + name + '</small>' : ''}${l.note ? `<small>${esc(l.note)}</small>` : ''}
-        <span class="share" title="${Math.round(pct)} % skupaj"><i class="${mids[i] < 0 ? 'neg' : ''}" style="width:${pct.toFixed(1)}%"></i></span></th>
-        <td class="n">${span(l.lo, l.hi)}<small>${l.tag || TAG[l.conf]} ${src}</small></td></tr>`;
+      const pct = Math.min(100, pctOf(Math.abs(mids[i])));
+      return `<tr><th scope="row">${l.label}${name ? '<small>' + name + '</small>' : ''}${l.note ? `<small>${esc(l.note)}</small>` : ''}${src ? `<small class="src">Viri: ${src}</small>` : ''}
+        ${mids[i] ? `<span class="share" title="${Math.round(pct)} % stroškov"><i class="${mids[i] < 0 ? 'neg' : ''}" style="width:${pct.toFixed(1)}%${color[i] ? ';background:' + color[i] : ''}"></i></span>` : ''}</th>
+        <td class="n">${l.txt || span(l.lo, l.hi)}<small>${l.tag || TAG[l.conf]}</small></td></tr>`;
     }).join('')}</tbody></table>`;
     window.HVCompare.refresh();
   }
@@ -392,6 +453,9 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     else { el.value = q.get(id); if (el.tagName === 'SELECT' && !el.value) el.value = before; }
   }
   if (!q.has('pd')) $('pd').checked = docsIn();
+  NUMS.forEach(id => { fmt(id); $(id).addEventListener('blur', () => fmt(id)); });
+  // mobile: a bar with the total while the form is on screen, gone once the result itself is in view
+  if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { $('stotal').hidden = e.isIntersecting; }).observe($('res'));
   $('h').addEventListener('change', () => { $('pd').checked = docsIn(); });
   $('calc').addEventListener('input', render);
   $('calc').addEventListener('change', render);

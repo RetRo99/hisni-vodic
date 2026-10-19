@@ -96,7 +96,20 @@ footer nav a:hover { color: var(--ink); }
 .head .prov { color: var(--mist); margin-top: 10px; }
 .photo { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); aspect-ratio: 600 / 315; }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+@media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
+.specs dt { font-size: 11px; }
+.na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
+abbr[title] { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+sub { font-size: max(12px, .75em); }
+.gloss { border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); padding: 14px 18px; color: #c9d3e6; font-size: 14px; max-width: 60em; }
+.gloss summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+.gloss dl { display: grid; gap: 8px; margin: 12px 0 0; }
+.gloss dt { display: inline; font-weight: 600; color: var(--ink); }
+.gloss dt::after { content: ": "; }
+.gloss dd { display: inline; margin: 0; }
+.basis { color: var(--mist); font-size: 14px; margin: 10px 0 0; max-width: 60em; }
+.basis a, .basis b { color: var(--ink); }
 .lede { color: #c9d3e6; font-size: 18px; max-width: 44em; margin: 0; }
 .lede p { margin: 0 0 10px; }
 h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12px; }
@@ -134,13 +147,16 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
 .tbl th, .tbl td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .tbl tr:last-child > * { border-bottom: 0; }
-.tbl thead th { font: 500 10px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
+.tbl thead th { font: 500 11px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
 .tbl tbody th { font-weight: 600; white-space: nowrap; }
 .tbl .n { font-family: var(--font-data); font-size: 14px; white-space: nowrap; }
 .tbl .stage { color: var(--mist); font-size: 13px; min-width: 260px; }
 .tbl td:first-child { min-width: 170px; }
 .tbl a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
 .tbl a:hover { color: var(--glow); }
+.tbl .n small { display: block; min-width: 13em; max-width: 18em; white-space: normal; font: 400 12.5px/1.4 var(--font-body); color: var(--mist); margin-top: 3px; }
+.tbl .hth { display: flex; align-items: center; gap: 12px; }
+.tbl .hth img { width: 72px; height: auto; border-radius: 8px; flex: none; background: var(--slate); }
 .points { margin: 0; padding-left: 20px; color: #c9d3e6; display: grid; gap: 10px; max-width: 48em; }
 .points b { color: var(--ink); }
 
@@ -149,7 +165,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 @media (min-width: 960px) { .calc { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; } }
 .form { display: grid; gap: 16px; background: var(--dusk); border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); padding: 20px; min-width: 0; }
 .form label, .form .f { display: grid; gap: 6px; font-size: 14px; color: var(--mist); min-width: 0; }
-.form select, .form input[type=number] { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
+.form select, .form input[type=text] { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
 .form label.ck { display: flex; gap: 10px; align-items: flex-start; color: var(--ink); cursor: pointer; }
 .form .ck input { margin: 4px 0 0; accent-color: var(--glow); flex: none; }
 .form small { font-size: 12.5px; line-height: 1.45; color: var(--mist); }
@@ -163,6 +179,29 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .lines th small { display: block; font-weight: 400; color: var(--mist); font-size: 12.5px; margin-top: 2px; }
 .lines .cmp { margin-left: 6px; }
 .lines td { text-align: right; }
+@media (min-width: 641px) { .lines td { width: 1%; white-space: nowrap; } }
+.lines th small.src { font-size: 12px; overflow-wrap: anywhere; }
+.lines th small.src a { color: var(--mist); text-decoration: none; }
+.lines th small.src a:hover { color: var(--ink); }
+.total .likely { font-size: 15px; color: var(--ink); }
+.total .likely strong { color: var(--glow); font-variant-numeric: tabular-nums; }
+.stack { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 14px; background: var(--line); }
+.stack i { display: block; height: 100%; }
+.legend { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--mist); }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.legend i.neg { background: #7fd1a8; }
+.legend span { color: var(--ink); font-variant-numeric: tabular-nums; }
+.stotal { display: none; }
+@media (max-width: 959px) {
+  .stotal { display: flex; position: fixed; z-index: 29; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); justify-content: space-between; align-items: center; gap: 12px;
+    padding: 12px 18px; border-radius: 18px; background: var(--dusk); box-shadow: inset 0 0 0 1px var(--glow), 0 12px 40px rgba(0,0,0,.5); color: var(--ink); text-decoration: none; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .stotal[hidden] { display: none; }
+  .stotal small { display: block; font: 500 11px/1.2 var(--font-data); letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
+  .stotal .go { color: var(--glow); font-size: 14px; white-space: nowrap; }
+  body.has-tray .stotal { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+  .calc { padding-bottom: 72px; }
+}
 .lines td small { display: block; font-size: 12px; color: var(--mist); white-space: nowrap; margin-top: 4px; }
 .lines td small a { color: var(--mist); }
 .share { display: block; height: 4px; border-radius: 4px; background: var(--line); margin-top: 8px; overflow: hidden; }
@@ -190,15 +229,15 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../koliko-stane-gradnja-hise/">Stroški gradnje</a> / Subvencija Eko sklada</div>
     <div class="head"><div><h1 class="display">Subvencija Eko sklada za novo hišo 2026</h1><div class="prov">Javni poziv 105SUB-sNESOB23 · stanje 17. 3. 2026</div></div></div>
   </div>
-  <div class="lede"><p>Eko sklad po javnem pozivu 105SUB-sNESOB23 daje nepovratno subvencijo za novo skoraj ničenergijsko hišo (sNES+): od 90 do 170 € na m² neto ogrevane površine,
+  <div class="lede"><p>Eko sklad po javnem pozivu 105SUB-sNESOB23 daje nepovratno subvencijo za novo skoraj ničenergijsko hišo (<abbr title="skoraj ničenergijska stavba po pogojih Eko sklada, pogoj za subvencijo za novo hišo">sNES+</abbr>): od 90 do 170 € na m² neto ogrevane površine,
     za največ 150 m² samostoječe hiše (120 m² pri dvojčku ali vrstni hiši), torej <b>do 25.500 €</b> <a href="#vir-eko-105">[1]</a><a href="#vir-eko-105-cistopis">[2]</a>.
     Poziv je odprt, nazadnje spremenjen 12. 3. 2026 <a href="#vir-eko-105-spr2026">[3]</a>.</p></div>
   <section><h2>Koliko znaša subvencija na m²?</h2>
-    <div class="scroll"><table class="tbl"><thead><tr><th scope="col">Izolacija</th><th scope="col">QH ≤ 10 kWh/m²a</th><th scope="col">QH ≤ 15 kWh/m²a</th><th scope="col">Največ za 150 m²</th></tr></thead><tbody><tr><th scope="row">Skupina I <small>naravna izolacija in lesena okna</small></th><td class="n">170 €/m²</td><td class="n">150 €/m²</td><td class="n">25.500 €</td></tr><tr><th scope="row">Skupina II <small>mineralna izolacija</small></th><td class="n">130 €/m²</td><td class="n">110 €/m²</td><td class="n">19.500 €</td></tr><tr><th scope="row">Skupina III <small>sintetična izolacija</small></th><td class="n">100 €/m²</td><td class="n">90 €/m²</td><td class="n">15.000 €</td></tr></tbody></table></div>
+    <div class="scroll"><table class="tbl"><thead><tr><th scope="col">Izolacija</th><th scope="col"><abbr title="letna potreba po toploti za ogrevanje na m² ogrevane površine (kWh/m²a)">QH</abbr> ≤ 10 kWh/m²a</th><th scope="col">QH ≤ 15 kWh/m²a</th><th scope="col">Največ za 150 m²</th></tr></thead><tbody><tr><th scope="row">Skupina I <small>naravna izolacija in lesena okna</small></th><td class="n">170 €/m²</td><td class="n">150 €/m²</td><td class="n">25.500 €</td></tr><tr><th scope="row">Skupina II <small>mineralna izolacija</small></th><td class="n">130 €/m²</td><td class="n">110 €/m²</td><td class="n">19.500 €</td></tr><tr><th scope="row">Skupina III <small>sintetična izolacija</small></th><td class="n">100 €/m²</td><td class="n">90 €/m²</td><td class="n">15.000 €</td></tr></tbody></table></div>
     <p class="credit-line">QH je letna potreba po toploti za ogrevanje na m². Znesek na m² je odvisen od vrste toplotne izolacije in od QH <a href="#vir-eko-105">[1]</a>. V Triglavskem narodnem parku je subvencija za 25 % višja.</p>
   </section>
   <section class="prose"><h2>Omejitve: največ 15 % cene hiše</h2>
-    <p>Subvencija je največ 30 % upravičenih stroškov. Pri gradnji na ključ so upravičeni stroški največ polovica pogodbene vrednosti, zato subvencija ne preseže okoli 15 % cene hiše <a href="#vir-eko-105">[1]</a><a href="#vir-eko-105-cistopis">[2]</a>.</p>
+    <p>Subvencija je največ 30 % upravičenih stroškov. Pri gradnji <abbr title="vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje">na ključ</abbr> so upravičeni stroški največ polovica pogodbene vrednosti, zato subvencija ne preseže okoli 15 % cene hiše <a href="#vir-eko-105">[1]</a><a href="#vir-eko-105-cistopis">[2]</a>.</p>
     <p><b>Primer:</b> <a href="../rihter-hisa-162/">Rihter Hiša 162</a> ima 162 m² in stane 280.530 €. Subvencija se računa za največ 150 m²:
       pri 170 €/m² je to 25.500 €, pri 90 €/m² 13.500 €. Meja 15 % cene je 42.080 € in pri tej hiši ne omejuje: dobite
       25.500 € oziroma 13.500 €. Pri 170 €/m² meja 15 % odloči le pri hiši, ki stane manj kot okoli 1.133 € na m²;
@@ -206,9 +245,9 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   </section>
   <section class="prose"><h2>Pogoji za subvencijo</h2>
     <ul>
-      <li>Izračun energijske bilance s programom PHPP (stane okoli 400 € – 650 € <a href="#vir-arhim-phpp">[4]</a>).</li>
-      <li>Letna potreba po toploti za ogrevanje (QH) in hlajenje (QK) največ 15 kWh/m².</li>
-      <li>Zrakotesnost n50 največ 0,6 izmenjave zraka na uro.</li>
+      <li>Izračun energijske bilance s programom <abbr title="program za izračun energijske bilance pasivne hiše (Passivhaus Projektierungspaket)">PHPP</abbr> (stane okoli 400 € – 650 € <a href="#vir-arhim-phpp">[4]</a>).</li>
+      <li>Letna potreba po toploti za ogrevanje (QH) in hlajenje (<abbr title="letna potreba po hladu za hlajenje na m² (kWh/m²a)">QK</abbr>) največ 15 kWh/m².</li>
+      <li>Zrakotesnost <abbr title="zrakotesnost: kolikokrat se zrak v hiši izmenja v eni uri pri tlačni razliki 50 Pa; manjša številka je boljša">n50</abbr> največ 0,6 izmenjave zraka na uro.</li>
       <li>Prezračevanje z vračanjem toplote (rekuperacija) z izkoristkom vsaj 80 %.</li>
       <li>Zbiralnik deževnice s prostornino vsaj 6 m³.</li>
       <li>Sončna elektrarna, ki pokrije porabo elektrike v hiši, je obvezna: brez nje do subvencije niste upravičeni. 10 €/m² manj dobite le, če distributer priključitev elektrarne zavrne <a href="#vir-eko-105-cistopis">[2]</a>.</li>
@@ -232,6 +271,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     <a class="btn line" href="https://www.ekosklad.si/prebivalstvo/pridobite-spodbudo/objava/javni-poziv-105sub-snesob23-nepovratne-financne-spodbude-obcanom-za-skoraj-nicenergijske-snes-stavbe" target="_blank" rel="noopener">Poziv na strani Eko sklada ↗</a>
   </div>
   <section class="prose"><h2>Viri</h2><ol class="viri"><li id="vir-eko-105"><a href="https://www.ekosklad.si/prebivalstvo/pridobite-spodbudo/objava/javni-poziv-105sub-snesob23-nepovratne-financne-spodbude-obcanom-za-skoraj-nicenergijske-snes-stavbe" target="_blank" rel="noopener">Javni poziv 105SUB-sNESOB23 (čistopis, spremenjen 17. 3. 2026)</a> <span>· Eko sklad</span></li><li id="vir-eko-105-cistopis"><a href="https://www.ekosklad.si/uploads/93cbe1e3-7c13-493b-a76c-ab71ba6f6c0a/" target="_blank" rel="noopener">Javni poziv 105SUB-sNESOB23, čistopis</a> <span>· Eko sklad</span></li><li id="vir-eko-105-spr2026"><a href="https://www.ekosklad.si/uploads/928b595a-36a0-4721-a59c-5c5f99c5977a/12.-3.-2026_Sprememba_javnega_poziva_105SUB-sNESOB23.pdf" target="_blank" rel="noopener">Sprememba javnega poziva 105SUB-sNESOB23 (12. 3. 2026)</a> <span>· Eko sklad</span></li><li id="vir-arhim-phpp"><a href="https://www.arhim.si/phpp/" target="_blank" rel="noopener">PHPP izračun</a> <span>· Arhim</span></li></ol></section>
+<details class="gloss"><summary>Kaj pomenijo izrazi na tej strani?</summary><dl><div><dt>QH</dt><dd>letna potreba po toploti za ogrevanje na m² ogrevane površine (kWh/m²a)</dd></div><div><dt>QK</dt><dd>letna potreba po hladu za hlajenje na m² (kWh/m²a)</dd></div><div><dt>n50</dt><dd>zrakotesnost: kolikokrat se zrak v hiši izmenja v eni uri pri tlačni razliki 50 Pa; manjša številka je boljša</dd></div><div><dt>PHPP</dt><dd>program za izračun energijske bilance pasivne hiše (Passivhaus Projektierungspaket)</dd></div><div><dt>sNES+</dt><dd>skoraj ničenergijska stavba po pogojih Eko sklada, pogoj za subvencijo za novo hišo</dd></div><div><dt>na ključ</dt><dd>vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje</dd></div></dl></details>
 </main>
 <footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../cena-montazne-hise/">Cene montažnih hiš</a><a href="../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../majhne-montazne-hise/">Majhne hiše</a><a href="../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../komunalni-prispevek/">Komunalni prispevek</a><a href="../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../tlorisi-montaznih-his/">Tlorisi</a><a href="../primerjava/">Primerjava</a></nav></div></footer>
 <script src="../compare.js"></script>
