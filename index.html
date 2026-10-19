@@ -484,6 +484,28 @@ footer p { max-width: 80ch; margin: 0; }
   const state = { floors: '1', bedrooms: '3', bathrooms: '2', area: 130, style: 'any', budget: 300000, nobudget: false, stretch: '10', prio: { energy: '2', sound: '1', natural: '1', speed: '0' }, step: 0, selected: null, done: false };
   try { const s = JSON.parse(localStorage.getItem('hise-quiz-3') || '{}'); Object.assign(state, s, { selected: null }); } catch (e) {}
 
+  // Shared result link: #r=floors_bedrooms_bathrooms_area_style_budget(0 = none)_stretch_prio[_house slug]
+  let shared = false; // a result opened from someone's link is not saved over the visitor's own answers until they change one
+  function shareLink(top, isBest) {
+    const v = [state.floors, state.bedrooms, state.bathrooms, state.area, state.style, state.nobudget ? 0 : state.budget, state.stretch, PRIO.map(([k]) => state.prio[k]).join('')];
+    if (!isBest && top.slug) v.push(top.slug);
+    return location.origin + location.pathname + '#r=' + v.join('_');
+  }
+  function fromLink() {
+    const m = location.hash.match(/^#r=([a-z0-9._-]+)$/i);
+    if (!m) return false;
+    const v = m[1].split('_'), one = (x, list) => list.includes(x) ? x : null;
+    const area = +v[3], budget = +v[5];
+    const s = { floors: one(v[0], ['1', '1.5', '2', 'any']), bedrooms: one(v[1], ['1', '2', '3', '4']), bathrooms: one(v[2], ['1', '2', '3']),
+      area: area >= 40 && area <= 250 ? Math.round(area / 5) * 5 : null, style: one(v[4], ['classic', 'modern', 'mono', 'hip', 'any']),
+      budget: budget === 0 ? state.budget : budget >= 80000 && budget <= 600000 ? Math.round(budget / 10000) * 10000 : null, nobudget: budget === 0,
+      stretch: one(v[6], ['0', '10', '20', '35']) };
+    if (v.length < 8 || Object.values(s).some(x => x === null) || !/^[012]{4}$/.test(v[7])) return false;
+    const pick = v[8] && MODELS.find(x => x.slug === v[8]);
+    Object.assign(state, s, { prio: Object.fromEntries(PRIO.map(([k], i) => [k, v[7][i]])), step: STEPS.length - 1, done: true, selected: pick ? pick.id : null });
+    return (shared = true);
+  }
+
   const tiles = (key, opts) => `<div class="tiles" style="--c:${opts.length}">${opts.map((o, i) => `<label class="tile"><input type="radio" name="${key}" id="q-${key}-${o.v.replace('.', '_')}" value="${o.v}" ${state[key] === o.v ? 'checked' : ''}><span><em class="key">${i + 1}</em>${o.html}</span></label>`).join('')}</div>`;
   const fill = (v, min, max) => `--fill:${((v - min) / (max - min) * 100).toFixed(1)}%`;
   const STEPS = [
@@ -586,7 +608,7 @@ footer p { max-width: 80ch; margin: 0; }
     if (top.id !== lastStageId) { $('stage-scene').innerHTML = top.image ? photo(top, '(min-width: 900px) 45vw, 100vw') + `<span class="credit">Foto: ${esc(top.provider)}</span>` : scene(top, { h: 360 }); lastStageId = top.id; }
   }
   function renderResult(lightsOn) {
-    try { const { selected, ...s } = state; localStorage.setItem('hise-quiz-3', JSON.stringify(s)); } catch (e) {}
+    if (!shared) try { const { selected, ...s } = state; localStorage.setItem('hise-quiz-3', JSON.stringify(s)); } catch (e) {}
     const ranked = rank();
     renderStage(ranked[0]);
     // the result and its nav link stay hidden until the quiz is finished
@@ -596,7 +618,7 @@ footer p { max-width: 80ch; margin: 0; }
     const prov = PROVIDERS.find(p => p.id === top.providerId) || {};
     const cell = (k, v) => `<div><dt>${k}</dt><dd>${v}</dd></div>`;
     const facts = [prov.energy_class && 'Energija: ' + prov.energy_class, prov.build_time && 'Gradnja: ' + prov.build_time, prov.warranty_years && 'Garancija na konstrukcijo: ' + prov.warranty_years + ' let'].filter(Boolean);
-    $('reveal-eyebrow').textContent = state.done ? 'Vaša hiša' : 'Glede na dosedanje odgovore';
+    $('reveal-eyebrow').textContent = shared ? 'Deljen rezultat' : state.done ? 'Vaša hiša' : 'Glede na dosedanje odgovore';
     $('reveal-title').textContent = isBest ? (state.done ? 'Ta hiša vam pristaja' : 'Najboljše ujemanje') : 'Izbrana hiša';
     $('result').innerHTML = `
       <article class="pick">
@@ -612,7 +634,7 @@ footer p { max-width: 80ch; margin: 0; }
             <div><div class="eyebrow">Zakaj ta hiša</div><ul class="why">${top.s.reasons.map(([c, t]) => `<li class="${c === 'ok' ? '' : c}">${esc(t)}</li>`).join('')}</ul></div>
             <div class="edge"><div class="eyebrow">Prednost proizvajalca ${esc(top.provider)}</div>${esc(prov.edge || '')}${facts.length ? `<ul class="facts">${facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}</div>
           </div>
-          <div class="actions">${top.url ? `<a class="btn glow" href="${esc(top.url)}" target="_blank" rel="noopener">Odpri hišo pri proizvajalcu <span class="arrow">↗</span></a>` : ''}${!isBest ? `<button type="button" class="btn line" id="back-best">Nazaj na najboljše ujemanje</button>` : `<a class="btn line" href="#kviz">Spremeni odgovore</a>`}</div>
+          <div class="actions">${top.url ? `<a class="btn glow" href="${esc(top.url)}" target="_blank" rel="noopener">Odpri hišo pri proizvajalcu <span class="arrow">↗</span></a>` : ''}${!isBest ? `<button type="button" class="btn line" id="back-best">Nazaj na najboljše ujemanje</button>` : `<a class="btn line" href="#kviz">${shared ? 'Rešite kviz sami' : 'Spremeni odgovore'}</a>`}${state.done ? '<button type="button" class="btn line" id="share">Deli rezultat</button>' : ''}${top.slug ? `<button type="button" class="btn line cmp" data-slug="${esc(top.slug)}">+ Primerjaj</button>` : ''}</div>
         </div>
       </article>
       <div class="alts"><h3>Druge hiše, ki vam ustrezajo</h3><div class="alt-row">
@@ -620,6 +642,18 @@ footer p { max-width: 80ch; margin: 0; }
       </div></div>`;
     document.querySelectorAll('.alt').forEach(b => b.addEventListener('click', () => { state.selected = b.dataset.id; renderResult(true); lightUp(); $('hisa').scrollIntoView({ block: 'start' }); }));
     const bb = $('back-best'); if (bb) bb.addEventListener('click', () => { state.selected = null; renderResult(true); lightUp(); });
+    const sh = $('share');
+    if (sh) sh.addEventListener('click', async () => {
+      const url = shareLink(top, isBest);
+      try { if (window.umami) window.umami.track('share-result', { house: top.name }); } catch (e) {}
+      if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+        try { await navigator.share({ title: 'Moja montažna hiša', text: `${top.name} (${top.provider}): ${top.s.pct} % ujemanje`, url }); } catch (e) {}
+        return;
+      }
+      try { await navigator.clipboard.writeText(url); sh.textContent = 'Povezava kopirana ✓'; setTimeout(() => { sh.textContent = 'Deli rezultat'; }, 2500); }
+      catch (e) { window.prompt('Kopirajte povezavo:', url); }
+    });
+    if (window.HVCompare) window.HVCompare.refresh();
   }
   function lightUp() { const s = $('pick-scene'); if (s) requestAnimationFrame(() => requestAnimationFrame(() => s.classList.remove('off'))); }
 
@@ -633,6 +667,7 @@ footer p { max-width: 80ch; margin: 0; }
     if (t.id === 'q-budget') { state.budget = +t.value; t.style.cssText = fill(state.budget, 80000, 600000); $('o-budget').textContent = fmtEur(state.budget); }
     if (t.id === 'q-nobudget') { state.nobudget = t.checked; $('q-budget').disabled = t.checked; $('o-budget').textContent = t.checked ? '—' : fmtEur(state.budget); }
     state.selected = null;
+    shared = false;
     renderResult();
     // tiles move on by themselves, so the quiz feels like tapping through
     if (t.type === 'radio' && STEPS[state.step].auto && state.step < STEPS.length - 1) {
@@ -664,7 +699,8 @@ footer p { max-width: 80ch; margin: 0; }
   $('chips').addEventListener('change', e => { provFilter = e.target.value; renderTable(); });
   function renderTable() {
     const rows = MODELS.filter(m => !provFilter || m.providerId === provFilter).sort((a, b) => (a.area_m2 ?? 0) - (b.area_m2 ?? 0));
-    $('tbl').innerHTML = `<thead><tr><th>Hiša</th><th>Proizvajalec</th><th>Etaže</th><th class="num">m²</th><th class="num">Spalnice</th><th class="num">Kopalnice</th><th>Streha</th><th class="num">Cena</th><th>Kaj cena vključuje</th></tr></thead><tbody>${rows.map(m => `<tr><td>${m.image ? `<img class="thumb" src="${esc(m.image)}" alt="" loading="lazy">` : '<span class="thumb"></span>'}<a href="${esc(m.slug)}/">${esc(m.name)}</a></td><td>${esc(m.provider)}</td><td>${floorLabel(m.floors)}${m.flags && m.flags.length ? ` <span class="muted" title="${esc(m.flags.join(', '))}">*</span>` : ''}</td><td class="num">${m.area_m2 ? Math.round(m.area_m2) : '—'}</td><td class="num">${m.bedrooms ?? '—'}</td><td class="num">${m.bathrooms ?? '—'}</td><td>${m.roof ? ROOF[m.roof] : '—'}</td><td class="num">${fmtEur(m.price_eur)}</td><td class="note">${m.price_eur != null ? esc(m.price_stage || '') : 'na povpraševanje'}</td></tr>`).join('')}</tbody>`;
+    $('tbl').innerHTML = `<thead><tr><th>Hiša</th><th><span class="sr-only">Primerjava</span></th><th>Proizvajalec</th><th>Etaže</th><th class="num">m²</th><th class="num">Spalnice</th><th class="num">Kopalnice</th><th>Streha</th><th class="num">Cena</th><th>Kaj cena vključuje</th></tr></thead><tbody>${rows.map(m => `<tr><td>${m.image ? `<img class="thumb" src="${esc(m.image)}" alt="" loading="lazy">` : '<span class="thumb"></span>'}<a href="${esc(m.slug)}/">${esc(m.name)}</a></td><td><button type="button" class="cmp sm" data-slug="${esc(m.slug)}">+ Primerjaj</button></td><td>${esc(m.provider)}</td><td>${floorLabel(m.floors)}${m.flags && m.flags.length ? ` <span class="muted" title="${esc(m.flags.join(', '))}">*</span>` : ''}</td><td class="num">${m.area_m2 ? Math.round(m.area_m2) : '—'}</td><td class="num">${m.bedrooms ?? '—'}</td><td class="num">${m.bathrooms ?? '—'}</td><td>${m.roof ? ROOF[m.roof] : '—'}</td><td class="num">${fmtEur(m.price_eur)}</td><td class="note">${m.price_eur != null ? esc(m.price_stage || '') : 'na povpraševanje'}</td></tr>`).join('')}</tbody>`;
+    if (window.HVCompare) window.HVCompare.refresh();
   }
   const bars = r => `<i>${[1, 2, 3].map(k => `<b class="${r != null && r >= k ? 'f' : ''}"></b>`).join('')}</i>`;
   $('makers').innerHTML = PROVIDERS.map(p => `<div class="maker"><h3>${esc(p.name)}</h3><p>${esc(p.description || '')}</p>${p.ratings ? `<div class="bars">${PRIO.map(([k]) => `<span>${PRIO_SHORT[k]}</span>${bars(p.ratings[k])}`).join('')}</div>` : ''}<div class="count">${(p.models || []).length} tipskih hiš${p.website ? ` · <a href="${esc(p.website)}" target="_blank" rel="noopener">${esc(p.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))} ↗</a>` : ''}</div></div>`).join('');
@@ -685,9 +721,11 @@ footer p { max-width: 80ch; margin: 0; }
   drawHero();
   window.addEventListener('resize', drawHero);
 
+  const fromShare = fromLink();
   renderTable();
   renderStep(false);
   renderResult(false);
+  if (fromShare) { $('hisa').scrollIntoView({ block: 'start' }); setTimeout(lightUp, 350); }
 })();
 </script>
 
@@ -728,5 +766,6 @@ footer p { max-width: 80ch; margin: 0; }
   if (chips) chips.addEventListener('change', function (e) { track('catalog-filter', { maker: e.target.value }); });
 })();
 </script>
+<script src="compare.js"></script>
 </body>
 </html>

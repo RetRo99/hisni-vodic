@@ -93,7 +93,7 @@ BAR = f'''<div class="bar"><div class="wrap">
   <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../{GUIDE}/">Cene</a><a href="../{PLANS}/">Tlorisi</a></nav>
 </div></div>'''
 FOOT = (f'<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev ({esc(data["collected"])}). '
-        'Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p></div></footer>')
+        'Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p></div></footer>\n<script src="../compare.js"></script>')
 
 
 def head(title, og_title, desc, url, image, ld):
@@ -206,6 +206,7 @@ def page(p, m):
   <div class="actions">
     <a class="btn glow" href="{SITE}#kviz">Ali vam pristaja? Rešite kviz <span class="arrow">→</span></a>
     <a class="btn line" href="{esc(m['url'])}" target="_blank" rel="noopener">{'Podrobnosti' if plans else 'Tloris in podrobnosti'} pri proizvajalcu ↗</a>
+    <button type="button" class="btn line cmp" data-slug="{m['slug']}">+ Primerjaj</button>
   </div>
   {plans_html}
   <div class="two">
@@ -349,7 +350,7 @@ def maker(p):
         price = eur(m['price_eur']) if m['price_eur'] else 'na povpraševanje'
         m2 = eur(round(m['price_eur'] / m['area_m2'])) + '/m²' if m['price_eur'] and m['area_m2'] else '—'
         rows.append(f'<tr><td><a href="../{m["slug"]}/">{esc(m["name"])}</a></td>{n(area)}{n(m["bedrooms"] or "—")}'
-                    f'<td>{ROOF.get(m["roof"], "—")}</td>{n(price)}{n(m2)}</tr>')
+                    f'<td>{ROOF.get(m["roof"], "—")}</td>{n(price)}{n(m2)}<td><button type="button" class="cmp sm" data-slug="{m["slug"]}">+ Primerjaj</button></td></tr>')
     others = ''.join(f'<li><a href="../{o["id"]}/">{esc(o["name"])}</a></li>' for o in data['providers'] if o is not p)
     maker_link, facts_html = maker_bits(p)
     desc = (f'{name}: {count}' + (f', cene od {eur(lo)} do {eur(hi)}' if priced else ', cene na povpraševanje') +
@@ -372,7 +373,7 @@ def maker(p):
   </div>
   {figure(img, 'Montažna hiša ' + name, name)}
   <div class="lede"><p>{esc(p.get('description', ''))}</p><p>{includes} <a href="../{GUIDE}/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
-  <section><h2>Vse hiše proizvajalca {esc(name)}</h2><div class="scroll"><table class="tbl">{thead('Hiša', 'Površina', 'Spalnice', 'Streha', 'Cena', 'Na m²')}<tbody>{''.join(rows)}</tbody></table></div></section>
+  <section><h2>Vse hiše proizvajalca {esc(name)}</h2><div class="scroll"><table class="tbl">{thead('Hiša', 'Površina', 'Spalnice', 'Streha', 'Cena', 'Na m²', '<span class="sr-only">Primerjava</span>')}<tbody>{''.join(rows)}</tbody></table></div></section>
   <div class="two">
     <div class="edge"><div class="eyebrow">Prednost proizvajalca {esc(name)}</div>{esc(p.get('edge') or '')}{facts_html}</div>
     <section class="maker-info"><h2>Spletna stran</h2>{maker_link}<h2>Drugi proizvajalci</h2><ul class="siblings">{others}</ul></section>
@@ -454,6 +455,135 @@ def plans_page():
 '''
 
 
+COMPARE = 'primerjava'
+COMPARE_CSS = '''
+.page > * { min-width: 0; }
+.cmp-tbl { table-layout: fixed; min-width: 640px; }
+.cmp-tbl th:first-child, .cmp-tbl td:first-child { width: 150px; min-width: 0; position: sticky; left: 0; background: var(--night); z-index: 1; }
+.cmp-tbl thead th { text-transform: none; letter-spacing: 0; font: inherit; color: var(--ink); white-space: normal; vertical-align: bottom; }
+.cmp-tbl .pic { aspect-ratio: 600 / 340; border-radius: 12px; overflow: hidden; background: var(--dusk); margin-bottom: 10px; }
+.cmp-tbl .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cmp-tbl thead a { font: 700 18px/1.2 var(--font-display); }
+.cmp-tbl thead small { display: block; color: var(--mist); margin: 2px 0 8px; }
+.cmp-tbl .rm { font: inherit; font-size: 13px; border: 0; background: none; color: var(--mist); padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.cmp-tbl tbody th { color: var(--mist); font-weight: 500; font-size: 13px; white-space: normal; }
+.cmp-tbl td { font-size: 15px; }
+.cmp-tbl td.small { font-size: 13px; color: var(--mist); }
+.cmp-tbl .best { color: var(--glow); }
+.cmp-tbl .best::after { content: "najnižja"; display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px; font: 500 10px/1.4 var(--font-data); letter-spacing: .08em; text-transform: uppercase; box-shadow: inset 0 0 0 1px var(--glow); }
+.cmp-tbl .plan { display: block; background: #fff; border-radius: 10px; overflow: hidden; }
+.cmp-tbl .plan img { width: 100%; height: auto; display: block; }
+.tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.tools select { font: inherit; color: var(--ink); background: var(--dusk); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 999px; padding: 12px 18px; max-width: 100%; }
+@media (max-width: 640px) {
+  .cmp-tbl { min-width: 500px; }
+  .cmp-tbl th:first-child, .cmp-tbl td:first-child { width: 92px; }
+  .cmp-tbl th, .cmp-tbl td { padding: 10px; }
+  .cmp-tbl thead a { font-size: 15px; }
+  .cmp-tbl .best::after { display: block; width: max-content; margin: 4px 0 0; }
+}
+.empty { padding: 28px; border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); color: #c9d3e6; }
+'''
+COMPARE_JS = r'''
+(function () {
+  const H = JSON.parse(document.getElementById('cmp-data').textContent);
+  const bySlug = Object.fromEntries(H.map(h => [h.slug, h]));
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // by hand: sl-SI number formatting leaves 4-digit numbers ungrouped (1655), the rest of the site writes 1.655
+  const eur = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' €';
+  const perM2 = h => h.price && h.area ? Math.round(h.price / h.area) : null;
+  const fromHash = decodeURIComponent(location.hash.slice(1)).split(',').filter(s => bySlug[s]).slice(0, 3);
+  let picks = fromHash.length ? fromHash : window.HVCompare.get().filter(s => bySlug[s]);
+  function lowest(fn) { const v = picks.map(s => fn(bySlug[s])).filter(x => x != null); return v.length > 1 ? Math.min(...v) : null; }
+  function render() {
+    window.HVCompare.set(picks);
+    history.replaceState(null, '', picks.length ? '#' + picks.join(',') : location.pathname);
+    for (const o of $('add').options) o.disabled = !!o.value && picks.includes(o.value);
+    $('add').hidden = picks.length >= 3;
+    $('copy').hidden = picks.length < 2;
+    if (picks.length < 2) {
+      $('cmp').innerHTML = `<div class="empty">${picks.length ? `Izbrana je <b>${esc(bySlug[picks[0]].name)}</b>. Dodajte še eno ali dve hiši.` : 'Izberite dve ali tri hiše.'}
+        Dodate jih z izbirnikom zgoraj ali z gumbom »+ Primerjaj« v <a href="../#katalog">katalogu</a> in na straneh hiš.</div>`;
+      return;
+    }
+    const hs = picks.map(s => bySlug[s]);
+    const lowPrice = lowest(h => h.price), lowM2 = lowest(perM2);
+    const rows = [
+      ['Cena', h => h.price ? `<span class="${h.price === lowPrice ? 'best' : ''}">${eur(h.price)}</span>` : 'na povpraševanje'],
+      ['Kaj cena vključuje', h => h.price ? esc(h.stage) : 'Proizvajalec cene ne objavlja.', 'small'],
+      ['Površina', h => h.area ? h.area + ' m²' : '—'],
+      ['Cena na m²', h => perM2(h) ? `<span class="${perM2(h) === lowM2 ? 'best' : ''}">${eur(perM2(h))}/m²</span>` : '—'],
+      ['Etaže', h => esc(h.floors)],
+      ['Spalnice', h => h.bed ?? '—'],
+      ['Kopalnice', h => h.bath ?? '—'],
+      ['Streha', h => esc(h.roof)],
+      ['Konstrukcija', h => esc(h.construction), 'small'],
+      ['Energija', h => esc(h.energy), 'small'],
+      ['Gradnja', h => esc(h.build), 'small'],
+      ['Garancija', h => h.warranty ? h.warranty + ' let' : '—'],
+      ['Tloris', h => h.plan ? `<a class="plan" href="../${esc(h.plan)}"><img src="../${esc(h.plan)}" alt="Tloris – ${esc(h.name)}" loading="lazy"></a>` : '—'],
+    ];
+    $('cmp').innerHTML = `<div class="scroll"><table class="tbl cmp-tbl"><thead><tr><th><span class="sr-only">Lastnost</span></th>${hs.map(h => `<th scope="col">
+        <div class="pic">${h.image ? `<img src="../${esc(h.image)}" alt="${esc(h.name)}">` : ''}</div>
+        <a href="../${h.slug}/">${esc(h.name)}</a><small>${esc(h.maker)}</small><button type="button" class="rm" data-rm="${h.slug}">Odstrani</button></th>`).join('')}</tr></thead>
+      <tbody>${rows.map(([label, f, cls]) => `<tr><th scope="row">${label}</th>${hs.map(h => `<td${cls ? ` class="${cls}"` : ''}>${f(h) || '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  }
+  $('cmp').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (b) { picks = picks.filter(s => s !== b.dataset.rm); render(); } });
+  $('add').addEventListener('change', e => { if (e.target.value && picks.length < 3) picks = picks.concat(e.target.value); e.target.value = ''; render(); });
+  $('copy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(location.href); $('copy').textContent = 'Povezava kopirana ✓'; setTimeout(() => { $('copy').textContent = 'Kopiraj povezavo'; }, 2500); }
+    catch (e) { window.prompt('Kopirajte povezavo:', location.href); }
+    try { if (window.umami) window.umami.track('compare-share', { houses: picks.join(',') }); } catch (e) {}
+  });
+  render();
+})();
+'''
+
+
+def compare_page():
+    url = SITE + COMPARE + '/'
+    rows = []
+    for p, m in models:
+        plans = house_plans(m)
+        rows.append({'slug': m['slug'], 'name': f"{p['name']} {m['name']}", 'maker': p['name'], 'price': m['price_eur'], 'stage': m['price_stage'],
+                     'area': round(m['area_m2']) if m['area_m2'] else None, 'floors': FLOORS.get(m['floors'], ('—',))[0],
+                     'bed': m['bedrooms'], 'bath': m['bathrooms'], 'roof': ROOF.get(m['roof'], '—'), 'image': m.get('image'),
+                     'plan': plans[0] if plans else None, 'construction': p.get('construction'), 'energy': p.get('energy_class'),
+                     'build': p.get('build_time'), 'warranty': p.get('warranty_years')})
+    options = ''.join(f'<optgroup label="{esc(p["name"])}">' + ''.join(f'<option value="{m["slug"]}">{esc(m["name"])}</option>' for m in p['models']) + '</optgroup>'
+                      for p in data['providers'])
+    desc = 'Primerjajte do tri tipske montažne hiše slovenskih proizvajalcev: cena, kaj cena vključuje, m², cena na m², sobe, energija, garancija in tloris.'
+    ld = {'@context': 'https://schema.org', '@type': 'WebPage', 'name': 'Primerjava montažnih hiš', 'url': url, 'description': desc, 'inLanguage': 'sl'}
+    data_json = json.dumps(rows, ensure_ascii=False).replace('</', '<\\/')
+    # noindex: the table is built in the browser from the link, so the page has no content of its own for search
+    return (head('Primerjava montažnih hiš · Hišni vodič', 'Primerjava montažnih hiš', desc, url, SITE + 'img/large/riko-mila.jpg', ld)
+            .replace('</head>', '<meta name="robots" content="noindex, follow"><style>' + TABLE_CSS + COMPARE_CSS + '</style></head>') + f'''
+<body data-page="compare">
+{BAR}
+<main class="wrap page">
+  <div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / Primerjava</div>
+    <div class="head"><div><h1 class="display">Primerjava hiš</h1><div class="prov">Do tri hiše drugo ob drugi</div></div></div>
+  </div>
+  <div class="tools">
+    <select id="add" aria-label="Dodaj hišo v primerjavo"><option value="">+ Dodaj hišo …</option>{options}</select>
+    <button type="button" class="btn line" id="copy" hidden>Kopiraj povezavo</button>
+  </div>
+  <div id="cmp"></div>
+  <div class="actions">
+    <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
+    <a class="btn line" href="../#katalog">Vse hiše v katalogu</a>
+  </div>
+</main>
+{FOOT}
+<script type="application/json" id="cmp-data">{data_json}</script>
+<script>{COMPARE_JS}</script>
+</body>
+</html>
+''')
+
+
 # Old addresses Google may already know, as instant redirects to the new ones.
 MOVED = {f'kager-vita-nova-{k}-family': f'kager-vita-nova-{k}-linija' for k in ('classic', 'edition', 'urbana', 'modern')}
 
@@ -475,6 +605,7 @@ for p in data['providers']:
     write(p['id'], maker(p))
 write(GUIDE, guide())
 write(PLANS, plans_page())
+write(COMPARE, compare_page())
 for old, new in MOVED.items():
     assert new in slugs, new
     write(old, moved(new))
