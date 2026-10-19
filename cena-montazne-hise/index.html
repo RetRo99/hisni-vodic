@@ -80,6 +80,9 @@ button, input, select { font: inherit; color: inherit; }
 .facts li::before { content: ""; position: absolute; left: 0; top: .6em; width: 5px; height: 5px; border-radius: 50%; background: var(--glow); }
 footer { padding-block: 30px 50px; border-top: 1px solid var(--line); color: var(--mist); font-size: 13px; }
 footer p { max-width: 80ch; margin: 0; }
+footer nav { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; }
+footer nav a { color: var(--mist); text-underline-offset: 3px; }
+footer nav a:hover { color: var(--ink); }
 .bar { position: static; }
 .mark { color: var(--ink); text-decoration: none; white-space: nowrap; }
 @media (max-width: 420px) { .bar nav { gap: 12px; font-size: 13px; } }
@@ -125,7 +128,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 <script defer src="https://cloud.umami.is/script.js" data-website-id="a2a672e4-a103-4f69-a69e-e2c7bd7927b8"></script>
 <style>
 .page > * { min-width: 0; }
-.scroll { overflow-x: auto; border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); }
+.scroll { position: relative; overflow-x: auto; border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); }
 .tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
 .tbl th, .tbl td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .tbl tr:last-child > * { border-bottom: 0; }
@@ -158,10 +161,11 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   <section><h2>Na kaj paziti pri primerjavi cen</h2><ul class="points"><li><b>Kaj pomeni »na ključ«.</b> Večina proizvajalcev navaja ceno vseljive hiše, a paketi se razlikujejo po opremi (tla, kopalnice, ogrevanje, prezračevanje). Primerjajte popis del, ne le končne številke.</li><li><b>Temeljna plošča.</b> Ni vključena v ceno, ki jo navajata Marles in NOAH.</li><li><b>Subvencije in popusti.</b> Lumar in Jelovica navajata ceno, ki je že zmanjšana za subvencijo Eko sklada oziroma popuste, zato je videti nižja.</li><li><b>Cene »od«.</b> Rihter in Jelovica objavljata izhodiščne cene za osnovno izvedbo; dejanska ponudba je lahko višja.</li><li><b>Kaj običajno ni v ceni.</b> Zemljišče, projektna dokumentacija in gradbeno dovoljenje, komunalni prispevek in priključki, zemeljska dela ter zunanja ureditev. Preverite v ponudbi.</li><li><b>Brez objavljenih cen.</b> Kager in Riko hiše cen tipskih hiš ne objavljata; ponudbo dobite na povpraševanje.</li></ul></section>
   <div class="actions">
     <a class="btn glow" href="https://hisomer.si/#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
+    <a class="btn line" href="../najcenejse-montazne-hise/">Najcenejše montažne hiše</a>
     <a class="btn line" href="../#katalog">Vse hiše v katalogu</a>
   </div>
 </main>
-<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p></div></footer>
+<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../cena-montazne-hise/">Cene montažnih hiš</a><a href="../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../majhne-montazne-hise/">Majhne hiše</a><a href="../tlorisi-montaznih-his/">Tlorisi</a><a href="../primerjava/">Primerjava</a></nav></div></footer>
 <script src="../compare.js"></script>
 </body>
 </html>

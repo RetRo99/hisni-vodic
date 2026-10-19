@@ -7,6 +7,9 @@ import collections, datetime, glob, html, json, os, re, statistics, unicodedata
 SITE = 'https://hisomer.si/'
 GUIDE = 'cena-montazne-hise'
 PLANS = 'tlorisi-montaznih-his'
+CHEAP = 'najcenejse-montazne-hise'
+SMALL = 'majhne-montazne-hise'
+COMPARE = 'primerjava'
 ROOT = os.path.dirname(os.path.abspath(__file__))
 os.chdir(ROOT)
 
@@ -101,7 +104,9 @@ BAR = f'''<div class="bar"><div class="wrap">
   <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../{GUIDE}/">Cene</a><a href="../{PLANS}/">Tlorisi</a></nav>
 </div></div>'''
 FOOT = (f'<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev ({esc(data["collected"])}). '
-        'Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p></div></footer>\n<script src="../compare.js"></script>')
+        'Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p>'
+        f'<nav aria-label="Vodiči"><a href="../{GUIDE}/">Cene montažnih hiš</a><a href="../{CHEAP}/">Najcenejše hiše</a><a href="../{SMALL}/">Majhne hiše</a>'
+        f'<a href="../{PLANS}/">Tlorisi</a><a href="../{COMPARE}/">Primerjava</a></nav></div></footer>\n<script src="../compare.js"></script>')
 
 
 def head(title, og_title, desc, url, image, ld):
@@ -247,7 +252,7 @@ def page(p, m):
 
 TABLE_CSS = '''
 .page > * { min-width: 0; }
-.scroll { overflow-x: auto; border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); }
+.scroll { position: relative; overflow-x: auto; border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); }
 .tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
 .tbl th, .tbl td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .tbl tr:last-child > * { border-bottom: 0; }
@@ -350,6 +355,7 @@ def guide():
   <section><h2>Na kaj paziti pri primerjavi cen</h2><ul class="points">{''.join(points)}</ul></section>
   <div class="actions">
     <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
+    <a class="btn line" href="../{CHEAP}/">Najcenejše montažne hiše</a>
     <a class="btn line" href="../#katalog">Vse hiše v katalogu</a>
   </div>
 </main>
@@ -479,7 +485,6 @@ def plans_page():
 '''
 
 
-COMPARE = 'primerjava'
 COMPARE_CSS = '''
 .page > * { min-width: 0; }
 .cmp-tbl { table-layout: fixed; min-width: 640px; }
@@ -608,6 +613,140 @@ def compare_page():
 ''')
 
 
+CMP_TH = '<span class="sr-only">Primerjava</span>'
+
+
+def cmp_btn(m):
+    return f'<button type="button" class="cmp sm" data-slug="{m["slug"]}">+ Primerjaj</button>'
+
+
+def house_link(p, m):
+    return f'<a href="../{m["slug"]}/">{esc(p["name"])} {esc(m["name"])}</a>'
+
+
+def cheap_page():
+    url = SITE + CHEAP + '/'
+    per_m2 = lambda m: m['price_eur'] / m['area_m2']
+    priced = [(p, m) for p, m in models if m['price_eur']]
+    sized = [(p, m) for p, m in priced if m['area_m2']]
+    turnkey = [(p, m) for p, m in priced if 'na ključ' in m['price_stage'].lower()]
+    n = lambda v: f'<td class="n">{v}</td>'
+
+    def table(rows):
+        body = ''.join(f'<tr><td>{house_link(p, m)}</td>{n(str(round(m["area_m2"])) + " m²" if m["area_m2"] else "—")}{n(eur(m["price_eur"]))}'
+                       f'{n(eur(round(per_m2(m))) + "/m²" if m["area_m2"] else "—")}<td class="stage">{esc(m["price_stage"])}</td><td>{cmp_btn(m)}</td></tr>'
+                       for p, m in rows)
+        return f'<div class="scroll"><table class="tbl">{thead("Hiša", "Površina", "Cena", "Na m²", "Kaj cena vključuje", CMP_TH)}<tbody>{body}</tbody></table></div>'
+
+    by_price = lambda rows: sorted(rows, key=lambda pm: pm[1]['price_eur'])[:12]
+    lo, lo_key, lo_m2 = by_price(priced)[0], by_price(turnkey)[0], min(sized, key=lambda pm: per_m2(pm[1]))
+    key_makers = {p['name'] for p, _ in turnkey}
+    other = [p['name'] for p in data['providers'] if p['name'] not in key_makers and any(m['price_eur'] for m in p['models'])]
+    unpublished = [p['name'] for p in data['providers'] if not any(m['price_eur'] for m in p['models'])]
+    verb = lambda names, one, two, many: one if len(names) == 1 else two if len(names) == 2 else many
+    rest = (f'{and_join(other)} {verb(other, "navaja", "navajata", "navajajo")} cene za druge pakete, zato {verb(other, "ni", "nista", "niso")} v tej tabeli' if other else '') + \
+        ('; ' if other and unpublished else '') + \
+        (f'{and_join(unpublished)} {verb(unpublished, "cen ne objavlja", "cen ne objavljata", "cen ne objavljajo")}' if unpublished else '')
+    rest_html = f'<p class="note">{esc(rest)}. <a href="../{GUIDE}/">Kaj vključujejo cene posameznih proizvajalcev</a></p>' if rest else ''
+
+    desc = (f'Najcenejše montažne hiše na ključ od {eur(lo_key[1]["price_eur"])}, najnižja cena na m² {eur(round(per_m2(lo_m2[1])))}. '
+            f'Primerjava {len(priced)} tipskih hiš slovenskih proizvajalcev z objavljeno ceno in kaj cena vključuje.')
+    image = SITE + (lo_key[1]['image'].replace('img/', 'img/large/') if lo_key[1].get('image') else 'img/large/riko-mila.jpg')
+    ld = {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': 'Najcenejše montažne hiše', 'url': url, 'description': desc,
+          'inLanguage': 'sl', 'image': image}
+    return f'''{head(f'Najcenejše montažne hiše {YEAR}: na ključ in po m² · Hišni vodič', 'Najcenejše montažne hiše', desc, url, image, ld).replace('</head>', '<style>' + TABLE_CSS + '.note { color: var(--mist); font-size: 14px; margin: 10px 0 0; } .note a { color: var(--ink); text-underline-offset: 3px; }</style></head>')}
+<body>
+{BAR}
+<main class="wrap page">
+  <div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../{GUIDE}/">Cene</a> / Najcenejše hiše</div>
+    <div class="head"><div><h1 class="display">Najcenejše montažne hiše</h1><div class="prov">{len(priced)} tipskih hiš z objavljeno ceno · podatki: {esc(data['collected'])}</div></div></div>
+  </div>
+  <div class="lede"><p>Najcenejša montažna hiša z objavljeno ceno je {house_link(*lo)} ({eur(lo[1]['price_eur'])}), najcenejša na ključ {house_link(*lo_key)}
+    ({eur(lo_key[1]['price_eur'])}). Najnižjo ceno na m² ima {house_link(*lo_m2)} ({eur(round(per_m2(lo_m2[1])))}/m²).</p>
+    <p>Proizvajalci navajajo cene za različne pakete, zato pred primerjavo preverite, kaj cena vključuje. <a href="../{GUIDE}/">Primerjava cen po proizvajalcih</a></p></div>
+  <section><h2>Najcenejše montažne hiše na ključ</h2>{table(by_price(turnkey))}{rest_html}</section>
+  <section><h2>Najcenejše po ceni</h2>{table(by_price(priced))}</section>
+  <section><h2>Najnižja cena na m²</h2>{table(sorted(sized, key=lambda pm: per_m2(pm[1]))[:12])}</section>
+  <div class="actions">
+    <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
+    <a class="btn line" href="../{GUIDE}/">Primerjava cen</a>
+    <a class="btn line" href="../{COMPARE}/">Primerjava hiš</a>
+  </div>
+</main>
+{FOOT}
+</body>
+</html>
+'''
+
+
+SMALL_CSS = '''
+.page > * { min-width: 0; }
+.hgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+@media (min-width: 700px) { .hgrid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
+.hc { display: flex; flex-direction: column; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); }
+.hc:hover { box-shadow: 0 0 0 1px var(--glow); }
+.hc > a { display: block; flex: 1; color: var(--ink); text-decoration: none; }
+.hc .pic { aspect-ratio: 600 / 340; background: var(--slate); }
+.hc img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hc span { display: block; padding: 10px 14px 8px; font-size: 14px; color: var(--mist); }
+.hc b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 2px; }
+.hc-act { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 0 14px 14px; font-size: 13px; }
+.hc-act a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
+'''
+
+
+def small_page():
+    url = SITE + SMALL + '/'
+    houses = sorted(((p, m) for p, m in models if m['area_m2'] and m['area_m2'] <= 100), key=lambda pm: (pm[1]['area_m2'], pm[1]['name']))
+    priced = [(p, m) for p, m in houses if m['price_eur']]
+    lo = min(priced, key=lambda pm: pm[1]['price_eur'])
+    areas = [round(m['area_m2']) for _, m in houses]
+    sections = []
+    for a, b, h2 in ((0, 60, 'Majhne montažne hiše do 60 m²'), (60, 80, 'Montažne hiše od 60 do 80 m²'), (80, 100, 'Montažne hiše od 80 do 100 m²')):
+        cards = []
+        for p, m in (t for t in houses if a < t[1]['area_m2'] <= b):
+            plans = house_plans(m)
+            bits = [f"{round(m['area_m2'])} m²", FLOORS.get(m['floors'], ('',))[0],
+                    f"{m['bedrooms']} {plural(m['bedrooms'], 'spalnica', 'spalnici', 'spalnice', 'spalnic')}" if m['bedrooms'] else '',
+                    eur(m['price_eur']) if m['price_eur'] else 'cena na povpraševanje']
+            pic = f'<img src="../{esc(m["image"])}" alt="" loading="lazy">' if m.get('image') else ''
+            plan = f'<a href="../{plans[0]}">Tloris</a>' if plans else ''
+            cards.append(f'<div class="hc"><a href="../{m["slug"]}/"><div class="pic">{pic}</div><span><b>{esc(p["name"])} {esc(m["name"])}</b>'
+                         f'{" · ".join(x for x in bits if x)}</span></a><div class="hc-act">{plan}{cmp_btn(m)}</div></div>')
+        if cards:
+            sections.append(f'<section><h2>{h2} <small class="eyebrow">{len(cards)}</small></h2><div class="hgrid">{"".join(cards)}</div></section>')
+    count = f"{len(houses)} {plural(len(houses), 'tipska montažna hiša', 'tipski montažni hiši', 'tipske montažne hiše', 'tipskih montažnih hiš')}"
+    desc = (f'Majhne montažne hiše do 100 m²: {count} slovenskih proizvajalcev od {min(areas)} do {max(areas)} m², '
+            f'cene od {eur(lo[1]["price_eur"])}, tlorisi in kaj cena vključuje.')
+    image = SITE + (lo[1]['image'].replace('img/', 'img/large/') if lo[1].get('image') else 'img/large/riko-mila.jpg')
+    ld = {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': 'Majhne montažne hiše', 'url': url, 'description': desc,
+          'inLanguage': 'sl', 'image': image}
+    return f'''{head('Majhne montažne hiše do 100 m²: cene in tlorisi · Hišni vodič', 'Majhne montažne hiše do 100 m²', desc, url, image, ld).replace('</head>', '<style>' + SMALL_CSS + '</style></head>')}
+<body>
+{BAR}
+<main class="wrap page">
+  <div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / Majhne hiše</div>
+    <div class="head"><div><h1 class="display">Majhne montažne hiše</h1><div class="prov">{count} do 100 m² · podatki: {esc(data['collected'])}</div></div></div>
+  </div>
+  <div class="lede"><p>V vodiču je {count} do 100 m² bivalne površine, od {min(areas)} do {max(areas)} m². Ceno proizvajalec objavlja za {len(priced)} od njih;
+    najcenejša je {house_link(*lo)} ({eur(lo[1]['price_eur'])}, {round(lo[1]['area_m2'])} m², {esc(lo[1]['price_stage'])}).</p>
+    <p>Za ostale je cena na povpraševanje. Proizvajalci navajajo cene za različne pakete. <a href="../{GUIDE}/">Kaj cena vključuje pri posameznem proizvajalcu</a></p></div>
+  {''.join(sections)}
+  <div class="actions">
+    <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
+    <a class="btn line" href="../{GUIDE}/">Primerjava cen</a>
+    <a class="btn line" href="../{PLANS}/">Tlorisi montažnih hiš</a>
+    <a class="btn line" href="../{COMPARE}/">Primerjava hiš</a>
+  </div>
+</main>
+{FOOT}
+</body>
+</html>
+'''
+
+
 # Old addresses Google may already know, as instant redirects to the new ones.
 MOVED = {f'kager-vita-nova-{k}-family': f'kager-vita-nova-{k}-linija' for k in ('classic', 'edition', 'urbana', 'modern')}
 
@@ -630,6 +769,8 @@ for p in data['providers']:
 write(GUIDE, guide())
 write(PLANS, plans_page())
 write(COMPARE, compare_page())
+write(CHEAP, cheap_page())
+write(SMALL, small_page())
 for old, new in MOVED.items():
     assert new in slugs, new
     write(old, moved(new))
@@ -677,7 +818,7 @@ def home_faq():
 src = re.sub(r'(<!-- faq -->).*?(<!-- /faq -->)', lambda mo: mo.group(1) + home_faq() + mo.group(2), src, flags=re.S)
 open('index.html', 'w', encoding='utf-8').write(src)
 
-locs = [SITE, SITE + GUIDE + '/', SITE + PLANS + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
+locs = [SITE, SITE + GUIDE + '/', SITE + PLANS + '/', SITE + CHEAP + '/', SITE + SMALL + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
 open('sitemap.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
                                                   ''.join(f'  <url><loc>{l}</loc></url>\n' for l in locs) + '</urlset>\n')
 
