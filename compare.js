@@ -44,7 +44,10 @@
     '.cmp-msg { flex: 1 1 100%; order: -1; margin: 0; padding: 2px 4px 0; font-size: 13px; color: var(--glow); }' +
     '.cmp-msg[hidden] { display: none; }' +
     'body.has-tray { padding-bottom: 96px; }' +
-    '@media (max-width: 480px) { .cmp-tray { padding-left: 12px; gap: 8px 10px; } .cmp-tray .cmp-n { display: none; } .cmp-thumbs { flex: 1; } .cmp-th { width: 46px; } }';
+    // phones: one row (thumbs, Primerjaj, Počisti), at most 64 px tall
+    '@media (max-width: 480px) { .cmp-tray { padding: 8px 8px 8px 12px; gap: 6px 8px; width: calc(100% - 32px); }' +
+    ' .cmp-tray .cmp-n { display: none; } .cmp-thumbs { flex: 1; min-width: 0; gap: 6px; } .cmp-th { width: 42px; height: 32px; }' +
+    ' .cmp-tray .btn { padding: 10px 14px; } .cmp-tray .cmp-clear { padding: 12px 4px; } body.has-tray { padding-bottom: 84px; } }';
   document.head.appendChild(style);
 
   var tray = document.createElement('div');
@@ -53,6 +56,23 @@
   tray.setAttribute('aria-label', 'Primerjava hiš');
   document.body.appendChild(tray);
   var onComparePage = document.body.getAttribute('data-page') === 'compare';
+
+  // a bar stuck to the bottom of the screen (marked [data-sticky-bottom], e.g. the calculator total): sit the tray above it
+  function place() {
+    var sb = document.querySelector('[data-sticky-bottom]'), off = 0;
+    if (sb && !tray.hidden) {
+      var r = sb.getBoundingClientRect();
+      if (r.height && r.top < innerHeight && r.bottom > innerHeight - 48) off = Math.round(innerHeight - r.top);
+    }
+    tray.style.bottom = off ? (off + 8) + 'px' : '';
+  }
+  var placing = 0;
+  function schedule() { if (!placing) placing = requestAnimationFrame(function () { placing = 0; place(); }); }
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
+  // the bar may show or hide without a scroll (e.g. toggled by an IntersectionObserver)
+  var sticky = document.querySelector('[data-sticky-bottom]');
+  if (sticky && window.ResizeObserver) new ResizeObserver(schedule).observe(sticky);
 
   function refresh() {
     var buttons = document.querySelectorAll('button.cmp[data-slug]');
@@ -77,6 +97,7 @@
       (n < MAX ? '<small> · dodate lahko še ' + (MAX - n) + '</small>' : '<small> · največ ' + MAX + '</small>') + '</span>' +
       '<a class="btn glow" href="/primerjava/#' + picks.join(',') + '">Primerjaj <span class="arrow">→</span></a>' +
       '<button type="button" class="cmp-clear">Počisti</button>';
+    place();
   }
 
   document.addEventListener('click', function (e) {
