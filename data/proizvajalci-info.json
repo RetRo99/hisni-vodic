@@ -43,7 +43,7 @@
   "id": "jelovica",
   "show_houses": [
    {
-    "name": "Stalna vzorčna hiša ni navedena; dnevi odprtih vrat (Zgornja Besnica, individualna hiša)",
+    "name": "Dan odprtih vrat v individualni hiši",
     "address": "ni navedeno",
     "town": "Zgornja Besnica",
     "hours": "ni navedeno",
@@ -85,15 +85,16 @@
   "id": "lumar",
   "show_houses": [
    {
-    "name": "Vzorčna hiša Dunaj",
+    "name": "Vzorčna hiša na Dunaju",
     "address": "ni navedeno",
-    "town": "ni navedeno",
+    "town": "Dunaj, Avstrija",
     "hours": "ni navedeno",
     "open_days": [],
-    "url": "https://www.lumar.si/dozivetja/vzorcne-hise"
+    "url": "https://www.lumar.si/dozivetja/vzorcne-hise",
+    "abroad": true
    },
    {
-    "name": "Vzorčna Aktivna hiša Dragomelj",
+    "name": "Vzorčna Aktivna hiša v Dragomlju",
     "address": "ni navedeno",
     "town": "Dragomelj",
     "hours": "ni navedeno",
@@ -131,7 +132,7 @@
   "id": "rihter",
   "show_houses": [
    {
-    "name": "Skoraj nič energijska hiša 126 (dan odprtih vrat)",
+    "name": "Dan odprtih vrat: skoraj nič energijska hiša 126",
     "address": "naslov se pošlje prijavljenim po e-pošti",
     "town": "Notranje Gorice",
     "hours": "Pet 6. 11. 2026 14.00–18.00; sob 7. 11. 2026 9.00–14.00",
@@ -139,7 +140,8 @@
      "6. 11. 2026 14.00–18.00",
      "7. 11. 2026 9.00–14.00 (prijava do 5. 11.)"
     ],
-    "url": "https://www.rihter.si/dan-odprtih-vrat-notranje-gorice-2/"
+    "url": "https://www.rihter.si/dan-odprtih-vrat-notranje-gorice-2/",
+    "house": "rihter-hisa-126"
    }
   ],
   "build_time": {
@@ -195,7 +197,19 @@
    "year": null,
    "url": "https://www.noah.si/sl/o-nas"
   },
-  "note": "Vzorčna hiša ni navedena; sedež Meznaričeva ulica 7, Maribor, pon–pet 7–15 ali po dogovoru (https://www.noah.si/sl/kontakt); virtualni sprehodi https://www.noah.si/sl/virtualni-sprehodi",
+  "note": {
+   "text": "Sedež: Meznaričeva ulica 7, Maribor, pon–pet 7–15 ali po dogovoru.",
+   "links": [
+    {
+     "label": "Kontakt",
+     "url": "https://www.noah.si/sl/kontakt"
+    },
+    {
+     "label": "Virtualni sprehodi po hišah",
+     "url": "https://www.noah.si/sl/virtualni-sprehodi"
+    }
+   ]
+  },
   "checked": "2026-10-19"
  },
  {
@@ -225,14 +239,22 @@
    "year": 1997,
    "url": "https://www.riko-hise.si/sl/o-nas/"
   },
-  "note": "Obrazec za povpraševanje ni najden; kontakt https://www.riko-hise.si/sl/o-nas/kontakti/; sedež Lepovče 23, Ribnica",
+  "note": {
+   "text": "Sedež: Lepovče 23, Ribnica. Spletnega obrazca za povpraševanje na strani Riko ni; pišite ali pokličite prek kontaktne strani.",
+   "links": [
+    {
+     "label": "Kontakt",
+     "url": "https://www.riko-hise.si/sl/o-nas/kontakti/"
+    }
+   ]
+  },
   "checked": "2026-10-19"
  },
  {
   "id": "kager",
   "show_houses": [
    {
-    "name": "Dokončana hiša KAGER VITA NOVA (dan odprtih vrat)",
+    "name": "Dan odprtih vrat v dokončani hiši KAGER VITA NOVA",
     "address": "ni navedeno",
     "town": "Mirna",
     "hours": "17. 10. 2026, 10.00–16.00",
@@ -272,7 +294,7 @@
   "id": "ziher",
   "show_houses": [
    {
-    "name": "Dan odprtih vrat: individualna pasivna hiša na ključ (Zreče)",
+    "name": "Dan odprtih vrat: individualna pasivna hiša na ključ",
     "address": "ni navedeno",
     "town": "Zreče",
     "hours": "12.00 in 13.00 termina; konec ni naveden",
@@ -282,12 +304,13 @@
     "url": "https://ziher-hise.si/dan-odprtih-vrat-v-zrecah/"
    },
    {
-    "name": "Žiher Studio (svetovalni studio, ne vzorčna hiša)",
+    "name": "Žiher Studio",
     "address": "Stegne 11c",
     "town": "1000 Ljubljana",
     "hours": "Ogled po predhodnem dogovoru",
     "open_days": [],
-    "url": "https://ziher-hise.si/kontakt/"
+    "url": "https://ziher-hise.si/kontakt/",
+    "kind": "studio"
    }
   ],
   "build_time": {

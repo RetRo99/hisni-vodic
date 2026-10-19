@@ -87,7 +87,13 @@ footer nav a { color: var(--mist); text-underline-offset: 3px; display: inline-f
 footer nav a:hover { color: var(--ink); }
 .bar { position: static; }
 .mark { color: var(--ink); text-decoration: none; white-space: nowrap; }
-@media (max-width: 420px) { .bar nav { gap: 12px; font-size: 13px; } }
+@media (max-width: 420px) {  /* five nav links and the wordmark in 343 px */
+  .bar .wrap { gap: 10px; }
+  .bar .mark { font-size: 13px; font-stretch: 100%; letter-spacing: 0; gap: 8px; }
+  .bar .mark svg { width: 22px; height: 22px; }
+  .bar nav { gap: 8px; font-size: 13px; }
+}
+@media (max-width: 370px) { .bar nav { gap: 6px; font-size: 12px; } }
 .page { display: grid; gap: 28px; padding-block: 8px 64px; }
 .crumbs a { color: var(--mist); text-decoration: none; }
 .crumbs a:hover { color: var(--ink); }
@@ -100,6 +106,14 @@ footer nav a:hover { color: var(--ink); }
 .photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
 @media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
 .specs dt { font-size: 11px; }
+@media (max-width: 640px) {
+  /* M-1: the primary action full width, the others two to a row, the maker link as plain text, so the photo stays near the fold */
+  .actions.hact { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: dense; gap: 8px; }
+  .actions.hact .btn { justify-content: center; text-align: center; padding: 12px 14px; font-size: 14px; min-height: 48px; }
+  .actions.hact .btn.glow { order: -1; grid-column: 1 / -1; font-size: 16px; }
+  .actions.hact .ask { grid-column: 1 / -1; }
+  .actions.hact .btn.mk { grid-column: 1 / -1; min-height: 44px; padding: 8px 4px; background: none; box-shadow: none; backdrop-filter: none; color: var(--mist); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+}
 .na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
 .price .est { display: block; font: 500 12px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
 abbr[data-tip] { position: relative; text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; border-radius: 3px; }
@@ -151,7 +165,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 <body>
 <div class="bar"><div class="wrap">
   <a class="mark" href="../"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 15 16 5l12 10" stroke="#eef2f9" stroke-width="2.4" stroke-linejoin="round"/><rect x="8" y="15" width="16" height="12" stroke="#eef2f9" stroke-width="2.4"/><rect x="13" y="19" width="6" height="8" fill="#ffc477"/></svg>Hišni vodič</a>
-  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a><a href="../tlorisi-montaznih-his/">Tlorisi</a></nav>
+  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a><a href="../koliko-stane-gradnja-hise/">Stroški</a><a href="../tlorisi-montaznih-his/">Tlorisi</a></nav>
 </div></div>
 <main class="wrap page">
   <div>
@@ -162,9 +176,9 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     </div>
   </div>
   <dl class="specs"><div><dt>Etaže</dt><dd>P + 1</dd></div><div><dt>Površina</dt><dd>149 m²</dd></div><div><dt>Spalnice</dt><dd>4</dd></div><div><dt>Kopalnice</dt><dd>3</dd></div><div><dt>Streha</dt><dd>enokapna</dd></div></dl>
-  <div class="actions">
+  <div class="actions hact">
     <a class="btn glow" href="../koliko-stane-gradnja-hise/#h=marles-lumniya-villa-149">Izračunaj celotne stroške gradnje <span class="arrow">→</span></a><button type="button" class="btn line cmp" data-slug="marles-lumniya-villa-149" data-name="Marles Lumniya Villa 149" aria-label="Dodaj Marles Lumniya Villa 149 v primerjavo">+ Primerjaj</button><a class="btn line" href="https://hisomer.si/#kviz">Ali vam pristaja? Rešite kviz</a>
-    <a class="btn line" href="https://www.marles.com/pure/lumniya-villa/enokapnica/149" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
+    <a class="btn line mk" href="https://www.marles.com/pure/lumniya-villa/enokapnica/149" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
   </div>
   <figure class="photo"><picture><source media="(min-width: 641px)" srcset="../img/marles-lumniya-villa-149.jpg 720w, ../img/large/marles-lumniya-villa-149.jpg 1400w" sizes="(min-width: 1240px) 1208px, 100vw"><img src="../img/marles-lumniya-villa-149.jpg" width="720" height="378" alt="Marles Lumniya Villa 149"></picture><figcaption>Foto: Marles</figcaption></figure>
   <div class="lede"><p>Marles Lumniya Villa 149 je dvoetažna montažna hiša (pritličje in nadstropje) s površino 149 m² proizvajalca Marles. Ima 4 spalnice in 3 kopalnice. Streha je enokapna. </p><p>Cena po podatkih proizvajalca: 243.382 € – na ključ, paket Essential, z DDV, brez temeljne plošče (ponudbena brošura). Opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>

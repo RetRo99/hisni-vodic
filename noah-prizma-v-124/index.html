@@ -87,7 +87,13 @@ footer nav a { color: var(--mist); text-underline-offset: 3px; display: inline-f
 footer nav a:hover { color: var(--ink); }
 .bar { position: static; }
 .mark { color: var(--ink); text-decoration: none; white-space: nowrap; }
-@media (max-width: 420px) { .bar nav { gap: 12px; font-size: 13px; } }
+@media (max-width: 420px) {  /* five nav links and the wordmark in 343 px */
+  .bar .wrap { gap: 10px; }
+  .bar .mark { font-size: 13px; font-stretch: 100%; letter-spacing: 0; gap: 8px; }
+  .bar .mark svg { width: 22px; height: 22px; }
+  .bar nav { gap: 8px; font-size: 13px; }
+}
+@media (max-width: 370px) { .bar nav { gap: 6px; font-size: 12px; } }
 .page { display: grid; gap: 28px; padding-block: 8px 64px; }
 .crumbs a { color: var(--mist); text-decoration: none; }
 .crumbs a:hover { color: var(--ink); }
@@ -100,6 +106,14 @@ footer nav a:hover { color: var(--ink); }
 .photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
 @media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
 .specs dt { font-size: 11px; }
+@media (max-width: 640px) {
+  /* M-1: the primary action full width, the others two to a row, the maker link as plain text, so the photo stays near the fold */
+  .actions.hact { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: dense; gap: 8px; }
+  .actions.hact .btn { justify-content: center; text-align: center; padding: 12px 14px; font-size: 14px; min-height: 48px; }
+  .actions.hact .btn.glow { order: -1; grid-column: 1 / -1; font-size: 16px; }
+  .actions.hact .ask { grid-column: 1 / -1; }
+  .actions.hact .btn.mk { grid-column: 1 / -1; min-height: 44px; padding: 8px 4px; background: none; box-shadow: none; backdrop-filter: none; color: var(--mist); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+}
 .na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
 .price .est { display: block; font: 500 12px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
 abbr[data-tip] { position: relative; text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; border-radius: 3px; }
@@ -151,7 +165,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 <body>
 <div class="bar"><div class="wrap">
   <a class="mark" href="../"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 15 16 5l12 10" stroke="#eef2f9" stroke-width="2.4" stroke-linejoin="round"/><rect x="8" y="15" width="16" height="12" stroke="#eef2f9" stroke-width="2.4"/><rect x="13" y="19" width="6" height="8" fill="#ffc477"/></svg>Hišni vodič</a>
-  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a><a href="../tlorisi-montaznih-his/">Tlorisi</a></nav>
+  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a><a href="../koliko-stane-gradnja-hise/">Stroški</a><a href="../tlorisi-montaznih-his/">Tlorisi</a></nav>
 </div></div>
 <main class="wrap page">
   <div>
@@ -162,18 +176,18 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     </div>
   </div>
   <dl class="specs"><div><dt>Etaže</dt><dd>P + 1</dd></div><div><dt>Površina</dt><dd>124 m²</dd></div><div><dt>Spalnice</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Kopalnice</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Streha</dt><dd>dvokapna</dd></div></dl>
-  <div class="actions">
+  <div class="actions hact">
     <a class="btn glow" href="../koliko-stane-gradnja-hise/#h=noah-prizma-v-124">Izračunaj celotne stroške gradnje <span class="arrow">→</span></a><button type="button" class="btn line cmp" data-slug="noah-prizma-v-124" data-name="NOAH PRIZMA V 124" aria-label="Dodaj NOAH PRIZMA V 124 v primerjavo">+ Primerjaj</button><a class="btn line" href="https://hisomer.si/#kviz">Ali vam pristaja? Rešite kviz</a>
-    <a class="btn line" href="https://www.noah.si/sl/prizma-v-124" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
+    <a class="btn line mk" href="https://www.noah.si/sl/prizma-v-124" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
   </div>
   <figure class="photo"><picture><source media="(min-width: 641px)" srcset="../img/noah-prizma-v-124.jpg 720w, ../img/large/noah-prizma-v-124.jpg 1400w" sizes="(min-width: 1240px) 1208px, 100vw"><img src="../img/noah-prizma-v-124.jpg" width="720" height="405" alt="NOAH PRIZMA V 124"></picture><figcaption>Foto: NOAH</figcaption></figure>
   <div class="lede"><p>NOAH PRIZMA V 124 je dvoetažna montažna hiša (pritličje in nadstropje) s površino 124 m² proizvajalca NOAH. Streha je dvokapna. Arhitekturni slog: moderen.</p><p>Cena po podatkih proizvajalca: 192.167 € – na ključ (NOAH KLJUČ), z 9,5 % DDV, brez temeljne plošče (cenik 2026, velja od 5. 8. 2026). Opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
   <section><h2>Tloris</h2><div class="plans"><a href="../img/tloris/noah-prizma-v-124-1.jpg"><img src="../img/tloris/thumb/noah-prizma-v-124-1.jpg" width="600" height="497" alt="Tloris pritličja – NOAH PRIZMA V 124, 124 m²" loading="lazy"></a><a href="../img/tloris/noah-prizma-v-124-2.jpg"><img src="../img/tloris/thumb/noah-prizma-v-124-2.jpg" width="600" height="491" alt="Tloris nadstropja – NOAH PRIZMA V 124, 124 m²" loading="lazy"></a></div><p class="credit-line">Tloris: NOAH, <a href="https://www.noah.si/sl/prizma-v-124" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a> · <a href="../tlorisi-montaznih-his/">Vsi tlorisi</a></p></section>
   <div class="two">
-    <section class="maker-info"><h2>O proizvajalcu NOAH</h2><p>Mariborski ponudnik nizkoenergijskih hiš z velikim katalogom (okoli 34 tipskih hiš), spletnim konfiguratorjem in objavljenimi cenami.</p><p><a href="https://www.noah.si" target="_blank" rel="noopener">noah.si ↗</a></p></section>
+    <section class="maker-info"><h2>O proizvajalcu NOAH</h2><p>Mariborski ponudnik nizkoenergijskih hiš z velikim katalogom (33 tipskih hiš), spletnim konfiguratorjem in objavljenimi cenami.</p><p><a href="https://www.noah.si" target="_blank" rel="noopener">noah.si ↗</a></p></section>
     <div class="edge"><div class="eyebrow">Prednost proizvajalca NOAH</div>Dostopne tipske hiše z javnim cenikom za tri faze gradnje (zunaj dokončan objekt, <abbr tabindex="0" data-tip="hiša z instalacijami in delom notranjih del, brez dela končne opreme; obseg določi proizvajalec" aria-describedby="gl-delni-kljuc">delni ključ</abbr>, na ključ).<ul class="facts"><li>Konstrukcija: lesena skeletna konstrukcija</li><li>Energija: nizkoenergijska, stena U 0,097–0,123</li><li>Garancija na konstrukcijo: 30 let</li></ul></div>
   </div>
-  <section><h2>Podobne hiše drugih proizvajalcev</h2><div class="sim"><a href="../marles-pure-lumniya-lux-125/"><div class="pic"><img src="../img/thumb/marles-pure-lumniya-lux-125.jpg" width="320" height="168" alt="" loading="lazy"></div><span><b>Marles Pure Lumniya Lux 125</b>125 m² · P + 1 · 205.182 €</span></a><a href="../lumar-primus-d-126/"><div class="pic"><img src="../img/thumb/lumar-primus-d-126.jpg" width="320" height="180" alt="" loading="lazy"></div><span><b>Lumar Primus-D 126</b>126 m² · P + 1 · 206.990 €</span></a><a href="../rihter-hisa-122/"><div class="pic"><img src="../img/thumb/rihter-hisa-122.jpg" width="320" height="197" alt="" loading="lazy"></div><span><b>Rihter Hiša 122</b>122 m² · P + 1 · 246.880 €</span></a><a href="../jelovica-kubus-b-126/"><div class="pic"><img src="../img/thumb/jelovica-kubus-b-126.jpg" width="320" height="180" alt="" loading="lazy"></div><span><b>Jelovica Kubus B 126</b>126 m² · P + 1 · 228.990 €</span></a></div></section>
+  <section><h2>Podobne hiše drugih proizvajalcev</h2><div class="sim"><a href="../marles-pure-lumniya-lux-125/"><div class="pic"><img src="../img/thumb/marles-pure-lumniya-lux-125.jpg" width="320" height="168" alt="" loading="lazy"></div><span><b>Marles Pure Lumniya Lux 125</b>125 m² · P + 1 · 205.182 €</span></a><a href="../lumar-primus-d-126/"><div class="pic"><img src="../img/thumb/lumar-primus-d-126.jpg" width="320" height="180" alt="" loading="lazy"></div><span><b>Lumar Primus-D 126</b>126 m² · P + 1 · 206.990 € · po odbitku subvencije</span></a><a href="../rihter-hisa-122/"><div class="pic"><img src="../img/thumb/rihter-hisa-122.jpg" width="320" height="197" alt="" loading="lazy"></div><span><b>Rihter Hiša 122</b>122 m² · P + 1 · 246.880 €</span></a><a href="../jelovica-kubus-b-126/"><div class="pic"><img src="../img/thumb/jelovica-kubus-b-126.jpg" width="320" height="180" alt="" loading="lazy"></div><span><b>Jelovica Kubus B 126</b>126 m² · P + 1 · 228.990 € · po odbitku subvencije</span></a></div></section>
   <section><h2>Druge hiše proizvajalca NOAH</h2><ul class="siblings"><li><a href="../noah-klasik-115/">KLASIK 115</a></li><li><a href="../noah-line-176/">LINE 176</a></li><li><a href="../noah-noe-167/">NOE 167</a></li><li><a href="../noah-noah-159/">NOAH 159</a></li><li><a href="../noah-neo-146/">NEO 146</a></li><li><a href="../noah-prizma-x-144/">PRIZMA X 144</a></li><li><a href="../noah-lukas-x-144/">LUKAS X 144</a></li><li><a href="../noah-prizma-r-124/">PRIZMA R 124</a></li><li><a href="../noah-linda-x-122/">LINDA X 122</a></li><li><a href="../noah-box-121/">BOX 121</a></li><li><a href="../noah-nano-r-115/">NANO R 115</a></li><li><a href="../noah-noah-113/">NOAH 113</a></li><li><a href="../noah-kubo-97/">KUBO 97</a></li><li><a href="../noah-one-95-1/">ONE 95/1</a></li><li><a href="../noah-eva-v-81/">EVA V 81</a></li><li><a href="../noah-neli-v-70/">NELI V 70</a></li><li><a href="../noah-nano-v-64-dvokapnica/">NANO V 64 (dvokapnica)</a></li><li><a href="../noah-nano-r-64-ravna-streha/">NANO R 64 (ravna streha)</a></li><li><a href="../noah-mini-60/">MINI 60</a></li><li><a href="../noah-vila-245-r/">VILA 245 R</a></li><li><a href="../noah-duo-190-dvostanovanjska/">DUO 190 (dvostanovanjska)</a></li><li><a href="../noah-lina-v-62/">LINA V 62</a></li><li><a href="../noah-one-95-2/">ONE 95/2</a></li><li><a href="../noah-nano-v-115/">NANO V 115</a></li><li><a href="../noah-nano-x-115/">NANO X 115</a></li><li><a href="../noah-nano-v-125/">NANO V 125</a></li><li><a href="../noah-klasik-b-130/">KLASIK B 130</a></li><li><a href="../noah-line-136/">LINE 136</a></li><li><a href="../noah-nova-141/">NOVA 141</a></li><li><a href="../noah-prizma-v-144/">PRIZMA V 144</a></li><li><a href="../noah-duo-163-dvostanovanjska/">DUO 163 (dvostanovanjska)</a></li><li><a href="../noah-lux-168/">LUX 168</a></li></ul></section>
 <details class="gloss"><summary>Kaj pomenijo izrazi na tej strani?</summary><dl><div><dt>delni ključ</dt><dd id="gl-delni-kljuc">hiša z instalacijami in delom notranjih del, brez dela končne opreme; obseg določi proizvajalec</dd></div><div><dt>na ključ</dt><dd id="gl-na-kljuc">vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje</dd></div></dl></details>
 </main>

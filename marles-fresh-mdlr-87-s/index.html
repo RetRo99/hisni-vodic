@@ -87,7 +87,13 @@ footer nav a { color: var(--mist); text-underline-offset: 3px; display: inline-f
 footer nav a:hover { color: var(--ink); }
 .bar { position: static; }
 .mark { color: var(--ink); text-decoration: none; white-space: nowrap; }
-@media (max-width: 420px) { .bar nav { gap: 12px; font-size: 13px; } }
+@media (max-width: 420px) {  /* five nav links and the wordmark in 343 px */
+  .bar .wrap { gap: 10px; }
+  .bar .mark { font-size: 13px; font-stretch: 100%; letter-spacing: 0; gap: 8px; }
+  .bar .mark svg { width: 22px; height: 22px; }
+  .bar nav { gap: 8px; font-size: 13px; }
+}
+@media (max-width: 370px) { .bar nav { gap: 6px; font-size: 12px; } }
 .page { display: grid; gap: 28px; padding-block: 8px 64px; }
 .crumbs a { color: var(--mist); text-decoration: none; }
 .crumbs a:hover { color: var(--ink); }
@@ -100,6 +106,14 @@ footer nav a:hover { color: var(--ink); }
 .photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
 @media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
 .specs dt { font-size: 11px; }
+@media (max-width: 640px) {
+  /* M-1: the primary action full width, the others two to a row, the maker link as plain text, so the photo stays near the fold */
+  .actions.hact { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: dense; gap: 8px; }
+  .actions.hact .btn { justify-content: center; text-align: center; padding: 12px 14px; font-size: 14px; min-height: 48px; }
+  .actions.hact .btn.glow { order: -1; grid-column: 1 / -1; font-size: 16px; }
+  .actions.hact .ask { grid-column: 1 / -1; }
+  .actions.hact .btn.mk { grid-column: 1 / -1; min-height: 44px; padding: 8px 4px; background: none; box-shadow: none; backdrop-filter: none; color: var(--mist); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+}
 .na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
 .price .est { display: block; font: 500 12px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
 abbr[data-tip] { position: relative; text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; border-radius: 3px; }
@@ -151,23 +165,23 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 <body>
 <div class="bar"><div class="wrap">
   <a class="mark" href="../"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 15 16 5l12 10" stroke="#eef2f9" stroke-width="2.4" stroke-linejoin="round"/><rect x="8" y="15" width="16" height="12" stroke="#eef2f9" stroke-width="2.4"/><rect x="13" y="19" width="6" height="8" fill="#ffc477"/></svg>Hišni vodič</a>
-  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a><a href="../tlorisi-montaznih-his/">Tlorisi</a></nav>
+  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a><a href="../koliko-stane-gradnja-hise/">Stroški</a><a href="../tlorisi-montaznih-his/">Tlorisi</a></nav>
 </div></div>
 <main class="wrap page">
   <div>
     <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../#katalog">Katalog</a> / <a href="../marles/">Marles</a></div>
     <div class="head">
       <div><h1 class="display">Marles Fresh MDLR 87 S</h1><div class="prov">Montažna hiša · Marles</div></div>
-      <div class="price"><b><small class="est">Okvirna ocena</small>~142.000 €</b><span>Ocena, ne cena proizvajalca: mediana cen 18 hiš Marles na m² (1.628 €/m²) × 87 m². Te cene so: <abbr tabindex="0" data-tip="vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje" aria-describedby="gl-na-kljuc">na ključ</abbr>, paket Essential, z DDV, brez temeljne plošče (ponudbena brošura). Proizvajalec cene za ta model ne objavlja.</span></div>
+      <div class="price"><b><small class="est">Okvirna ocena</small>~153.000 €</b><span>Ocena, ne cena proizvajalca: mediana primerljivih cen 18 hiš Marles na m² (1.753 €/m²) × 87 m². Te cene so: <abbr tabindex="0" data-tip="vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje" aria-describedby="gl-na-kljuc">na ključ</abbr>, paket Essential, z DDV, brez temeljne plošče (ponudbena brošura), s prišteto oceno temeljne plošče. Proizvajalec cene za ta model ne objavlja.</span></div>
     </div>
   </div>
   <dl class="specs"><div><dt>Etaže</dt><dd>pritličje</dd></div><div><dt>Površina</dt><dd>87 m²</dd></div><div><dt>Spalnice</dt><dd>2</dd></div><div><dt>Kopalnice</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Streha</dt><dd>dvokapna</dd></div></dl>
-  <div class="actions">
-    <a class="btn glow" href="../koliko-stane-gradnja-hise/#h=lastna&cp=142000&ca=87&cf=1&cs=0">Izračunaj celotne stroške gradnje z oceno <span class="arrow">→</span></a><button type="button" class="btn line cmp" data-slug="marles-fresh-mdlr-87-s" data-name="Marles Fresh MDLR 87 S" aria-label="Dodaj Marles Fresh MDLR 87 S v primerjavo">+ Primerjaj</button><a class="btn line" href="https://www.marles.com/povprasevanje" target="_blank" rel="noopener">Povpraševanje pri proizvajalcu ↗</a><a class="btn line" href="https://hisomer.si/#kviz">Ali vam pristaja? Rešite kviz</a>
-    <a class="btn line" href="https://www.marles.com/fresh/mldr-87-s/dvokapnica/87" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
+  <div class="actions hact">
+    <a class="btn glow" href="../koliko-stane-gradnja-hise/#h=lastna&cp=153000&ca=87&cf=1&cs=1">Izračunaj celotne stroške gradnje z oceno <span class="arrow">→</span></a><button type="button" class="btn line cmp" data-slug="marles-fresh-mdlr-87-s" data-name="Marles Fresh MDLR 87 S" aria-label="Dodaj Marles Fresh MDLR 87 S v primerjavo">+ Primerjaj</button><a class="btn line ask" href="https://www.marles.com/povprasevanje" target="_blank" rel="noopener">Povpraševanje pri proizvajalcu ↗</a><a class="btn line" href="https://hisomer.si/#kviz">Ali vam pristaja? Rešite kviz</a>
+    <a class="btn line mk" href="https://www.marles.com/fresh/mldr-87-s/dvokapnica/87" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
   </div>
   <figure class="photo"><picture><source media="(min-width: 641px)" srcset="../img/marles-fresh-mdlr-87-s.jpg 720w, ../img/large/marles-fresh-mdlr-87-s.jpg 1400w" sizes="(min-width: 1240px) 1208px, 100vw"><img src="../img/marles-fresh-mdlr-87-s.jpg" width="720" height="378" alt="Marles Fresh MDLR 87 S"></picture><figcaption>Foto: Marles</figcaption></figure>
-  <div class="lede"><p>Marles Fresh MDLR 87 S je pritlična montažna hiša s površino 87 m² proizvajalca Marles. Ima 2 spalnici. Streha je dvokapna. Arhitekturni slog: moderen alpski oz. skandinavski.</p><p>Proizvajalec cene za ta model ne objavlja, ponudbo dobite na povpraševanje. Okvirna ocena ~142.000 € je izračunana iz mediane cen Marles na m² in ni cena proizvajalca. Opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
+  <div class="lede"><p>Marles Fresh MDLR 87 S je pritlična montažna hiša s površino 87 m² proizvajalca Marles. Ima 2 spalnici. Streha je dvokapna. Arhitekturni slog: moderen alpski oz. skandinavski.</p><p>Proizvajalec cene za ta model ne objavlja, ponudbo dobite na povpraševanje. Okvirna ocena ~153.000 € je izračunana iz mediane primerljivih cen Marles na m² in ni cena proizvajalca. Opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
   <section><h2>Tloris</h2><div class="plans"><a href="../img/tloris/marles-fresh-mdlr-87-s-1.jpg"><img src="../img/tloris/thumb/marles-fresh-mdlr-87-s-1.jpg" width="600" height="721" alt="Tloris pritličja – Marles Fresh MDLR 87 S, 87 m²" loading="lazy"></a></div><p class="credit-line">Tloris: Marles, <a href="https://www.marles.com/fresh/mldr-87-s/dvokapnica/87" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a> · <a href="../tlorisi-montaznih-his/">Vsi tlorisi</a></p></section>
   <div class="two">
     <section class="maker-info"><h2>O proizvajalcu Marles</h2><p>Najstarejši slovenski proizvajalec montažnih hiš (od 1899) iz Maribora. Linije Pure, Prime, Tiny in modularna Fresh.</p><p><a href="https://www.marles.com" target="_blank" rel="noopener">marles.com ↗</a></p></section>
