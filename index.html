@@ -196,7 +196,8 @@ section { scroll-margin-top: 16px; }
 .scene .win:nth-of-type(3n) { transition-delay: .5s; }
 
 .alts { margin-top: clamp(40px, 6vw, 70px); }
-.alts h3 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 16px; }
+.alts h3 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0; }
+.alts-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 20px; margin-bottom: 16px; }
 .alt-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 1fr); gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
 .alt { scroll-snap-align: start; text-align: left; border: 0; padding: 0; background: var(--dusk); border-radius: 16px; overflow: hidden; cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); transition: transform .2s, box-shadow .2s; }
 .alt:hover { transform: translateY(-3px); box-shadow: inset 0 0 0 1px var(--glow), 0 20px 40px -20px rgba(255,157,77,.45); }
@@ -615,6 +616,7 @@ footer p { max-width: 80ch; margin: 0; }
     $('hisa').hidden = document.querySelector('nav a[href="#hisa"]').hidden = !state.done;
     const top = (state.selected && ranked.find(r => r.id === state.selected)) || ranked[0];
     const isBest = top === ranked[0];
+    const top3 = ranked.slice(0, 3).map(r => r.slug).filter(Boolean);
     const prov = PROVIDERS.find(p => p.id === top.providerId) || {};
     const cell = (k, v) => `<div><dt>${k}</dt><dd>${v}</dd></div>`;
     const facts = [prov.energy_class && 'Energija: ' + prov.energy_class, prov.build_time && 'Gradnja: ' + prov.build_time, prov.warranty_years && 'Garancija na konstrukcijo: ' + prov.warranty_years + ' let'].filter(Boolean);
@@ -637,7 +639,7 @@ footer p { max-width: 80ch; margin: 0; }
           <div class="actions">${top.url ? `<a class="btn glow" href="${esc(top.url)}" target="_blank" rel="noopener">Odpri hišo pri proizvajalcu <span class="arrow">↗</span></a>` : ''}${!isBest ? `<button type="button" class="btn line" id="back-best">Nazaj na najboljše ujemanje</button>` : `<a class="btn line" href="#kviz">${shared ? 'Rešite kviz sami' : 'Spremeni odgovore'}</a>`}${state.done ? '<button type="button" class="btn line" id="share">Deli rezultat</button>' : ''}${top.slug ? `<button type="button" class="btn line cmp" data-slug="${esc(top.slug)}">+ Primerjaj</button>` : ''}</div>
         </div>
       </article>
-      <div class="alts"><h3>Druge hiše, ki vam ustrezajo</h3><div class="alt-row">
+      <div class="alts"><div class="alts-head"><h3>Druge hiše, ki vam ustrezajo</h3>${top3.length === 3 ? `<a class="btn line" href="primerjava/#${top3.join(',')}">Primerjaj najboljše 3 <span class="arrow">→</span></a>` : ''}</div><div class="alt-row">
         ${ranked.filter(r => r !== top).slice(0, 6).map(r => `<button type="button" class="alt" data-id="${r.id}"><div class="mini">${r.image ? `<img src="${esc(r.image)}" alt="" loading="lazy">` : scene(r, { h: 300, stars: false })}</div><div class="t">${esc(r.name)}</div><div class="s">${esc(r.provider)} · ${floorLabel(r.floors)} · ${Math.round(r.area_m2)} m²</div><div class="row"><span class="pct">${r.s.pct} % ujemanje</span><span>${r.price_eur != null ? fmtEur(r.price_eur) : '<span class="muted">na povpraševanje</span>'}</span></div></button>`).join('')}
       </div></div>`;
     document.querySelectorAll('.alt').forEach(b => b.addEventListener('click', () => { state.selected = b.dataset.id; renderResult(true); lightUp(); $('hisa').scrollIntoView({ block: 'start' }); }));

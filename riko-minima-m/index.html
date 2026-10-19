@@ -105,6 +105,14 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .plans a { display: block; border-radius: var(--r); overflow: hidden; background: #fff; box-shadow: 0 0 0 1px var(--line); }
 .plans img { width: 100%; height: auto; display: block; }
 .credit-line { font-size: 13px; color: var(--mist); margin: 10px 0 0; }
+.sim { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+@media (min-width: 700px) { .sim { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.sim a { display: block; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); color: var(--ink); text-decoration: none; }
+.sim a:hover { box-shadow: 0 0 0 1px var(--glow); }
+.sim .pic { aspect-ratio: 600 / 340; background: var(--slate); }
+.sim img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sim span { display: block; padding: 10px 14px 14px; font-size: 14px; color: var(--mist); }
+.sim b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 2px; }
 @media (max-width: 899px) { .two { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) {
   .specs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -142,6 +150,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     <section class="maker-info"><h2>O proizvajalcu Riko hiše</h2><p>Proizvajalec iz Ribnice z močnim izvozom. Ne prodaja tipskih hiš, ampak gradi po arhitektovem projektu. Spodaj so njihove idejne zasnove.</p><p><a href="https://www.riko-hise.si" target="_blank" rel="noopener">riko-hise.si ↗</a></p></section>
     <div class="edge"><div class="eyebrow">Prednost proizvajalca Riko hiše</div>Individualne arhitekturne hiše s fiksno ceno ob podpisu pogodbe in urejanjem subvencije Eko sklada.<ul class="facts"><li>Konstrukcija: lesena okvirna ali masivna konstrukcija</li><li>Energija: stena U 0,15 (Riko Plus)</li><li>Garancija na konstrukcijo: 30 let</li></ul></div>
   </div>
+  <section><h2>Podobne hiše drugih proizvajalcev</h2><div class="sim"><a href="../ziher-smarthouse-l/"><div class="pic"></div><span><b>Žiher hiše SmartHouse L</b>93 m² · P + 1 · 145.990 €</span></a><a href="../marles-pure-sky-lux-95/"><div class="pic"><img src="../img/marles-pure-sky-lux-95.jpg" alt="" loading="lazy"></div><span><b>Marles Pure Sky Lux 95</b>95 m² · pritličje · 163.244 €</span></a><a href="../jelovica-prima-93/"><div class="pic"><img src="../img/jelovica-prima-93.jpg" alt="" loading="lazy"></div><span><b>Jelovica Prima 93</b>93 m² · pritličje · 190.990 €</span></a><a href="../noah-one-95-1/"><div class="pic"><img src="../img/noah-one-95-1.jpg" alt="" loading="lazy"></div><span><b>NOAH ONE 95/1</b>95 m² · pritličje · 154.964 €</span></a></div></section>
   <section><h2>Druge hiše proizvajalca Riko hiše</h2><ul class="siblings"><li><a href="../riko-mila/">Mila</a></li><li><a href="../riko-minima-s/">Minima S</a></li><li><a href="../riko-minima-l/">Minima L</a></li><li><a href="../riko-carna/">Čarna</a></li><li><a href="../riko-lavaldia/">Lavaldia</a></li></ul></section>
 </main>
 <footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p></div></footer>

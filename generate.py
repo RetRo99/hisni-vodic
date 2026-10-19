@@ -76,6 +76,14 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .plans a { display: block; border-radius: var(--r); overflow: hidden; background: #fff; box-shadow: 0 0 0 1px var(--line); }
 .plans img { width: 100%; height: auto; display: block; }
 .credit-line { font-size: 13px; color: var(--mist); margin: 10px 0 0; }
+.sim { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+@media (min-width: 700px) { .sim { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.sim a { display: block; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); color: var(--ink); text-decoration: none; }
+.sim a:hover { box-shadow: 0 0 0 1px var(--glow); }
+.sim .pic { aspect-ratio: 600 / 340; background: var(--slate); }
+.sim img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sim span { display: block; padding: 10px 14px 14px; font-size: 14px; color: var(--mist); }
+.sim b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 2px; }
 @media (max-width: 899px) { .two { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) {
   .specs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -149,6 +157,16 @@ def plan_alt(m, name, i, count):
     return f"Tloris{' ' + floor if floor else ''} – {name}" + (f", {round(m['area_m2'])} m²" if m['area_m2'] else '')
 
 
+def similar(p, m, count=4):
+    """The closest house of each other maker (same floors, nearest size, same roof as a tie-break), best `count` of those."""
+    if not m['area_m2']:
+        return []
+    def gap(o):
+        return abs(o['area_m2'] - m['area_m2']) / m['area_m2'] + (0 if o['floors'] == m['floors'] else .25) + (0 if o['roof'] == m['roof'] else .05)
+    best = [min(((op, o) for o in op['models'] if o['area_m2']), key=lambda t: gap(t[1]), default=None) for op in data['providers'] if op is not p]
+    return sorted((t for t in best if t), key=lambda t: gap(t[1]))[:count]
+
+
 def page(p, m):
     name = f"{p['name']} {m['name']}"
     url = SITE + m['slug'] + '/'
@@ -180,6 +198,11 @@ def page(p, m):
     siblings = [o for o in p['models'] if o is not m]
     photo = figure(img, name, p['name'])
     maker_link, facts_html = maker_bits(p)
+    sim = similar(p, m)
+    sim_html = (f'<section><h2>Podobne hiše drugih proizvajalcev</h2><div class="sim">' + ''.join(
+        f'<a href="../{o["slug"]}/"><div class="pic">' + (f'<img src="../{esc(o["image"])}" alt="" loading="lazy">' if o.get('image') else '') +
+        f'</div><span><b>{esc(op["name"])} {esc(o["name"])}</b>{round(o["area_m2"])} m² · {FLOORS.get(o["floors"], ("—",))[0]} · '
+        f'{eur(o["price_eur"]) if o["price_eur"] else "cena na povpraševanje"}</span></a>' for op, o in sim) + '</div></section>') if sim else ''
     sib_html = (f'<section><h2>Druge hiše proizvajalca {esc(p["name"])}</h2><ul class="siblings">' +
                 ''.join(f'<li><a href="../{o["slug"]}/">{esc(o["name"])}</a></li>' for o in siblings) + '</ul></section>') if siblings else ''
     note = ' Opomba: ' + esc(', '.join(m['flags'])) + '.' if m['flags'] else ''
@@ -213,6 +236,7 @@ def page(p, m):
     <section class="maker-info"><h2>O proizvajalcu {esc(p['name'])}</h2><p>{esc(p.get('description', ''))}</p>{maker_link}</section>
     <div class="edge"><div class="eyebrow">Prednost proizvajalca {esc(p['name'])}</div>{esc(p.get('edge') or '')}{facts_html}</div>
   </div>
+  {sim_html}
   {sib_html}
 </main>
 {FOOT}

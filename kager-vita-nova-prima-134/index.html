@@ -105,6 +105,14 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .plans a { display: block; border-radius: var(--r); overflow: hidden; background: #fff; box-shadow: 0 0 0 1px var(--line); }
 .plans img { width: 100%; height: auto; display: block; }
 .credit-line { font-size: 13px; color: var(--mist); margin: 10px 0 0; }
+.sim { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+@media (min-width: 700px) { .sim { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.sim a { display: block; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); color: var(--ink); text-decoration: none; }
+.sim a:hover { box-shadow: 0 0 0 1px var(--glow); }
+.sim .pic { aspect-ratio: 600 / 340; background: var(--slate); }
+.sim img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sim span { display: block; padding: 10px 14px 14px; font-size: 14px; color: var(--mist); }
+.sim b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 2px; }
 @media (max-width: 899px) { .two { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) {
   .specs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -142,6 +150,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     <section class="maker-info"><h2>O proizvajalcu Kager</h2><p>Družinsko podjetje s Ptuja, ki gradi hiše iz lesa in stekla na vidnem lepljenem lesenem skeletu. Večinoma individualni projekti.</p><p><a href="https://kager.si" target="_blank" rel="noopener">kager.si ↗</a></p></section>
     <div class="edge"><div class="eyebrow">Prednost proizvajalca Kager</div>Arhitektura iz lesa in stekla z vidnim ročno obdelanim lesenim skeletom in velikimi steklenimi stenami.<ul class="facts"><li>Konstrukcija: lesena skeletna konstrukcija in steklo</li><li>Energija: pasivne izvedbe, stena U 0,108–0,143</li><li>Garancija na konstrukcijo: 30 let</li></ul></div>
   </div>
+  <section><h2>Podobne hiše drugih proizvajalcev</h2><div class="sim"><a href="../marles-pure-lumniya-haven-135/"><div class="pic"><img src="../img/marles-pure-lumniya-haven-135.jpg" alt="" loading="lazy"></div><span><b>Marles Pure Lumniya Haven 135</b>135 m² · z mansardo · 206.337 €</span></a><a href="../jelovica-klasik-t-134/"><div class="pic"><img src="../img/jelovica-klasik-t-134.jpg" alt="" loading="lazy"></div><span><b>Jelovica Klasik T 134</b>134 m² · z mansardo · cena na povpraševanje</span></a><a href="../ziher-smart-140/"><div class="pic"><img src="../img/ziher-smart-140.jpg" alt="" loading="lazy"></div><span><b>Žiher hiše Smart 140</b>140 m² · z mansardo · cena na povpraševanje</span></a><a href="../rihter-hisa-126/"><div class="pic"><img src="../img/rihter-hisa-126.jpg" alt="" loading="lazy"></div><span><b>Rihter Hiša 126</b>126 m² · z mansardo · 173.970 €</span></a></div></section>
   <section><h2>Druge hiše proizvajalca Kager</h2><ul class="siblings"><li><a href="../kager-vita-nova-prima-138/">VITA NOVA Prima 138</a></li><li><a href="../kager-vita-nova-prima-141/">VITA NOVA Prima 141</a></li><li><a href="../kager-vita-nova-classic-linija/">VITA NOVA Classic (linija)</a></li><li><a href="../kager-vita-nova-edition-linija/">VITA NOVA Edition (linija)</a></li><li><a href="../kager-vita-nova-urbana-linija/">VITA NOVA Urbana (linija)</a></li><li><a href="../kager-vita-nova-modern-linija/">VITA NOVA Modern (linija)</a></li></ul></section>
 </main>
 <footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p></div></footer>
