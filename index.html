@@ -56,6 +56,7 @@ button, input, select { font: inherit; color: inherit; }
 .bar .wrap { display: flex; justify-content: space-between; align-items: center; padding-block: 18px; gap: 16px; }
 .mark { display: flex; align-items: center; gap: 10px; font: 700 15px/1 var(--font-display); font-stretch: 118%; letter-spacing: .02em; text-transform: uppercase; }
 .mark svg { width: 26px; height: 26px; }
+.mark { white-space: nowrap; }
 .bar nav { display: flex; gap: 22px; font-size: 14px; }
 .bar nav a { color: var(--mist); text-decoration: none; }
 .bar nav a:hover { color: var(--ink); }
@@ -96,6 +97,9 @@ section { scroll-margin-top: 16px; }
 .match { text-align: right; flex: none; }
 .match b { display: block; font: 800 34px/1 var(--font-display); font-stretch: 112%; color: var(--glow); font-variant-numeric: tabular-nums; }
 .match span { font-size: 12px; color: var(--mist); }
+.match.wait b { font-size: 15px; font-family: var(--font-body); font-weight: 600; color: var(--mist); max-width: 12ch; line-height: 1.3; }
+.trust { margin: 22px 0 0; font-size: 14px; color: var(--mist); }
+.trust b { color: #c9d3e6; font-weight: 600; }
 
 .quiz { background: var(--dusk); border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); padding: clamp(22px, 3vw, 38px); min-width: 0; }
 .progress { display: grid; grid-template-columns: repeat(var(--n, 8), 1fr); gap: 6px; margin-bottom: 28px; }
@@ -107,7 +111,13 @@ section { scroll-margin-top: 16px; }
 .q-count .step { font: 500 13px/1 var(--font-data); color: var(--glow); letter-spacing: .08em; }
 .q-title { font-size: clamp(28px, 3.3vw, 42px); margin: 14px 0 10px; }
 .q-sub { color: var(--mist); margin: 0 0 26px; max-width: 40em; }
-.q-body { min-height: 230px; }
+.q-body { min-height: 300px; }
+.quiz { display: flex; flex-direction: column; }
+.quiz .nav { margin-top: auto; }
+.q-title:focus { outline: none; }
+.dial.unset output { color: var(--mist); }
+.dial .note { font-size: 13px; color: var(--mist); margin: 10px 0 0; min-height: 1.55em; }
+.prio-note { font-size: 13px; color: var(--mist); margin: 16px 0 0; }
 .q-body.enter { animation: rise .45s cubic-bezier(.2,.7,.2,1); }
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
@@ -118,7 +128,7 @@ section { scroll-margin-top: 16px; }
 .tile > span small { display: block; font-weight: 400; font-size: 12px; color: var(--mist); }
 .tile svg { width: 64px; height: 40px; color: var(--mist); transition: color .2s, filter .2s; }
 .tile .big { font: 800 40px/1 var(--font-display); font-stretch: 112%; color: var(--mist); transition: color .2s; }
-.tile .key { position: absolute; top: 12px; right: 13px; font: 500 10px/1 var(--font-data); color: var(--mist); opacity: .6; border: 1px solid var(--line); border-radius: 4px; padding: 3px 5px; }
+.tile .key { position: absolute; top: 12px; right: 13px; font: 500 12px/1 var(--font-data); color: var(--mist); opacity: .6; border: 1px solid var(--line); border-radius: 4px; padding: 3px 5px; }
 .tile:hover > span { box-shadow: inset 0 0 0 1px var(--mist); transform: translateY(-1px); }
 .tile input:checked + span { background: linear-gradient(160deg, rgba(255,196,119,.16), rgba(255,157,77,.06)); box-shadow: inset 0 0 0 1.5px var(--glow), 0 10px 30px -12px rgba(255,157,77,.6); }
 .tile input:checked + span svg, .tile input:checked + span .big { color: var(--glow); filter: drop-shadow(0 0 8px rgba(255,196,119,.55)); }
@@ -158,11 +168,11 @@ section { scroll-margin-top: 16px; }
 .pick .scene { position: relative; aspect-ratio: 600 / 300; max-width: 100%; }
 .pick .scene svg { width: 100%; height: 100%; display: block; }
 .pick .scene::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, var(--dusk)); pointer-events: none; }
-.ring { position: absolute; top: clamp(14px, 2.5vw, 28px); right: clamp(14px, 2.5vw, 28px); z-index: 2; width: clamp(84px, 11vw, 120px); aspect-ratio: 1; border-radius: 50%; background: conic-gradient(var(--glow) calc(var(--p) * 1%), rgba(255,255,255,.12) 0); display: grid; place-items: center; box-shadow: 0 0 40px rgba(255,170,80,.35); }
+.ring { position: absolute; top: clamp(14px, 2.5vw, 28px); right: clamp(14px, 2.5vw, 28px); z-index: 2; width: clamp(96px, 11vw, 120px); aspect-ratio: 1; border-radius: 50%; background: conic-gradient(var(--glow) calc(var(--p) * 1%), rgba(255,255,255,.12) 0); display: grid; place-items: center; box-shadow: 0 0 40px rgba(255,170,80,.35); }
 .ring::before { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: rgba(10,18,32,.86); backdrop-filter: blur(6px); }
 .ring div { position: relative; text-align: center; }
 .ring b { display: block; font: 800 clamp(26px, 3.4vw, 38px)/1 var(--font-display); font-stretch: 112%; font-variant-numeric: tabular-nums; }
-.ring span { font: 500 9px/1 var(--font-data); letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
+.ring span { font: 500 11px/1 var(--font-data); letter-spacing: .06em; text-transform: uppercase; color: var(--mist); }
 .pick-body { position: relative; padding: 0 clamp(20px, 3.5vw, 44px) clamp(24px, 3.5vw, 44px); margin-top: clamp(-70px, -6vw, -30px); display: grid; gap: 28px; }
 .pick-title { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 18px 30px; }
 .pick-title h3 { font-size: clamp(32px, 4.6vw, 60px); }
@@ -172,7 +182,7 @@ section { scroll-margin-top: 16px; }
 .price span { display: block; font-size: 12px; color: var(--mist); max-width: 30ch; margin-left: auto; margin-top: 6px; }
 .specs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; margin: 0; background: var(--line); border-block: 1px solid var(--line); }
 .specs div { padding: 16px 4px; background: var(--dusk); text-align: center; }
-.specs dt { font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); }
+.specs dt { font: 500 12px/1.2 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); }
 .specs dd { margin: 8px 0 0; font: 700 20px/1.1 var(--font-display); font-stretch: 105%; font-variant-numeric: tabular-nums; }
 .two { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); }
 .why { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 9px; }
@@ -186,7 +196,14 @@ section { scroll-margin-top: 16px; }
 .facts { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 6px; font-size: 13px; color: #c9d3e6; }
 .facts li { padding-left: 14px; position: relative; }
 .facts li::before { content: ""; position: absolute; left: 0; top: .6em; width: 5px; height: 5px; border-radius: 50%; background: var(--glow); }
-.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.actions .ext { color: var(--mist); font-size: 14px; padding: 12px 4px; text-underline-offset: 3px; }
+.actions .ext:hover { color: var(--ink); }
+.share-box { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; width: 100%; }
+.share-box label { font-size: 13px; color: var(--mist); width: 100%; }
+.share-box input { flex: 1 1 240px; min-width: 0; padding: 12px 14px; border-radius: 12px; border: 0; background: var(--night); box-shadow: inset 0 0 0 1px var(--line); font: 13px var(--font-data); color: var(--ink); }
+.share-box .btn { padding: 12px 20px; }
+.price .cmpn { color: var(--glow); }
 
 /* lights-on moment */
 .scene .win, .scene .halo { transition: opacity 1.1s ease; }
@@ -199,12 +216,14 @@ section { scroll-margin-top: 16px; }
 .alts h3 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0; }
 .alts-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 20px; margin-bottom: 16px; }
 .alt-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 1fr); gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
-.alt { scroll-snap-align: start; text-align: left; border: 0; padding: 0; background: var(--dusk); border-radius: 16px; overflow: hidden; cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); transition: transform .2s, box-shadow .2s; }
+.alt { scroll-snap-align: start; display: flex; flex-direction: column; background: var(--dusk); border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); transition: transform .2s, box-shadow .2s; }
+.alt > button { display: block; width: 100%; text-align: left; border: 0; padding: 0; background: none; cursor: pointer; flex: 1; }
+.alt .open { display: block; padding: 0 16px 15px; font-size: 14px; text-underline-offset: 3px; }
 .alt:hover { transform: translateY(-3px); box-shadow: inset 0 0 0 1px var(--glow), 0 20px 40px -20px rgba(255,157,77,.45); }
 .alt .mini { aspect-ratio: 600 / 300; }
 .alt .mini svg { width: 100%; height: 100%; display: block; }
 .alt .mini img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.scene .credit { position: absolute; left: 12px; top: 12px; z-index: 2; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); color: var(--ink); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+.scene .credit { position: absolute; left: 12px; top: 12px; z-index: 2; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); color: var(--ink); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
 .alt .t { font: 700 17px/1.2 var(--font-display); font-stretch: 105%; padding: 14px 16px 0; }
 .alt .s { font-size: 13px; color: var(--mist); padding: 4px 16px 0; }
 .alt .row { display: flex; justify-content: space-between; gap: 10px; padding: 12px 16px 15px; font-size: 13px; font-variant-numeric: tabular-nums; }
@@ -221,17 +240,32 @@ section { scroll-margin-top: 16px; }
 .chips label:hover span { color: var(--ink); }
 .chips input:checked + span { background: var(--ink); color: var(--night); box-shadow: none; font-weight: 600; }
 .chips input:focus-visible + span { outline: 2px solid var(--glow); outline-offset: 2px; }
-.table-wrap { overflow-x: auto; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); max-height: 640px; overflow-y: auto; }
+.table-wrap { border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); }
+.filters { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; margin: 0 0 16px; }
+.filters label { display: grid; gap: 6px; font-size: 13px; color: var(--mist); }
+.filters select { min-height: 44px; padding: 0 36px 0 14px; border-radius: 12px; border: 0; background: var(--slate) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2393a3c0' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 14px center / 12px 8px; box-shadow: inset 0 0 0 1px var(--line); -webkit-appearance: none; appearance: none; cursor: pointer; }
+.filters select:hover { box-shadow: inset 0 0 0 1px var(--mist); }
+.filters .count { margin-left: auto; font-size: 13px; color: var(--mist); padding-bottom: 12px; }
+.filters .reset { font: inherit; font-size: 13px; border: 0; background: none; color: var(--glow); cursor: pointer; padding: 12px 4px; text-decoration: underline; text-underline-offset: 3px; }
+.empty { padding: 40px 20px; text-align: center; color: var(--mist); }
+.na { color: var(--mist); opacity: .75; font-size: 13px; }
+.u { display: none; }
+td small.cn { display: block; font-size: 12px; color: var(--glow); white-space: normal; max-width: 18ch; margin-left: auto; margin-top: 3px; }
+td .cmpp { display: block; font-size: 12px; color: var(--mist); }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
-th { position: sticky; top: 0; background: var(--dusk); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); z-index: 1; }
+th { position: sticky; top: 0; background: var(--dusk); font: 500 12px/1.2 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); z-index: 1; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-td.note { white-space: normal; min-width: 220px; color: var(--mist); font-size: 12px; }
+td.note { white-space: normal; min-width: 200px; color: var(--mist); font-size: 13px; }
+td.house { white-space: normal; min-width: 220px; }
+td.house a { font-weight: 600; }
+td.house .mk { display: block; font-size: 13px; color: var(--mist); }
+td.house > div { display: flex; align-items: center; }
 tbody tr { transition: background .15s; }
 tbody tr:hover { background: var(--slate); }
 td a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
 td a:hover { color: var(--glow); }
-td .thumb { display: inline-block; width: 64px; height: 40px; object-fit: cover; border-radius: 6px; vertical-align: middle; margin-right: 12px; box-shadow: inset 0 0 0 1px var(--line); }
+td .thumb { display: inline-block; flex: none; width: 64px; height: 40px; object-fit: cover; border-radius: 6px; vertical-align: middle; margin-right: 12px; background: var(--slate); }
 .muted { color: var(--mist); }
 
 .faq { padding-block: clamp(56px, 8vw, 96px) 24px; }
@@ -245,6 +279,9 @@ td .thumb { display: inline-block; width: 64px; height: 40px; object-fit: cover;
 .makers { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-top: 40px; }
 .maker { background: var(--dusk); border-radius: 16px; padding: 22px; box-shadow: inset 0 0 0 1px var(--line); display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
 .maker h3 { font: 800 24px/1 var(--font-display); font-stretch: 112%; margin: 0; }
+.maker h3 a { color: var(--ink); text-decoration: none; }
+.maker h3 a:hover { color: var(--glow); }
+.maker h3 a::after { content: " →"; color: var(--glow); font-size: .7em; }
 .maker p { margin: 0; color: #c9d3e6; }
 .maker .count { font: 12px var(--font-data); color: var(--mist); margin-top: auto; padding-top: 6px; }
 .bars { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; font-size: 12px; color: var(--mist); }
@@ -264,8 +301,8 @@ td .thumb { display: inline-block; width: 64px; height: 40px; object-fit: cover;
 
 footer { padding-block: 30px 50px; border-top: 1px solid var(--line); color: var(--mist); font-size: 13px; }
 footer p { max-width: 80ch; margin: 0; }
-footer nav { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; }
-footer nav a { color: var(--mist); text-underline-offset: 3px; }
+footer nav { display: flex; flex-wrap: wrap; gap: 0 18px; margin-top: 8px; }
+footer nav a { color: var(--mist); text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 44px; }
 footer nav a:hover { color: var(--ink); }
 
 @media (max-width: 899px) {
@@ -280,7 +317,11 @@ footer nav a:hover { color: var(--ink); }
   .two { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
-  .bar nav { display: none; }
+  .bar .wrap { gap: 12px; }
+  .bar nav { gap: 12px; font-size: 13px; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+  .bar nav a { padding-block: 12px; white-space: nowrap; }
+  .q-body { min-height: 0; }
+  .quiz { min-height: 560px; }
   .specs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .specs div { grid-column: span 2; }
   .specs div:nth-child(n+4) { grid-column: span 3; }
@@ -292,7 +333,30 @@ footer nav a:hover { color: var(--ink); }
   .prio-row { grid-template-columns: minmax(0, 1fr); }
   .tile .key { display: none; }
   .nav .hint { display: none; }
-  .q-body { min-height: 0; }
+}
+@media (max-width: 720px) {
+  .table-wrap { box-shadow: none; }
+  #tbl, #tbl tbody { display: block; }
+  #tbl thead { display: none; }
+  #tbl tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 0; padding: 14px; margin-bottom: 10px; border-radius: 14px; background: var(--dusk); box-shadow: inset 0 0 0 1px var(--line); }
+  #tbl tr:hover { background: var(--dusk); }
+  #tbl td { display: block; padding: 0; border: 0; white-space: normal; }
+  #tbl td.house { flex: 1 1 100%; min-width: 0; margin-bottom: 8px; }
+  #tbl td .thumb { width: 96px; height: 60px; }
+  #tbl .u { display: inline; }
+  #tbl td.spec { font-size: 14px; color: #c9d3e6; }
+  #tbl td.spec:not(.na) ~ td.spec:not(.na)::before { content: "·"; margin: 0 7px; color: var(--mist); }
+  #tbl td.spec.na { display: none; }
+  #tbl td.pr { flex: 1 1 100%; text-align: left; margin-top: 8px; font: 700 18px/1.2 var(--font-display); color: var(--glow); }
+  #tbl td.pr small.cn { margin-left: 0; max-width: none; font-family: var(--font-body); font-weight: 400; }
+  #tbl td.pr .cmpp { font-family: var(--font-body); font-weight: 400; }
+  #tbl td.note { flex: 1 1 100%; min-width: 0; }
+  #tbl td.cmpc { flex: 1 1 100%; margin-top: 10px; order: 9; }
+  #tbl td.cmpc button { min-height: 44px; }
+  .filters label { flex: 1 1 140px; }
+  .filters label:first-child { flex-basis: 100%; }
+  .filters select { width: 100%; }
+  .filters .count { margin-left: 0; width: 100%; padding: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -306,7 +370,7 @@ footer nav a:hover { color: var(--ink); }
 
 <div class="bar"><div class="wrap">
   <div class="mark"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 15 16 5l12 10" stroke="#eef2f9" stroke-width="2.4" stroke-linejoin="round"/><rect x="8" y="15" width="16" height="12" stroke="#eef2f9" stroke-width="2.4"/><rect x="13" y="19" width="6" height="8" fill="#ffc477"/></svg>Hišni vodič</div>
-  <nav><a href="#kviz">Kviz</a><a href="#hisa" hidden>Vaša hiša</a><a href="#katalog">Katalog</a><a href="cena-montazne-hise/">Cene</a></nav>
+  <nav aria-label="Glavna navigacija"><a href="#kviz">Kviz</a><a href="#hisa" hidden>Vaša hiša</a><a href="#katalog">Katalog</a><a href="cena-montazne-hise/">Cene</a><a href="tlorisi-montaznih-his/">Tlorisi</a></nav>
 </div></div>
 
 <header class="hero">
@@ -319,6 +383,7 @@ footer nav a:hover { color: var(--ink); }
       <a class="btn glow" href="#kviz">Poiščite svojo hišo <span class="arrow">→</span></a>
       <a class="btn line" href="#katalog">Vse hiše</a>
     </div>
+    <p class="trust" id="trust"></p>
     <div class="stats" id="stats"></div>
   </div>
 </header>
@@ -330,18 +395,18 @@ footer nav a:hover { color: var(--ink); }
         <div class="scene" id="stage-scene"></div>
         <div class="stage-cap">
           <div><div class="eyebrow">Trenutno vodi</div><div class="n" id="stage-name"></div><div class="p" id="stage-prov"></div></div>
-          <div class="match"><b id="stage-pct"></b><span>ujemanje</span></div>
+          <div class="match" id="stage-match"><b id="stage-pct"></b><span>ujemanje</span></div>
         </div>
       </aside>
       <form class="quiz" id="quiz" autocomplete="off">
         <div class="progress" id="progress"></div>
         <div class="q-count"><span class="step" id="q-step"></span><span class="eyebrow" id="q-left"></span></div>
-        <h2 class="display q-title" id="q-title"></h2>
+        <h2 class="display q-title" id="q-title" tabindex="-1"></h2>
         <p class="q-sub" id="q-sub"></p>
         <div class="q-body" id="q-body"></div>
         <div class="nav">
           <button type="button" class="btn line" id="prev">← Nazaj</button>
-          <span class="hint">Tipke 1–5 izberejo, Enter nadaljuje</span>
+          <span class="hint" id="q-hint"></span>
           <button type="button" class="btn glow" id="next">Naprej <span class="arrow">→</span></button>
         </div>
       </form>
@@ -362,6 +427,13 @@ footer nav a:hover { color: var(--ink); }
       <div class="cat-head">
         <div><div class="eyebrow">Katalog</div><h2 class="display">Vse tipske hiše</h2></div>
         <div class="chips" id="chips" role="radiogroup" aria-label="Proizvajalec"></div>
+      </div>
+      <div class="filters" id="filters">
+        <label>Razvrsti<select id="f-sort"><option value="price">Cena: najnižja najprej</option><option value="price-d">Cena: najvišja najprej</option><option value="area">Površina: najmanjša najprej</option><option value="area-d">Površina: največja najprej</option><option value="ppm">Cena na m²: najnižja najprej</option></select></label>
+        <label>Spalnice<select id="f-bed"><option value="">Vse</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4 ali več</option></select></label>
+        <label>Etaže<select id="f-floors"><option value="">Vse</option><option value="1">Pritlične</option><option value="1.5">Z mansardo</option><option value="2">Nadstropne</option></select></label>
+        <label>Cena<select id="f-price"><option value="">Vse cene</option><option value="0-150000">do 150.000 €</option><option value="150000-200000">150.000–200.000 €</option><option value="200000-250000">200.000–250.000 €</option><option value="250000-300000">250.000–300.000 €</option><option value="300000-400000">300.000–400.000 €</option><option value="400000-1e9">nad 400.000 €</option></select></label>
+        <span class="count" id="f-count" aria-live="polite"></span>
       </div>
       <div class="table-wrap"><table id="tbl"></table></div>
       <div class="makers" id="makers"></div>
@@ -384,12 +456,13 @@ footer nav a:hover { color: var(--ink); }
   const MODELS = [];
   PROVIDERS.forEach(p => (p.models || []).forEach((m, i) => MODELS.push(Object.assign({ provider: p.name, providerId: p.id, providerSite: p.website, id: p.id + '-' + i }, m))));
 
-  const fmtEur = n => n == null ? '—' : new Intl.NumberFormat('sl-SI', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+  const fmtEur = n => n == null ? '—' : new Intl.NumberFormat('sl-SI', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0, useGrouping: 'always' }).format(n);
   const floorLabel = f => f == null ? '—' : f === 1 ? 'pritličje' : f === 1.5 ? 'z mansardo' : f >= 2 ? 'P + 1' : String(f);
   const ROOF = { gable: 'dvokapna', flat: 'ravna', mono: 'enokapna', hip: 'štirikapna', multi: 'večkapna' };
   const cap = s => s[0].toUpperCase() + s.slice(1);
   const plural = (n, one, two, few, many) => n === 1 ? one : n === 2 ? two : n <= 4 ? few : many;
   const photo = (m, sizes) => `<img src="${esc(m.image)}" srcset="${esc(m.image)} 720w, ${esc(m.image.replace('img/', 'img/large/'))} 1400w" sizes="${sizes}" alt="${esc(m.name)}, ${esc(m.provider)}">`;
+  const NA = '<span class="na">ni podatka</span>';
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   // ---------- Blue-hour scene: sky, Julian Alps ridge, spruces, and the house with lit windows ----------
@@ -496,13 +569,15 @@ footer nav a:hover { color: var(--ink); }
   const PRIO = [['energy', 'Nizka poraba energije in dobra izolacija'], ['sound', 'Zvočna izolacija med prostori'], ['natural', 'Naravni, ekološki materiali'], ['speed', 'Hitra gradnja in vselitev']];
   const PRIO_SHORT = { energy: 'Energija', sound: 'Zvok', natural: 'Naravni materiali', speed: 'Hitrost' };
   const PRIO_LVL = [['0', 'Ni pomembno'], ['1', 'Delno'], ['2', 'Zelo']];
-  const state = { floors: '1', bedrooms: '3', bathrooms: '2', area: 130, style: 'any', budget: 300000, nobudget: false, stretch: '10', prio: { energy: '2', sound: '1', natural: '1', speed: '0' }, step: 0, selected: null, done: false };
-  try { const s = JSON.parse(localStorage.getItem('hise-quiz-3') || '{}'); Object.assign(state, s, { selected: null }); } catch (e) {}
+  // Nothing is pre-selected: tile answers start empty, the two sliders start at a typical value marked "not set" until touched or confirmed.
+  const state = { floors: null, bedrooms: null, bathrooms: null, area: 130, areaSet: false, style: null, budget: 300000, budgetSet: false, nobudget: false, stretch: null, prio: { energy: null, sound: null, natural: null, speed: null }, step: 0, selected: null, done: false };
+  try { const s = JSON.parse(localStorage.getItem('hise-quiz-4') || '{}'); Object.assign(state, s, { selected: null }); } catch (e) {}
+  const pc = m => m.price_cmp ?? m.price_eur; // comparable price where the data has it, else the maker's price
 
   // Shared result link: #r=floors_bedrooms_bathrooms_area_style_budget(0 = none)_stretch_prio[_house slug]
   let shared = false; // a result opened from someone's link is not saved over the visitor's own answers until they change one
   function shareLink(top, isBest) {
-    const v = [state.floors, state.bedrooms, state.bathrooms, state.area, state.style, state.nobudget ? 0 : state.budget, state.stretch, PRIO.map(([k]) => state.prio[k]).join('')];
+    const v = [state.floors, state.bedrooms, state.bathrooms, state.area, state.style, state.nobudget ? 0 : state.budget, state.stretch || '0', PRIO.map(([k]) => state.prio[k] || '0').join('')];
     if (!isBest && top.slug) v.push(top.slug);
     return location.origin + location.pathname + '#r=' + v.join('_');
   }
@@ -517,32 +592,37 @@ footer nav a:hover { color: var(--ink); }
       stretch: one(v[6], ['0', '10', '20', '35']) };
     if (v.length < 8 || Object.values(s).some(x => x === null) || !/^[012]{4}$/.test(v[7])) return false;
     const pick = v[8] && MODELS.find(x => x.slug === v[8]);
-    Object.assign(state, s, { prio: Object.fromEntries(PRIO.map(([k], i) => [k, v[7][i]])), step: STEPS.length - 1, done: true, selected: pick ? pick.id : null });
+    Object.assign(state, s, { areaSet: true, budgetSet: true, prio: Object.fromEntries(PRIO.map(([k], i) => [k, v[7][i]])), step: STEPS.length - 1, done: true, selected: pick ? pick.id : null });
     return (shared = true);
   }
 
   const tiles = (key, opts) => `<div class="tiles" style="--c:${opts.length}">${opts.map((o, i) => `<label class="tile"><input type="radio" name="${key}" id="q-${key}-${o.v.replace('.', '_')}" value="${o.v}" ${state[key] === o.v ? 'checked' : ''}><span><em class="key">${i + 1}</em>${o.html}</span></label>`).join('')}</div>`;
   const fill = (v, min, max) => `--fill:${((v - min) / (max - min) * 100).toFixed(1)}%`;
   const STEPS = [
-    { t: 'Koliko etaž naj ima hiša?', s: 'Pritlična je brez stopnic, nadstropna zasede manj zemljišča.', auto: true, r: () => tiles('floors', [
+    { k: 'floors', t: 'Koliko etaž naj ima hiša?', s: 'Pritlična je brez stopnic, nadstropna zasede manj zemljišča.', auto: true, r: () => tiles('floors', [
       { v: '1', html: tileHouse(1, 'gable') + 'Pritlična' }, { v: '1.5', html: tileHouse(1.5, 'gable') + 'Z mansardo' },
       { v: '2', html: tileHouse(2, 'flat') + 'Nadstropna' }, { v: 'any', html: '<b class="big">?</b>Vseeno' }]) },
-    { t: 'Koliko spalnic potrebujete?', s: 'Štejte sobe za spanje, brez dnevnega prostora in kabineta.', auto: true, r: () => tiles('bedrooms', ['1', '2', '3', '4'].map(v => ({ v, html: `<b class="big">${v === '4' ? '4+' : v}</b>${v === '1' ? 'spalnica' : v === '2' ? 'spalnici' : 'spalnice'}` }))) },
-    { t: 'In koliko kopalnic?', s: 'Ločen WC ne šteje kot kopalnica.', auto: true, r: () => tiles('bathrooms', ['1', '2', '3'].map(v => ({ v, html: `<b class="big">${v === '3' ? '3+' : v}</b>${v === '1' ? 'kopalnica' : v === '2' ? 'kopalnici' : 'kopalnice'}` }))) },
-    { t: 'Kako veliko hišo si želite?', s: 'Neto bivalna površina vseh etaž.', r: () => `<div class="dial"><output id="o-area" class="num">${state.area}<small>m²</small></output><input type="range" id="q-area" min="40" max="250" step="5" value="${state.area}" style="${fill(state.area, 40, 250)}" aria-label="Bivalna površina v m²"><div class="scale"><span>40 m²</span><span>250 m²</span></div></div>` },
-    { t: 'Kakšna streha vam je všeč?', s: 'Streha najbolj določa videz hiše.', auto: true, r: () => tiles('style', [
+    { k: 'bedrooms', t: 'Koliko spalnic potrebujete?', s: 'Štejte sobe za spanje, brez dnevnega prostora in kabineta.', auto: true, r: () => tiles('bedrooms', ['1', '2', '3', '4'].map(v => ({ v, html: `<b class="big">${v === '4' ? '4+' : v}</b>${v === '1' ? 'spalnica' : v === '2' ? 'spalnici' : 'spalnice'}` }))) },
+    { k: 'bathrooms', t: 'In koliko kopalnic?', s: 'Ločen WC ne šteje kot kopalnica.', auto: true, r: () => tiles('bathrooms', ['1', '2', '3'].map(v => ({ v, html: `<b class="big">${v === '3' ? '3+' : v}</b>${v === '1' ? 'kopalnica' : v === '2' ? 'kopalnici' : 'kopalnice'}` }))) },
+    { k: 'area', t: 'Kako veliko hišo si želite?', s: 'Neto bivalna površina vseh etaž.', r: () => `<div class="dial${state.areaSet ? '' : ' unset'}"><output id="o-area" class="num">${state.area}<small>m²</small></output><input type="range" id="q-area" min="40" max="250" step="5" value="${state.area}" style="${fill(state.area, 40, 250)}" aria-label="Bivalna površina v m²"><div class="scale"><span>40 m²</span><span>250 m²</span></div>${unsetNote(state.areaSet)}</div>` },
+    { k: 'style', t: 'Kakšna streha vam je všeč?', s: 'Streha najbolj določa videz hiše.', auto: true, r: () => tiles('style', [
       { v: 'classic', html: tileHouse(1, 'gable') + 'Dvokapnica<small>klasična</small>' }, { v: 'modern', html: tileHouse(1, 'flat') + 'Ravna<small>moderna</small>' },
       { v: 'mono', html: tileHouse(1, 'mono') + 'Enokapnica<small>moderna</small>' }, { v: 'hip', html: tileHouse(1, 'hip') + 'Štirikapnica<small>&nbsp;</small>' },
       { v: 'any', html: '<b class="big">?</b>Vseeno' }]) },
-    { t: 'Kakšen je vaš proračun?', s: 'Za hišo, brez zemljišča in komunalnih priključkov.', r: () => `<div class="dial"><output id="o-budget" class="num">${state.nobudget ? '—' : fmtEur(state.budget)}</output><input type="range" id="q-budget" min="80000" max="600000" step="10000" value="${state.budget}" style="${fill(state.budget, 80000, 600000)}" ${state.nobudget ? 'disabled' : ''} aria-label="Proračun v evrih"><div class="scale"><span>80.000 €</span><span>600.000 €</span></div><label class="check"><input type="checkbox" id="q-nobudget" ${state.nobudget ? 'checked' : ''}> Proračun ni pomemben</label></div>` },
-    { t: 'Koliko lahko preseže proračun?', s: 'Če bi hiša res ustrezala vašim željam.', auto: true, r: () => tiles('stretch', [['0', 'Nič'], ['10', 'Do 10 %'], ['20', 'Do 20 %'], ['35', 'Do 35 %']].map(([v, t]) => ({ v, html: `<b class="big">${v === '0' ? '0' : '+' + v}</b>${t}` }))) },
-    { t: 'Kaj vam je še pomembno?', s: 'Upoštevamo, kaj posamezni proizvajalec izpostavlja kot svojo prednost.', r: () => `<div class="prio">${PRIO.map(([k, label]) => `<div class="prio-row"><div class="lbl">${label}</div><div class="seg" role="radiogroup" aria-label="${label}">${PRIO_LVL.map(([v, t]) => `<label><input type="radio" name="prio-${k}" id="q-prio-${k}-${v}" value="${v}" ${state.prio[k] === v ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div></div>`).join('')}</div>` },
+    { k: 'budget', t: 'Kakšen je vaš proračun?', s: 'Za hišo, brez zemljišča in komunalnih priključkov.', r: () => `<div class="dial${state.budgetSet || state.nobudget ? '' : ' unset'}"><output id="o-budget" class="num">${state.nobudget ? '—' : fmtEur(state.budget)}</output><input type="range" id="q-budget" min="80000" max="600000" step="10000" value="${state.budget}" style="${fill(state.budget, 80000, 600000)}" ${state.nobudget ? 'disabled' : ''} aria-label="Proračun v evrih"><div class="scale"><span>80.000 €</span><span>600.000 €</span></div><label class="check"><input type="checkbox" id="q-nobudget" ${state.nobudget ? 'checked' : ''}> Proračun ni pomemben</label>${unsetNote(state.budgetSet || state.nobudget)}</div>` },
+    { k: 'stretch', t: 'Koliko lahko preseže proračun?', s: 'Če bi hiša res ustrezala vašim željam.', auto: true, r: () => tiles('stretch', [['0', 'Nič'], ['10', 'Do 10 %'], ['20', 'Do 20 %'], ['35', 'Do 35 %']].map(([v, t]) => ({ v, html: `<b class="big">${v === '0' ? '0' : '+' + v}</b>${t}` }))) },
+    { k: 'prio', t: 'Kaj vam je še pomembno?', s: 'Upoštevamo, kaj posamezni proizvajalec izpostavlja kot svojo prednost.', r: () => `<div class="prio">${PRIO.map(([k, label]) => `<div class="prio-row"><div class="lbl">${label}</div><div class="seg" role="radiogroup" aria-label="${label}">${PRIO_LVL.map(([v, t]) => `<label><input type="radio" name="prio-${k}" id="q-prio-${k}-${v}" value="${v}" ${state.prio[k] === v ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div></div>`).join('')}</div><p class="prio-note">Česar ne označite, ne upoštevamo.</p>` },
   ];
+  function unsetNote(set) { return `<p class="note">${set ? '' : 'Privzeta vrednost. Premaknite drsnik ali potrdite z gumbom Naprej.'}</p>`; }
+  // a step is answered when its tile is chosen; sliders count once you move past them, priorities are optional
+  const answered = i => { const k = STEPS[i].k; return k === 'stretch' ? state.nobudget || state.stretch != null : ['floors', 'bedrooms', 'bathrooms', 'style'].includes(k) ? state[k] != null : true; };
+  const firstOpen = () => STEPS.findIndex((s, i) => !answered(i));
+  const anyAnswer = () => ['floors', 'bedrooms', 'bathrooms', 'style', 'stretch'].some(k => state[k] != null) || state.areaSet || state.budgetSet || state.nobudget || Object.values(state.prio).some(v => v != null);
 
   function score(m) {
     const reasons = []; let pts = 0, max = 0;
-    max += 30;
-    if (state.floors === 'any') pts += 30;
+    if (state.floors == null) {}
+    else if ((max += 30) && state.floors === 'any') pts += 30;
     else if (m.floors == null) { pts += 10; reasons.push(['unk', 'Število etaž ni navedeno']); }
     else {
       const want = parseFloat(state.floors);
@@ -550,37 +630,37 @@ footer nav a:hover { color: var(--ink); }
       else if (Math.abs(m.floors - want) <= 0.5 && want !== 1 && m.floors !== 1) { pts += 15; reasons.push(['miss', `${floorLabel(m.floors)} namesto ${floorLabel(want)}`]); }
       else reasons.push(['miss', `${floorLabel(m.floors)} namesto ${floorLabel(want)}`]);
     }
-    max += 20;
     const wantB = parseInt(state.bedrooms, 10);
-    if (m.bedrooms == null) { pts += 8; reasons.push(['unk', 'Število spalnic ni navedeno']); }
+    if (state.bedrooms == null) {}
+    else if ((max += 20) && m.bedrooms == null) { pts += 8; reasons.push(['unk', 'Število spalnic ni navedeno']); }
     else if (m.bedrooms >= wantB && m.bedrooms <= wantB + 1) { pts += 20; reasons.push(['ok', `${m.bedrooms} ${plural(m.bedrooms, 'spalnica', 'spalnici', 'spalnice', 'spalnic')}`]); }
     else if (m.bedrooms > wantB) { pts += 12; reasons.push(['ok', `${m.bedrooms} spalnic, več kot potrebujete`]); }
     else reasons.push(['miss', `Samo ${m.bedrooms} ${plural(m.bedrooms, 'spalnica', 'spalnici', 'spalnice', 'spalnic')}`]);
-    max += 10;
     const wantBa = parseInt(state.bathrooms, 10);
-    if (m.bathrooms == null) { pts += 4; reasons.push(['unk', 'Število kopalnic ni navedeno']); }
+    if (state.bathrooms == null) {}
+    else if ((max += 10) && m.bathrooms == null) { pts += 4; reasons.push(['unk', 'Število kopalnic ni navedeno']); }
     else if (m.bathrooms >= wantBa) { pts += 10; reasons.push(['ok', `${m.bathrooms} ${plural(m.bathrooms, 'kopalnica', 'kopalnici', 'kopalnice', 'kopalnic')}`]); }
     else reasons.push(['miss', `${m.bathrooms} ${plural(m.bathrooms, 'kopalnica', 'kopalnici', 'kopalnice', 'kopalnic')} namesto ${wantBa}`]);
-    max += 25;
-    if (m.area_m2 == null) { pts += 6; reasons.push(['unk', 'Površina ni navedena']); }
+    if (!state.areaSet) {}
+    else if ((max += 25) && m.area_m2 == null) { pts += 6; reasons.push(['unk', 'Površina ni navedena']); }
     else {
       const d = Math.abs(m.area_m2 - state.area) / state.area;
       pts += Math.max(0, 25 * (1 - d * 2.5));
       reasons.push([d <= 0.25 ? 'ok' : 'miss', d <= 0.12 ? `${Math.round(m.area_m2)} m², blizu želenih ${state.area} m²` : `${Math.round(m.area_m2)} m² (želeli ste ${state.area} m²)`]);
     }
-    max += 15;
     const roofWanted = { modern: 'flat', mono: 'mono', classic: 'gable', hip: 'hip' }[state.style];
-    if (!roofWanted) pts += 15;
+    if (state.style == null) {}
+    else if ((max += 15) && !roofWanted) pts += 15;
     else if (!m.roof) { pts += 5; reasons.push(['unk', 'Oblika strehe ni navedena']); }
     else if (m.roof === roofWanted || (roofWanted === 'gable' && m.roof === 'multi')) { pts += 15; reasons.push(['ok', `${cap(ROOF[m.roof])} streha`]); }
     else if ((roofWanted === 'flat' && m.roof === 'mono') || (roofWanted === 'mono' && m.roof === 'flat')) { pts += 9; reasons.push(['miss', `${cap(ROOF[m.roof])} streha, podobno moderna`]); }
     else reasons.push(['miss', `${cap(ROOF[m.roof])} streha`]);
-    if (!state.nobudget) {
+    if (!state.nobudget && state.budgetSet) {
       max += 25;
-      if (m.price_eur == null) { pts += 8; reasons.push(['unk', 'Cena na povpraševanje']); }
+      if (pc(m) == null) { pts += 8; reasons.push(['unk', 'Cena na povpraševanje']); }
       else {
-        const over = (m.price_eur - state.budget) / state.budget;
-        const stretch = parseInt(state.stretch, 10) / 100;
+        const over = (pc(m) - state.budget) / state.budget;
+        const stretch = parseInt(state.stretch || '0', 10) / 100;
         if (over <= 0) { pts += 25; reasons.push(['ok', `Cena v okviru proračuna`]); }
         else if (over <= stretch) { pts += 19; reasons.push(['ok', `${Math.round(over * 100)} % nad proračunom, znotraj vaše rezerve`]); }
         else { pts += Math.max(0, 16 * (1 - (over - stretch) * 4)); reasons.push(['miss', `${Math.round(over * 100)} % nad proračunom`]); }
@@ -588,23 +668,24 @@ footer nav a:hover { color: var(--ink); }
     }
     const prov = PROVIDERS.find(p => p.id === m.providerId) || {};
     PRIO.forEach(([k, label]) => {
-      const w = parseInt(state.prio[k], 10); if (!w) return;
+      const w = parseInt(state.prio[k] || '0', 10); if (!w) return;
       max += 10 * w;
       const r = prov.ratings ? prov.ratings[k] : null;
       const why = prov.rating_notes && prov.rating_notes[k];
       if (r == null) { pts += 10 * w / 3; reasons.push(['unk', `${label}: proizvajalec podatka ne objavlja`]); }
       else { pts += 10 * w * r / 3; reasons.push([r >= 2 ? 'ok' : 'miss', why || label]); }
     });
-    return { pct: Math.round(100 * pts / max), reasons };
+    return { pct: max ? Math.round(100 * pts / max) : null, reasons };
   }
-  const rank = () => MODELS.filter(m => m.area_m2 != null).map(m => Object.assign({ s: score(m) }, m)).sort((a, b) => b.s.pct - a.s.pct || (a.price_eur ?? 1e9) - (b.price_eur ?? 1e9));
+  const rank = () => MODELS.filter(m => m.area_m2 != null).map(m => Object.assign({ s: score(m) }, m)).sort((a, b) => (b.s.pct ?? 0) - (a.s.pct ?? 0) || (pc(a) ?? 1e9) - (pc(b) ?? 1e9));
 
   // ---------- rendering ----------
   const $ = id => document.getElementById(id);
   function renderStep(animate) {
     const st = STEPS[state.step];
     $('progress').style.setProperty('--n', STEPS.length);
-    $('progress').innerHTML = STEPS.map((s, i) => `<button type="button" class="${i < state.step ? 'done' : i === state.step ? 'on' : ''}" data-i="${i}" aria-label="Vprašanje ${i + 1}: ${s.t}"></button>`).join('');
+    const open = firstOpen();
+    $('progress').innerHTML = STEPS.map((s, i) => `<button type="button" class="${i === state.step ? 'on' : answered(i) && i < state.step ? 'done' : ''}" data-i="${i}" aria-label="Vprašanje ${i + 1}: ${s.t}"${open >= 0 && i > open ? ' disabled' : ''}${i === state.step ? ' aria-current="step"' : ''}></button>`).join('');
     $('q-step').textContent = `${String(state.step + 1).padStart(2, '0')} / ${String(STEPS.length).padStart(2, '0')}`;
     $('q-left').textContent = state.step === STEPS.length - 1 ? 'Zadnje vprašanje' : `Še ${STEPS.length - state.step - 1}`;
     $('q-title').textContent = st.t;
@@ -613,17 +694,24 @@ footer nav a:hover { color: var(--ink); }
     body.innerHTML = st.r();
     if (animate) { body.classList.remove('enter'); void body.offsetWidth; body.classList.add('enter'); }
     $('prev').disabled = state.step === 0;
+    $('next').disabled = !answered(state.step);
+    const n = body.querySelectorAll('.tiles input').length;
+    $('q-hint').textContent = n ? `Tipke 1–${n} izberejo, Enter nadaljuje` : st.k === 'prio' ? 'Enter pokaže rezultat' : 'Puščice premaknejo drsnik, Enter potrdi';
     $('next').innerHTML = state.step === STEPS.length - 1 ? 'Pokaži mojo hišo <span class="arrow">→</span>' : 'Naprej <span class="arrow">→</span>';
   }
   let lastStageId = null;
   function renderStage(top) {
     $('stage-name').textContent = top.name;
     $('stage-prov').textContent = `${top.provider} · ${floorLabel(top.floors)} · ${Math.round(top.area_m2)} m²`;
-    $('stage-pct').textContent = top.s.pct + ' %';
+    const wait = !anyAnswer();
+    document.querySelector('.stage-cap .eyebrow').textContent = wait ? 'Primer iz kataloga' : 'Trenutno vodi';
+    $('stage-match').classList.toggle('wait', wait);
+    $('stage-pct').textContent = wait ? 'Odgovorite na prvo vprašanje' : top.s.pct + ' %';
+    $('stage-match').querySelector('span').hidden = wait;
     if (top.id !== lastStageId) { $('stage-scene').innerHTML = top.image ? photo(top, '(min-width: 900px) 45vw, 100vw') + `<span class="credit">Foto: ${esc(top.provider)}</span>` : scene(top, { h: 360 }); lastStageId = top.id; }
   }
   function renderResult(lightsOn) {
-    if (!shared) try { const { selected, ...s } = state; localStorage.setItem('hise-quiz-3', JSON.stringify(s)); } catch (e) {}
+    if (!shared) try { const { selected, ...s } = state; localStorage.setItem('hise-quiz-4', JSON.stringify(s)); } catch (e) {}
     const ranked = rank();
     renderStage(ranked[0]);
     // the result and its nav link stay hidden until the quiz is finished
@@ -643,20 +731,20 @@ footer nav a:hover { color: var(--ink); }
         <div class="pick-body">
           <div class="pick-title">
             <div><h3 class="display">${esc(top.name)}</h3><div class="prov">${esc(top.provider)}${prov.construction ? ' · ' + esc(prov.construction) : ''}</div></div>
-            <div class="price"><b>${top.price_eur != null ? fmtEur(top.price_eur) : 'Na povpraševanje'}</b><span>${top.price_eur != null ? esc(top.price_stage || 'faza gradnje ni navedena') : 'Proizvajalec cene ne objavlja.'}</span></div>
+            <div class="price"><b>${pc(top) != null ? fmtEur(pc(top)) : 'Na povpraševanje'}</b><span>${pc(top) != null ? (top.cmp_note ? `<span class="cmpn">${esc(top.cmp_note)}</span> · ` : '') + (pc(top) !== top.price_eur && top.price_eur != null ? `cena proizvajalca ${fmtEur(top.price_eur)}: ` : '') + esc(top.price_stage || 'faza gradnje ni navedena') : 'Proizvajalec cene ne objavlja.'}</span></div>
           </div>
-          <dl class="specs">${cell('Etaže', floorLabel(top.floors))}${cell('Površina', top.area_m2 ? Math.round(top.area_m2) + ' m²' : '—')}${cell('Spalnice', top.bedrooms ?? '—')}${cell('Kopalnice', top.bathrooms ?? '—')}${cell('Streha', top.roof ? ROOF[top.roof] : '—')}</dl>
+          <dl class="specs">${cell('Etaže', floorLabel(top.floors))}${cell('Površina', top.area_m2 ? Math.round(top.area_m2) + ' m²' : NA)}${cell('Spalnice', top.bedrooms ?? NA)}${cell('Kopalnice', top.bathrooms ?? NA)}${cell('Streha', top.roof ? ROOF[top.roof] : NA)}</dl>
           <div class="two">
             <div><div class="eyebrow">Zakaj ta hiša</div><ul class="why">${top.s.reasons.map(([c, t]) => `<li class="${c === 'ok' ? '' : c}">${esc(t)}</li>`).join('')}</ul></div>
             <div class="edge"><div class="eyebrow">Prednost proizvajalca ${esc(top.provider)}</div>${esc(prov.edge || '')}${facts.length ? `<ul class="facts">${facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}</div>
           </div>
-          <div class="actions">${top.url ? `<a class="btn glow" href="${esc(top.url)}" target="_blank" rel="noopener">Odpri hišo pri proizvajalcu <span class="arrow">↗</span></a>` : ''}${!isBest ? `<button type="button" class="btn line" id="back-best">Nazaj na najboljše ujemanje</button>` : `<a class="btn line" href="#kviz">${shared ? 'Rešite kviz sami' : 'Spremeni odgovore'}</a>`}${state.done ? '<button type="button" class="btn line" id="share">Deli rezultat</button>' : ''}${top.slug ? `<button type="button" class="btn line cmp" data-slug="${esc(top.slug)}">+ Primerjaj</button>` : ''}</div>
+          <div class="actions">${top.slug ? `<a class="btn glow" href="${esc(top.slug)}/">Tloris in podrobnosti <span class="arrow">→</span></a>` : ''}${top.slug && top.price_eur != null ? `<a class="btn line" href="koliko-stane-gradnja-hise/#h=${esc(top.slug)}">Izračunaj celotne stroške</a>` : ''}${!isBest ? `<button type="button" class="btn line" id="back-best">Nazaj na najboljše ujemanje</button>` : `<a class="btn line" href="#kviz">${shared ? 'Rešite kviz sami' : 'Spremeni odgovore'}</a>`}${state.done ? '<button type="button" class="btn line" id="share">Deli rezultat</button>' : ''}${top.slug ? `<button type="button" class="btn line cmp" data-slug="${esc(top.slug)}" data-name="${esc(top.provider + ' ' + top.name)}">+ Primerjaj</button>` : ''}${top.url ? `<a class="ext" href="${esc(top.url)}" target="_blank" rel="noopener">Hiša pri proizvajalcu ↗</a>` : ''}</div>
         </div>
       </article>
       <div class="alts"><div class="alts-head"><h3>Druge hiše, ki vam ustrezajo</h3>${top3.length === 3 ? `<a class="btn line" href="primerjava/#${top3.join(',')}">Primerjaj najboljše 3 <span class="arrow">→</span></a>` : ''}</div><div class="alt-row">
-        ${ranked.filter(r => r !== top).slice(0, 6).map(r => `<button type="button" class="alt" data-id="${r.id}"><div class="mini">${r.image ? `<img src="${esc(r.image)}" alt="" loading="lazy">` : scene(r, { h: 300, stars: false })}</div><div class="t">${esc(r.name)}</div><div class="s">${esc(r.provider)} · ${floorLabel(r.floors)} · ${Math.round(r.area_m2)} m²</div><div class="row"><span class="pct">${r.s.pct} % ujemanje</span><span>${r.price_eur != null ? fmtEur(r.price_eur) : '<span class="muted">na povpraševanje</span>'}</span></div></button>`).join('')}
+        ${ranked.filter(r => r !== top).slice(0, 6).map(r => `<div class="alt"><button type="button" data-id="${r.id}"><div class="mini">${r.image ? `<img src="${esc(r.image)}" alt="" loading="lazy">` : scene(r, { h: 300, stars: false })}</div><div class="t">${esc(r.name)}</div><div class="s">${esc(r.provider)} · ${floorLabel(r.floors)} · ${Math.round(r.area_m2)} m²</div><div class="row"><span class="pct">${r.s.pct} % ujemanje</span><span>${pc(r) != null ? fmtEur(pc(r)) + (r.cmp_note ? `<span class="muted" title="${esc(r.cmp_note)}"> *</span>` : '') : '<span class="muted">na povpraševanje</span>'}</span></div></button>${r.slug ? `<a class="open" href="${esc(r.slug)}/">Podrobnosti o hiši →</a>` : ''}</div>`).join('')}
       </div></div>`;
-    document.querySelectorAll('.alt').forEach(b => b.addEventListener('click', () => { state.selected = b.dataset.id; renderResult(true); lightUp(); $('hisa').scrollIntoView({ block: 'start' }); }));
+    document.querySelectorAll('.alt > button').forEach(b => b.addEventListener('click', () => { state.selected = b.dataset.id; renderResult(true); lightUp(); $('hisa').scrollIntoView({ block: 'start' }); }));
     const bb = $('back-best'); if (bb) bb.addEventListener('click', () => { state.selected = null; renderResult(true); lightUp(); });
     const sh = $('share');
     if (sh) sh.addEventListener('click', async () => {
@@ -667,9 +755,25 @@ footer nav a:hover { color: var(--ink); }
         return;
       }
       try { await navigator.clipboard.writeText(url); sh.textContent = 'Povezava kopirana ✓'; setTimeout(() => { sh.textContent = 'Deli rezultat'; }, 2500); }
-      catch (e) { window.prompt('Kopirajte povezavo:', url); }
+      catch (e) { shareBox(sh, url); }
     });
     if (window.HVCompare) window.HVCompare.refresh();
+  }
+  // the clipboard can be blocked; show the link in a selectable field instead of a prompt()
+  function shareBox(sh, url) {
+    let box = $('share-box');
+    if (!box) {
+      box = document.createElement('div'); box.className = 'share-box'; box.id = 'share-box';
+      box.innerHTML = '<label for="share-url">Povezava do rezultata</label><input id="share-url" readonly><button type="button" class="btn line" id="share-copy">Kopiraj</button>';
+      sh.closest('.actions').appendChild(box);
+    }
+    const i = $('share-url'), c = $('share-copy');
+    i.value = url; i.focus(); i.select();
+    c.onclick = async () => {
+      i.select(); let ok = false;
+      try { await navigator.clipboard.writeText(url); ok = true; } catch (e) { try { ok = document.execCommand('copy'); } catch (e2) {} }
+      c.textContent = ok ? 'Kopirano ✓' : 'Povezava je označena, kopirajte jo';
+    };
   }
   function lightUp() { const s = $('pick-scene'); if (s) requestAnimationFrame(() => requestAnimationFrame(() => s.classList.remove('off'))); }
 
@@ -679,31 +783,48 @@ footer nav a:hover { color: var(--ink); }
     const t = e.target;
     if (t.name && t.name.startsWith('prio-')) state.prio[t.name.slice(5)] = t.value;
     else if (t.name && t.type === 'radio') state[t.name] = t.value;
-    if (t.id === 'q-area') { state.area = +t.value; t.style.cssText = fill(state.area, 40, 250); $('o-area').innerHTML = `${state.area}<small>m²</small>`; }
-    if (t.id === 'q-budget') { state.budget = +t.value; t.style.cssText = fill(state.budget, 80000, 600000); $('o-budget').textContent = fmtEur(state.budget); }
-    if (t.id === 'q-nobudget') { state.nobudget = t.checked; $('q-budget').disabled = t.checked; $('o-budget').textContent = t.checked ? '—' : fmtEur(state.budget); }
+    if (t.id === 'q-area') { state.areaSet = true; markSet(); state.area = +t.value; t.style.cssText = fill(state.area, 40, 250); $('o-area').innerHTML = `${state.area}<small>m²</small>`; }
+    if (t.id === 'q-budget') { state.budgetSet = true; markSet(); state.budget = +t.value; t.style.cssText = fill(state.budget, 80000, 600000); $('o-budget').textContent = fmtEur(state.budget); }
+    if (t.id === 'q-nobudget') { state.budgetSet = true; markSet(); state.nobudget = t.checked; $('q-budget').disabled = t.checked; $('o-budget').textContent = t.checked ? '—' : fmtEur(state.budget); }
     state.selected = null;
     shared = false;
     renderResult();
+    $('next').disabled = !answered(state.step);
     // tiles move on by themselves, so the quiz feels like tapping through
     if (t.type === 'radio' && STEPS[state.step].auto && state.step < STEPS.length - 1) {
       autoNext();
     }
   });
-  function autoNext() { clearTimeout(autoTimer); autoTimer = setTimeout(() => { state.step++; renderStep(true); focusFirst(); }, 380); }
+  function markSet() { const d = $('q-body').querySelector('.dial'); if (d) { d.classList.remove('unset'); d.querySelector('.note').textContent = ''; } }
+  function autoNext() { clearTimeout(autoTimer); autoTimer = setTimeout(() => go(state.step + 1), 380); }
+  // keep focus inside the quiz on every step change, so the keys keep working and screen readers hear the new question
+  function go(i) {
+    state.step = i; renderStep(true);
+    const b = $('q-body'), title = $('q-title');
+    (b.querySelector('.tiles input:checked') || b.querySelector('input[type=range]:not(:disabled)') || title).focus({ preventScroll: true });
+    if (title.getBoundingClientRect().top < 0) form.scrollIntoView({ block: 'start' });
+  }
   // a click on the tile that is already selected fires no input event, so move on here (click comes before input)
   form.addEventListener('click', e => { const t = e.target; if (t.type === 'radio' && state[t.name] === t.value && STEPS[state.step].auto && state.step < STEPS.length - 1) autoNext(); });
   form.addEventListener('submit', e => e.preventDefault());
-  function focusFirst() { const c = $('q-body').querySelector('input:checked') || $('q-body').querySelector('input'); if (c && document.activeElement && form.contains(document.activeElement)) c.focus({ preventScroll: true }); }
   function next() {
     clearTimeout(autoTimer);
-    if (state.step < STEPS.length - 1) { state.step++; renderStep(true); focusFirst(); }
+    if (!answered(state.step)) return;
+    const k = STEPS[state.step].k;
+    if (k === 'area' && !state.areaSet) { state.areaSet = true; renderResult(); }
+    if (k === 'budget' && !state.budgetSet) { state.budgetSet = true; renderResult(); }
+    const open = firstOpen();
+    if (open >= 0 && open !== state.step) go(open);
+    else if (state.step < STEPS.length - 1) go(state.step + 1);
     else { state.done = true; state.selected = null; renderResult(true); $('hisa').scrollIntoView({ block: 'start' }); setTimeout(lightUp, 350); }
   }
-  $('prev').addEventListener('click', () => { clearTimeout(autoTimer); if (state.step > 0) { state.step--; renderStep(true); } });
+  $('prev').addEventListener('click', () => { clearTimeout(autoTimer); if (state.step > 0) go(state.step - 1); });
   $('next').addEventListener('click', next);
-  $('progress').addEventListener('click', e => { const i = e.target.dataset && e.target.dataset.i; if (i != null) { clearTimeout(autoTimer); state.step = +i; renderStep(true); } });
-  form.addEventListener('keydown', e => {
+  $('progress').addEventListener('click', e => { const i = e.target.dataset && e.target.dataset.i; if (i != null) { clearTimeout(autoTimer); go(+i); } });
+  // on the document, so the keys work wherever focus is while the quiz is on screen
+  document.addEventListener('keydown', e => {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (!form.contains(e.target)) { const q = form.getBoundingClientRect(); if (e.target !== document.body || q.bottom < 80 || q.top > innerHeight - 80) return; }
     if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') { e.preventDefault(); next(); return; }
     const n = parseInt(e.key, 10);
     if (n >= 1 && n <= 9 && e.target.type !== 'range') { const opts = $('q-body').querySelectorAll('.tiles input'); if (opts[n - 1]) { opts[n - 1].checked = true; opts[n - 1].dispatchEvent(new Event('input', { bubbles: true })); opts[n - 1].focus({ preventScroll: true }); } }
@@ -713,17 +834,48 @@ footer nav a:hover { color: var(--ink); }
   let provFilter = '';
   $('chips').innerHTML = [['', 'Vsi']].concat(PROVIDERS.map(p => [p.id, p.name])).map(([v, t]) => `<label><input type="radio" name="prov" id="f-prov-${v || 'all'}" value="${v}" ${v === '' ? 'checked' : ''}><span>${esc(t)}</span></label>`).join('');
   $('chips').addEventListener('change', e => { provFilter = e.target.value; renderTable(); });
+  $('filters').addEventListener('change', renderTable);
+  const pl = (n, ...f) => plural(n % 100 || 100, ...f); // Slovenian plural by the last two digits
   function renderTable() {
-    const rows = MODELS.filter(m => !provFilter || m.providerId === provFilter).sort((a, b) => (a.area_m2 ?? 0) - (b.area_m2 ?? 0));
-    $('tbl').innerHTML = `<thead><tr><th>Hiša</th><th><span class="sr-only">Primerjava</span></th><th>Proizvajalec</th><th>Etaže</th><th class="num">m²</th><th class="num">Spalnice</th><th class="num">Kopalnice</th><th>Streha</th><th class="num">Cena</th><th>Kaj cena vključuje</th></tr></thead><tbody>${rows.map(m => `<tr><td>${m.image ? `<img class="thumb" src="${esc(m.image)}" alt="" loading="lazy">` : '<span class="thumb"></span>'}<a href="${esc(m.slug)}/">${esc(m.name)}</a></td><td><button type="button" class="cmp sm" data-slug="${esc(m.slug)}">+ Primerjaj</button></td><td>${esc(m.provider)}</td><td>${floorLabel(m.floors)}${m.flags && m.flags.length ? ` <span class="muted" title="${esc(m.flags.join(', '))}">*</span>` : ''}</td><td class="num">${m.area_m2 ? Math.round(m.area_m2) : '—'}</td><td class="num">${m.bedrooms ?? '—'}</td><td class="num">${m.bathrooms ?? '—'}</td><td>${m.roof ? ROOF[m.roof] : '—'}</td><td class="num">${fmtEur(m.price_eur)}</td><td class="note">${m.price_eur != null ? esc(m.price_stage || '') : 'na povpraševanje'}</td></tr>`).join('')}</tbody>`;
+    const v = id => $(id).value, sort = v('f-sort'), bed = v('f-bed'), fl = v('f-floors'), pr = v('f-price');
+    const [lo, hi] = (pr || '0-1e12').split('-').map(Number);
+    const ppm = m => pc(m) != null && m.area_m2 ? pc(m) / m.area_m2 : null;
+    const key = { price: pc, 'price-d': pc, area: m => m.area_m2, 'area-d': m => m.area_m2, ppm }[sort], dir = sort.endsWith('-d') ? -1 : 1;
+    const filled = m => ['floors', 'area_m2', 'bedrooms', 'bathrooms', 'roof'].filter(k => m[k] != null).length;
+    // missing values always sort last; ties go to the house with more known specs
+    const rows = MODELS.filter(m => (!provFilter || m.providerId === provFilter) && (!bed || (bed === '4' ? m.bedrooms >= 4 : m.bedrooms === +bed))
+        && (!fl || (fl === '2' ? m.floors >= 2 : m.floors === +fl)) && (!pr || (pc(m) != null && pc(m) >= lo && pc(m) < hi)))
+      .sort((a, b) => { const x = key(a), y = key(b); return (x == null) - (y == null) || (x != null && y != null ? dir * (x - y) : 0) || filled(b) - filled(a); });
+    const col = sort.startsWith('price') ? 'price' : sort.startsWith('area') ? 'area' : '';
+    const srt = c => c === col ? ` aria-sort="${dir > 0 ? 'ascending' : 'descending'}"` : '';
+    const spec = (val, html) => val == null ? `<td class="spec na">${NA}</td>` : `<td class="spec">${html}</td>`;
+    const nspec = (val, html) => val == null ? `<td class="spec num na">${NA}</td>` : `<td class="spec num">${html}</td>`;
+    const n = rows.length;
+    $('f-count').textContent = `${pl(n, 'Prikazana', 'Prikazani', 'Prikazane', 'Prikazanih')} ${n} od ${MODELS.length} hiš`;
+    $('tbl').innerHTML = `<thead><tr><th scope="col">Hiša</th><th scope="col">Etaže</th><th scope="col" class="num"${srt('area')}>m²</th><th scope="col" class="num">Spalnice</th><th scope="col" class="num">Kopalnice</th><th scope="col">Streha</th><th scope="col" class="num"${srt('price')}>Cena</th><th scope="col">Kaj cena vključuje</th><th scope="col"><span class="sr-only">Primerjava</span></th></tr></thead><tbody>${n ? rows.map(m => {
+      const p = pc(m);
+      return `<tr><td class="house"><div>${m.image ? `<img class="thumb" src="${esc(m.image)}" alt="" loading="lazy">` : '<span class="thumb"></span>'}<span><a href="${esc(m.slug)}/">${esc(m.name)}</a><span class="mk">${esc(m.provider)}</span></span></div></td>`
+        + spec(m.floors, floorLabel(m.floors) + (m.flags && m.flags.length ? ` <span class="muted" title="${esc(m.flags.join(', '))}">*</span>` : ''))
+        + nspec(m.area_m2, `${Math.round(m.area_m2)}<span class="u"> m²</span>`)
+        + nspec(m.bedrooms, `${m.bedrooms}<span class="u"> ${pl(m.bedrooms || 0, 'spalnica', 'spalnici', 'spalnice', 'spalnic')}</span>`)
+        + nspec(m.bathrooms, `${m.bathrooms}<span class="u"> ${pl(m.bathrooms || 0, 'kopalnica', 'kopalnici', 'kopalnice', 'kopalnic')}</span>`)
+        + spec(m.roof, `${m.roof ? ROOF[m.roof] : ''}<span class="u"> streha</span>`)
+        + `<td class="num pr">${p != null ? fmtEur(p) + (m.cmp_note ? `<small class="cn">${esc(m.cmp_note)}</small>` : '') + (ppm(m) ? `<span class="cmpp">${fmtEur(ppm(m))}/m²</span>` : '') : '<span class="na">na povpraševanje</span>'}</td>`
+        + `<td class="note">${m.price_eur != null ? (p !== m.price_eur ? `Cena proizvajalca ${fmtEur(m.price_eur)}: ` : '') + esc(m.price_stage || '') : ''}</td>`
+        + `<td class="cmpc"><button type="button" class="cmp sm" data-slug="${esc(m.slug)}" data-name="${esc(m.provider + ' ' + m.name)}">+ Primerjaj</button></td></tr>`;
+    }).join('') : `<tr><td class="empty" colspan="9">Nobena hiša ne ustreza izbranim filtrom. <button type="button" class="reset" id="f-reset">Počisti filtre</button></td></tr>`}</tbody>`;
+    const rs = $('f-reset');
+    if (rs) rs.addEventListener('click', () => { ['f-bed', 'f-floors', 'f-price'].forEach(id => { $(id).value = ''; }); $('f-prov-all').checked = true; provFilter = ''; renderTable(); });
     if (window.HVCompare) window.HVCompare.refresh();
   }
-  const bars = r => `<i>${[1, 2, 3].map(k => `<b class="${r != null && r >= k ? 'f' : ''}"></b>`).join('')}</i>`;
-  $('makers').innerHTML = PROVIDERS.map(p => `<div class="maker"><h3>${esc(p.name)}</h3><p>${esc(p.description || '')}</p>${p.ratings ? `<div class="bars">${PRIO.map(([k]) => `<span>${PRIO_SHORT[k]}</span>${bars(p.ratings[k])}`).join('')}</div>` : ''}<div class="count">${(p.models || []).length} tipskih hiš${p.website ? ` · <a href="${esc(p.website)}" target="_blank" rel="noopener">${esc(p.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))} ↗</a>` : ''}</div></div>`).join('');
+  const bars = (r, label) => `<i role="img" aria-label="${label}: ${r != null ? r + ' od 3' : 'ni podatka'}">${[1, 2, 3].map(k => `<b class="${r != null && r >= k ? 'f' : ''}"></b>`).join('')}</i>`;
+  $('makers').innerHTML = PROVIDERS.map(p => `<div class="maker"><h3><a href="${esc(p.id)}/">${esc(p.name)}</a></h3><p>${esc(p.description || '')}</p>${p.ratings ? `<div class="bars">${PRIO.map(([k]) => `<span aria-hidden="true">${PRIO_SHORT[k]}</span>${bars(p.ratings[k], PRIO_SHORT[k])}`).join('')}</div>` : ''}<div class="count">${(p.models || []).length} tipskih hiš${p.website ? ` · <a href="${esc(p.website)}" target="_blank" rel="noopener">${esc(p.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))} ↗</a>` : ''}</div></div>`).join('');
 
   const priced = MODELS.filter(m => m.price_eur != null).length;
   $('stats').innerHTML = `<div class="stat"><b>${PROVIDERS.length}</b><span>proizvajalcev</span></div><div class="stat"><b>${MODELS.length}</b><span>tipskih hiš</span></div><div class="stat"><b>${priced}</b><span>z objavljeno ceno</span></div>`;
-  $('foot').textContent = `Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (${DATA.collected}). Cene so informativne in se nanašajo na različne faze gradnje, zato je pri vsaki navedeno, kaj vključuje. Ocene prednosti proizvajalcev (energija, zvok, materiali, hitrost) so naša presoja na podlagi objavljenih podatkov. Prototip, ni povezan s proizvajalci.`;
+  $('foot').textContent = `Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (${DATA.collected}). Cene so informativne in se nanašajo na različne faze gradnje, zato je pri vsaki navedeno, kaj vključuje. Ocene prednosti proizvajalcev (energija, zvok, materiali, hitrost) so naša presoja na podlagi objavljenih podatkov. Hišni vodič ni povezan s proizvajalci.`;
+  const GEN = { januar: 'januarja', februar: 'februarja', marec: 'marca', april: 'aprila', maj: 'maja', junij: 'junija', julij: 'julija', avgust: 'avgusta', september: 'septembra', oktober: 'oktobra', november: 'novembra', december: 'decembra' };
+  $('trust').textContent = `Neodvisna primerjava · podatki preverjeni ${DATA.collected.replace(/^\p{L}+/u, w => GEN[w.toLowerCase()] || w).replace(' ', '\u00a0')}`;
 
   // hero: a large two-storey flat-roof house from the catalog, lights on
   const heroModel = MODELS.find(m => m.floors === 2 && m.roof === 'flat' && m.area_m2 > 150) || MODELS[0];
