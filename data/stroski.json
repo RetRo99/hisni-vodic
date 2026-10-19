@@ -49,6 +49,50 @@
         "amount": {
           "min": 18755,
           "max": 18755
+        },
+        "coefficients": {
+          "source_ids": [
+            "kp-vsevem-lj",
+            "kp-lj-ul"
+          ],
+          "dpo": 0.3,
+          "dto": 0.7,
+          "fn": [
+            0.7
+          ],
+          "items": [
+            {
+              "name": "ceste",
+              "cpo": 38.12,
+              "cto": 53.95,
+              "psz": 0.94
+            },
+            {
+              "name": "vodovod",
+              "cpo": 9.1,
+              "cto": 12.33,
+              "psz": 0.82
+            },
+            {
+              "name": "kanalizacija",
+              "cpo": 18.2,
+              "cto": 22.58,
+              "psz": 0.75
+            },
+            {
+              "name": "javne površine",
+              "cpo": 4.28,
+              "cto": 6.37,
+              "psz": 1
+            },
+            {
+              "name": "ravnanje z odpadki",
+              "cpo": 3.61,
+              "cto": 5.38,
+              "psz": 0.28
+            }
+          ],
+          "not_included": "plinovod in vročevod (le če se hiša nanju priključi)"
         }
       },
       {
@@ -61,13 +105,52 @@
         "note": "min/max = Fn 0.7 vs 1.0 (Fn for 1110 not confirmed). The 2024 amendment set psz to 100 % for all utilities (news reports; MUV text not reachable); Cpo/Cto from vsevem, Dpo/Dto 0.5/0.5. No indexation: the odlok has no indexation clause and neither ZUreP-3 nor Uredba 53/26 provides one, so assessments use the odlok prices (kp-uredba-53-26).",
         "source_ids": [
           "kp-mb-news",
-          "kp-vsevem"
+          "kp-vsevem",
+          "kp-vsevem-mb"
         ],
         "as_of": "2019-12-24 odlok, amended 2024-04-16",
         "confidence": "low",
         "amount": {
           "min": 15217,
           "max": 16542
+        },
+        "coefficients": {
+          "source_ids": [
+            "kp-vsevem-mb",
+            "kp-mb-news"
+          ],
+          "dpo": 0.5,
+          "dto": 0.5,
+          "fn": [
+            0.7,
+            1.0
+          ],
+          "items": [
+            {
+              "name": "ceste",
+              "cpo": 24,
+              "cto": 30.01,
+              "psz": 1
+            },
+            {
+              "name": "vodovod",
+              "cpo": 6.11,
+              "cto": 7.05,
+              "psz": 1
+            },
+            {
+              "name": "kanalizacija",
+              "cpo": 9.61,
+              "cto": 10.01,
+              "psz": 1
+            },
+            {
+              "name": "javne površine",
+              "cpo": 0.7,
+              "cto": 2,
+              "psz": 1
+            }
+          ]
         }
       },
       {
@@ -84,6 +167,43 @@
         "amount": {
           "min": 14229,
           "max": 14229
+        },
+        "coefficients": {
+          "source_ids": [
+            "kp-vsevem-ce",
+            "kp-celje-ul"
+          ],
+          "dpo": 0.5,
+          "dto": 0.5,
+          "fn": [
+            1.0
+          ],
+          "items": [
+            {
+              "name": "ceste",
+              "cpo": 15.75,
+              "cto": 61.47,
+              "psz": 1
+            },
+            {
+              "name": "javne površine",
+              "cpo": 0.48,
+              "cto": 1.88,
+              "psz": 1
+            },
+            {
+              "name": "kanalizacija",
+              "cpo": 3.58,
+              "cto": 10.32,
+              "psz": 1
+            },
+            {
+              "name": "vodovod",
+              "cpo": 2.9,
+              "cto": 8.73,
+              "psz": 1
+            }
+          ]
         }
       },
       {
@@ -100,6 +220,44 @@
         "amount": {
           "min": 14010,
           "max": 14010
+        },
+        "coefficients": {
+          "source_ids": [
+            "kp-kranj-ul",
+            "kp-kranj-2023",
+            "kp-vsevem-kr"
+          ],
+          "dpo": 0.5,
+          "dto": 0.5,
+          "fn": [
+            1.0
+          ],
+          "items": [
+            {
+              "name": "ceste",
+              "cpo": 17.5,
+              "cto": 48,
+              "psz": 0.9
+            },
+            {
+              "name": "vodovod",
+              "cpo": 6.5,
+              "cto": 17,
+              "psz": 0.7
+            },
+            {
+              "name": "kanalizacija",
+              "cpo": 5.4,
+              "cto": 11,
+              "psz": 1
+            },
+            {
+              "name": "javne površine",
+              "cpo": 0.7,
+              "cto": 2,
+              "psz": 0.9
+            }
+          ]
         }
       },
       {
@@ -119,6 +277,74 @@
         "amount": {
           "min": 22426,
           "max": 28075
+        },
+        "coefficients": {
+          "source_ids": [
+            "kp-koper"
+          ],
+          "dpo": 0.3,
+          "dto": 0.7,
+          "fn": [
+            1.0
+          ],
+          "items": [
+            {
+              "name": "kanalizacija",
+              "cpo": 13.9,
+              "cto": 19.92,
+              "psz": 1
+            },
+            {
+              "name": "vodovod",
+              "cpo": 10.47,
+              "cto": 17.05,
+              "psz": 1
+            },
+            {
+              "name": "ravnanje z odpadki",
+              "cpo": 0.37,
+              "cto": 0.6,
+              "psz": 1
+            },
+            {
+              "name": "javne površine",
+              "cpo": 30.23,
+              "cto": 34.6,
+              "psz": 1
+            }
+          ],
+          "road_zones": [
+            {
+              "name": "ceste CES1",
+              "cpo": 6.11,
+              "cto": 18.56,
+              "psz": 1
+            },
+            {
+              "name": "ceste CES2",
+              "cpo": 12.23,
+              "cto": 23.34,
+              "psz": 1
+            },
+            {
+              "name": "ceste CES3",
+              "cpo": 20.84,
+              "cto": 38.03,
+              "psz": 1
+            },
+            {
+              "name": "ceste CES4",
+              "cpo": 39.62,
+              "cto": 15.52,
+              "psz": 1
+            },
+            {
+              "name": "ceste CES5",
+              "cpo": 25.19,
+              "cto": 32.95,
+              "psz": 1
+            }
+          ]
         }
       },
       {
@@ -134,6 +360,49 @@
         "amount": {
           "min": 11042,
           "max": 11042
+        },
+        "coefficients": {
+          "source_ids": [
+            "kp-vsevem-nm",
+            "kp-nm-npb3"
+          ],
+          "dpo": 0.3,
+          "dto": 0.7,
+          "fn": [
+            1.0
+          ],
+          "items": [
+            {
+              "name": "vodovod",
+              "cpo": 2.99,
+              "cto": 8.65,
+              "psz": 1
+            },
+            {
+              "name": "kanalizacija",
+              "cpo": 4.12,
+              "cto": 12.77,
+              "psz": 1
+            },
+            {
+              "name": "ceste",
+              "cpo": 13.54,
+              "cto": 37.57,
+              "psz": 0.93
+            },
+            {
+              "name": "ravnanje z odpadki",
+              "cpo": 0.59,
+              "cto": 1.63,
+              "psz": 0.55
+            },
+            {
+              "name": "javne površine",
+              "cpo": 0.44,
+              "cto": 1.14,
+              "psz": 1
+            }
+          ]
         }
       },
       {
@@ -150,6 +419,42 @@
         "amount": {
           "min": 6930,
           "max": 6930
+        },
+        "coefficients": {
+          "source_ids": [
+            "kp-ptuj"
+          ],
+          "dpo": 0.3,
+          "dto": 0.7,
+          "fn": [
+            0.7
+          ],
+          "items": [
+            {
+              "name": "ceste",
+              "cpo": 11.4,
+              "cto": 32.02,
+              "psz": 0.95
+            },
+            {
+              "name": "vodovod",
+              "cpo": 1.88,
+              "cto": 5.31,
+              "psz": 0.75
+            },
+            {
+              "name": "kanalizacija",
+              "cpo": 5.06,
+              "cto": 13.37,
+              "psz": 0.51
+            },
+            {
+              "name": "javne površine",
+              "cpo": 1.92,
+              "cto": 4.96,
+              "psz": 0.8
+            }
+          ]
         }
       },
       {
@@ -244,7 +549,7 @@
         }
       }
     ],
-    "indexation_note": "Assessments are indexed (GZS \"ostala nizka gradnja\" index from the odlok's adoption year): vsevem estimates +33 % for Ljubljana 2021-2025 and +49 % for Koper's 2019 odlok. The calculator uses \"indexed\"; calc_600_180 stays the unindexed odlok figure. Uredba 53/26 (in force 28. 3. 2026) may change the rules."
+    "indexation_note": "Not indexed: the odloki of Ljubljana, Koper, Celje, Kranj, Novo mesto and Ptuj, read in full, have no indexation clause, and neither ZUreP-3 nor Uredba 53/26 provides one, so assessments use odlok prices (kp-uredba-53-26, kp-lj-ul). vsevem.si's +8 to +49 % \"indexed\" estimates have no legal basis for these municipalities. Uredba 53/26 (in force 28. 3. 2026) leaves the formula unchanged for a typical new house."
   },
   "items": [
     {
