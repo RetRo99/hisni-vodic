@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Komunalni prispevek za hišo 2026: izračun po občinah · Hišni vodič</title>
+<meta name="description" content="Komunalni prispevek za novo hišo po občinah: od 1.584 € do 35.341 €, povprečno 8.028 €. Formula, izračun za 14 občin in viri.">
+<link rel="canonical" href="https://hisomer.si/komunalni-prispevek/">
+<meta property="og:title" content="Komunalni prispevek za hišo 2026">
+<meta property="og:description" content="Komunalni prispevek za novo hišo po občinah: od 1.584 € do 35.341 €, povprečno 8.028 €. Formula, izračun za 14 občin in viri.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hisomer.si/komunalni-prispevek/">
+<meta property="og:site_name" content="Hišni vodič">
+<meta property="og:locale" content="sl_SI">
+<meta property="og:image" content="https://hisomer.si/img/large/riko-mila.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Komunalni prispevek za hišo 2026", "description": "Komunalni prispevek za novo hišo po občinah: od 1.584 € do 35.341 €, povprečno 8.028 €. Formula, izračun za 14 občin in viri.", "inLanguage": "sl", "url": "https://hisomer.si/komunalni-prispevek/", "dateModified": "2026-10-19", "image": "https://hisomer.si/img/large/riko-mila.jpg", "author": {"@type": "Organization", "name": "Hišni vodič", "url": "https://hisomer.si/"}}</script>
+<meta name="theme-color" content="#0a1220">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a1220'/%3E%3Cpath d='M6 15 16 6l10 9v11H6z' fill='%231c2a44'/%3E%3Crect x='13' y='17' width='6' height='6' fill='%23f5b54a'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>:root {
+  --night: #0a1220;      /* page ground */
+  --dusk: #121d31;       /* raised surfaces */
+  --slate: #1c2a44;      /* controls, hover */
+  --line: #2a3a58;       /* hairlines */
+  --mist: #93a3c0;       /* secondary text */
+  --ink: #eef2f9;        /* primary text */
+  --glow: #ffc477;       /* window light, the one accent */
+  --glow-hot: #ff9d4d;
+  --glow-soft: rgba(255, 196, 119, .14);
+  --good: #9fe0b5;
+  --miss: #ff9d8a;
+  --font-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 18px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--night); color: var(--ink); font: 16px/1.55 var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--night); }
+a { color: var(--glow); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.eyebrow { font: 500 11px/1.2 var(--font-data); letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
+.display { font-family: var(--font-display); font-stretch: 112%; font-weight: 800; letter-spacing: -.025em; line-height: .98; text-wrap: balance; margin: 0; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- top bar ---------- */
+.bar { position: absolute; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 3; }
+.bar .wrap { display: flex; justify-content: space-between; align-items: center; padding-block: 18px; gap: 16px; }
+.mark { display: flex; align-items: center; gap: 10px; font: 700 15px/1 var(--font-display); font-stretch: 118%; letter-spacing: .02em; text-transform: uppercase; }
+.mark svg { width: 26px; height: 26px; }
+.bar nav { display: flex; gap: 22px; font-size: 14px; }
+.bar nav a { color: var(--mist); text-decoration: none; }
+.bar nav a:hover { color: var(--ink); }
+
+.btn { display: inline-flex; align-items: center; gap: 10px; border: 0; border-radius: 999px; padding: 15px 26px; font-weight: 600; font-size: 16px; cursor: pointer; text-decoration: none; transition: transform .2s, box-shadow .2s, background .2s; }
+.btn.glow { background: var(--glow); color: #1a1206; box-shadow: 0 0 0 0 rgba(255,196,119,.0), 0 10px 40px -8px rgba(255,157,77,.6); }
+.btn.glow:hover { transform: translateY(-2px); box-shadow: 0 0 0 6px var(--glow-soft), 0 16px 50px -8px rgba(255,157,77,.75); }
+.btn.line { background: rgba(255,255,255,.04); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); backdrop-filter: blur(6px); }
+.btn.line:hover { box-shadow: inset 0 0 0 1px var(--mist); }
+.btn:disabled { opacity: .35; cursor: default; transform: none; }
+.btn .arrow { transition: transform .2s; }
+.btn:hover .arrow { transform: translateX(3px); }
+.price { text-align: right; }
+.price b { display: block; font: 800 clamp(26px, 3vw, 38px)/1 var(--font-display); font-stretch: 108%; font-variant-numeric: tabular-nums; color: var(--glow); }
+.price span { display: block; font-size: 12px; color: var(--mist); max-width: 30ch; margin-left: auto; margin-top: 6px; }
+.specs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; margin: 0; background: var(--line); border-block: 1px solid var(--line); }
+.specs div { padding: 16px 4px; background: var(--dusk); text-align: center; }
+.specs dt { font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); }
+.specs dd { margin: 8px 0 0; font: 700 20px/1.1 var(--font-display); font-stretch: 105%; font-variant-numeric: tabular-nums; }
+.two { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); }
+.edge { background: var(--glow-soft); border-radius: 14px; padding: 20px 22px; font-size: 15px; }
+.edge .eyebrow { color: var(--glow); margin-bottom: 10px; }
+.facts { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 6px; font-size: 13px; color: #c9d3e6; }
+.facts li { padding-left: 14px; position: relative; }
+.facts li::before { content: ""; position: absolute; left: 0; top: .6em; width: 5px; height: 5px; border-radius: 50%; background: var(--glow); }
+footer { padding-block: 30px 50px; border-top: 1px solid var(--line); color: var(--mist); font-size: 13px; }
+footer p { max-width: 80ch; margin: 0; }
+footer nav { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; }
+footer nav a { color: var(--mist); text-underline-offset: 3px; }
+footer nav a:hover { color: var(--ink); }
+.bar { position: static; }
+.mark { color: var(--ink); text-decoration: none; white-space: nowrap; }
+@media (max-width: 420px) { .bar nav { gap: 12px; font-size: 13px; } }
+.page { display: grid; gap: 28px; padding-block: 8px 64px; }
+.crumbs a { color: var(--mist); text-decoration: none; }
+.crumbs a:hover { color: var(--ink); }
+.head { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 18px 30px; }
+.head h1 { font-size: clamp(36px, 6vw, 72px); margin-top: 12px; }
+.head .prov { color: var(--mist); margin-top: 10px; }
+.photo { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); aspect-ratio: 600 / 315; }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 10px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
+.lede { color: #c9d3e6; font-size: 18px; max-width: 44em; margin: 0; }
+.lede p { margin: 0 0 10px; }
+h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12px; }
+.maker-info p { margin: 0 0 10px; color: #c9d3e6; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.siblings { list-style: none; padding: 0; margin: 0; columns: 3 200px; column-gap: 24px; }
+.siblings li { padding: 4px 0; break-inside: avoid; }
+.siblings a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
+.siblings a:hover { color: var(--glow); }
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 14px; }
+.plans a { display: block; border-radius: var(--r); overflow: hidden; background: #fff; box-shadow: 0 0 0 1px var(--line); }
+.plans img { width: 100%; height: auto; display: block; }
+.credit-line { font-size: 13px; color: var(--mist); margin: 10px 0 0; }
+.sim { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+@media (min-width: 700px) { .sim { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.sim a { display: block; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); color: var(--ink); text-decoration: none; }
+.sim a:hover { box-shadow: 0 0 0 1px var(--glow); }
+.sim .pic { aspect-ratio: 600 / 340; background: var(--slate); }
+.sim img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sim span { display: block; padding: 10px 14px 14px; font-size: 14px; color: var(--mist); }
+.sim b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 2px; }
+@media (max-width: 899px) { .two { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .specs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .specs div { grid-column: span 2; }
+  .specs div:nth-child(n+4) { grid-column: span 3; }
+  .price { text-align: left; }
+  .price span { margin-left: 0; }
+  .photo { aspect-ratio: 600 / 380; }
+}</style>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="a2a672e4-a103-4f69-a69e-e2c7bd7927b8"></script>
+<style>
+.page > * { min-width: 0; }
+.scroll { position: relative; overflow-x: auto; border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); }
+.tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
+.tbl th, .tbl td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl tr:last-child > * { border-bottom: 0; }
+.tbl thead th { font: 500 10px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); white-space: nowrap; }
+.tbl tbody th { font-weight: 600; white-space: nowrap; }
+.tbl .n { font-family: var(--font-data); font-size: 14px; white-space: nowrap; }
+.tbl .stage { color: var(--mist); font-size: 13px; min-width: 260px; }
+.tbl td:first-child { min-width: 170px; }
+.tbl a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
+.tbl a:hover { color: var(--glow); }
+.points { margin: 0; padding-left: 20px; color: #c9d3e6; display: grid; gap: 10px; max-width: 48em; }
+.points b { color: var(--ink); }
+
+.page > * { min-width: 0; }
+.calc { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+@media (min-width: 960px) { .calc { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; } }
+.form { display: grid; gap: 16px; background: var(--dusk); border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); padding: 20px; min-width: 0; }
+.form label, .form .f { display: grid; gap: 6px; font-size: 14px; color: var(--mist); min-width: 0; }
+.form select, .form input[type=number] { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
+.form label.ck { display: flex; gap: 10px; align-items: flex-start; color: var(--ink); cursor: pointer; }
+.form .ck input { margin: 4px 0 0; accent-color: var(--glow); flex: none; }
+.form small { font-size: 12.5px; line-height: 1.45; color: var(--mist); }
+.sub { display: grid; gap: 12px; padding: 14px; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); }
+.sub[hidden] { display: none; }
+.res { display: grid; gap: 16px; min-width: 0; }
+.total { padding: 20px; border-radius: var(--r); background: linear-gradient(160deg, rgba(255,196,119,.14), rgba(255,157,77,.04)); box-shadow: inset 0 0 0 1px var(--glow); }
+.total b { display: block; font: 800 clamp(28px, 5vw, 46px)/1.1 var(--font-display); font-stretch: 108%; color: var(--glow); font-variant-numeric: tabular-nums; margin-top: 6px; }
+.total p { margin: 8px 0 0; font-size: 13px; color: var(--mist); }
+.lines tbody th { white-space: normal; font-weight: 600; }
+.lines th small { display: block; font-weight: 400; color: var(--mist); font-size: 12.5px; margin-top: 2px; }
+.lines .cmp { margin-left: 6px; }
+.lines td { text-align: right; }
+.lines td small { display: block; font-size: 12px; color: var(--mist); white-space: nowrap; margin-top: 4px; }
+.lines td small a { color: var(--mist); }
+.share { display: block; height: 4px; border-radius: 4px; background: var(--line); margin-top: 8px; overflow: hidden; }
+.share i { display: block; height: 100%; background: var(--glow); }
+.share i.neg { background: #7fd1a8; }
+@media (max-width: 640px) { .lines th, .lines td { padding: 10px; } .lines td.n, .lines td small { white-space: normal; } .lines tbody th { width: 52%; } }
+.tools { display: flex; flex-wrap: wrap; gap: 12px; }
+.prose { max-width: 48em; }
+.prose p { color: #c9d3e6; margin: 0 0 10px; }
+.prose a, .viri a { color: var(--ink); text-underline-offset: 3px; }
+.viri { margin: 0; padding-left: 22px; color: #c9d3e6; display: grid; gap: 8px; font-size: 14px; overflow-wrap: anywhere; }
+.viri span { color: var(--mist); }
+
+.prose ul { color: #c9d3e6; padding-left: 20px; margin: 0 0 10px; display: grid; gap: 6px; }
+.formula { font-family: var(--font-data); font-size: 14px; overflow-x: auto; white-space: nowrap; padding: 12px 14px; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); }
+.tbl tfoot th, .tbl tfoot td { border-top: 1px solid var(--line); font-weight: 600; }
+</style></head>
+<body>
+<div class="bar"><div class="wrap">
+  <a class="mark" href="../"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 15 16 5l12 10" stroke="#eef2f9" stroke-width="2.4" stroke-linejoin="round"/><rect x="8" y="15" width="16" height="12" stroke="#eef2f9" stroke-width="2.4"/><rect x="13" y="19" width="6" height="8" fill="#ffc477"/></svg>Hišni vodič</a>
+  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a><a href="../tlorisi-montaznih-his/">Tlorisi</a></nav>
+</div></div>
+<main class="wrap page">
+  <div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../koliko-stane-gradnja-hise/">Stroški gradnje</a> / Komunalni prispevek</div>
+    <div class="head"><div><h1 class="display">Komunalni prispevek za hišo 2026</h1><div class="prov">Izračun po občinah · podatki preverjeni 19. 10. 2026</div></div></div>
+  </div>
+  <div class="lede"><p>Komunalni prispevek je del stroškov komunalne opreme (ceste, vodovod, kanalizacija, javne površine), ki ga investitor plača občini.
+    Plačati ga morate za vsako novo hišo, za katero potrebujete gradbeno dovoljenje; občina ga odmeri pred izdajo dovoljenja <a href="#vir-kp-uredba-2026">[1]</a><a href="#vir-kp-tolmin">[2]</a>.</p>
+    <p>Za 204 od 212 slovenskih občin je povprečje <b>8.028 €</b>, najmanj 1.584 € (Kobilje), največ 35.341 € (Piran),
+    za parcelo 600 m² in 200 m² bruto tlorisne površine <a href="#vir-kp-vsevem">[3]</a>. Po oceni arhitekta za 24ur je to običajno okoli desetina naložbe brez zemljišča <a href="#vir-kp-24ur-2026">[4]</a>.</p></div>
+  <section><h2>Komunalni prispevek po občinah</h2>
+    <div class="scroll"><table class="tbl"><thead><tr><th scope="col">Občina</th><th scope="col">Znesek za primer</th><th scope="col">Osnova</th><th scope="col">Zanesljivost</th></tr></thead><tbody><tr><th scope="row"><a href="koper/">Koper</a></th><td class="n">22.426 € – 28.075 €</td><td>po odloku, 180 m² BTP</td><td>uradni podatek <a href="#vir-kp-koper">[5]</a><a href="#vir-kp-vsevem">[3]</a></td></tr><tr><th scope="row"><a href="grosuplje/">Grosuplje</a></th><td class="n">22.873 €</td><td>vsevem.si, 200 m² BTP</td><td>okvirno <a href="#vir-kp-vsevem">[3]</a></td></tr><tr><th scope="row"><a href="ljubljana/">Ljubljana</a></th><td class="n">18.755 €</td><td>po odloku, 180 m² BTP</td><td>uradni podatek <a href="#vir-kp-lj-ul">[6]</a><a href="#vir-kp-vsevem-lj">[7]</a><a href="#vir-kp-24ur-2026">[4]</a></td></tr><tr><th scope="row"><a href="maribor/">Maribor</a></th><td class="n">15.217 € – 16.542 €</td><td>po odloku, 180 m² BTP</td><td>zelo okvirno <a href="#vir-kp-mb-news">[8]</a><a href="#vir-kp-vsevem">[3]</a></td></tr><tr><th scope="row"><a href="celje/">Celje</a></th><td class="n">14.229 €</td><td>po odloku, 180 m² BTP</td><td>uradni podatek <a href="#vir-kp-celje-ul">[9]</a><a href="#vir-kp-vsevem-ce">[10]</a></td></tr><tr><th scope="row"><a href="kranj/">Kranj</a></th><td class="n">14.010 €</td><td>po odloku, 180 m² BTP</td><td>uradni podatek <a href="#vir-kp-kranj-ul">[11]</a><a href="#vir-kp-kranj-2023">[12]</a></td></tr><tr><th scope="row"><a href="domzale/">Domžale</a></th><td class="n">13.861 €</td><td>vsevem.si, 200 m² BTP</td><td>okvirno <a href="#vir-kp-vsevem">[3]</a></td></tr><tr><th scope="row"><a href="novo-mesto/">Novo mesto</a></th><td class="n">11.042 €</td><td>po odloku, 180 m² BTP</td><td>uradni podatek <a href="#vir-kp-nm-npb3">[13]</a></td></tr><tr><th scope="row"><a href="kamnik/">Kamnik</a></th><td class="n">9.535 €</td><td>vsevem.si, 200 m² BTP</td><td>okvirno <a href="#vir-kp-vsevem">[3]</a></td></tr><tr><th scope="row"><a href="murska-sobota/">Murska Sobota</a></th><td class="n">9.234 €</td><td>vsevem.si, 200 m² BTP</td><td>okvirno <a href="#vir-kp-vsevem">[3]</a></td></tr><tr><th scope="row"><a href="skofja-loka/">Škofja Loka</a></th><td class="n">9.003 €</td><td>vsevem.si, 200 m² BTP</td><td>okvirno <a href="#vir-kp-vsevem">[3]</a></td></tr><tr><th scope="row"><a href="ptuj/">Ptuj</a></th><td class="n">6.930 €</td><td>po odloku, 180 m² BTP</td><td>uradni podatek <a href="#vir-kp-ptuj">[14]</a><a href="#vir-kp-vsevem">[3]</a></td></tr><tr><th scope="row"><a href="krsko/">Krško</a></th><td class="n">5.765 €</td><td>vsevem.si, 200 m² BTP</td><td>okvirno <a href="#vir-kp-vsevem">[3]</a></td></tr><tr><th scope="row"><a href="brezice/">Brežice</a></th><td class="n">4.901 €</td><td>vsevem.si, 200 m² BTP</td><td>okvirno <a href="#vir-kp-vsevem">[3]</a></td></tr></tbody></table></div>
+    <p class="credit-line">Primer: parcela 600 m² in hiša s 180 m² bruto tlorisne površine (BTP, okoli 150 m² neto), izračunano iz občinskega odloka.
+      Kjer odloka nismo preračunali, je naveden izračun vsevem.si za 200 m² BTP z vso komunalno opremo. Za druge občine kalkulator uporabi povprečje 8.028 €.</p>
+  </section>
+  <section class="prose"><h2>Kako se izračuna komunalni prispevek?</h2>
+    <p>Prispevek se izračuna iz površine parcele, bruto tlorisne površine hiše in cen komunalne opreme iz občinskega odloka <a href="#vir-kp-koper">[5]</a><a href="#vir-kp-tolmin">[2]</a><a href="#vir-kp-uredba-53-26">[15]</a>:</p>
+    <p class="formula">KP = Σ (A<sub>parcela</sub> × Cpo × Dpo + A<sub>BTP</sub> × Cto × Dto × Fn) × psz</p>
+    <ul>
+      <li><b>Cpo in Cto</b>: cena posamezne vrste komunalne opreme na m² parcele oziroma na m² BTP, določi jo odlok.</li>
+      <li><b>Dpo in Dto</b>: delež parcele in delež površine objekta, skupaj 1, na primer 0,3 in 0,7 (Koper, Ptuj, Ljubljana, Novo mesto) ali 0,5 in 0,5 (Maribor, Celje, Kranj, Tolmin).</li>
+      <li><b>Fn</b>: faktor namembnosti za enostanovanjske stavbe (CC-SI 1110), na primer 1,0 v Kopru in 0,7 na Ptuju.</li>
+      <li><b>psz</b>: prispevna stopnja zavezanca, delež cene, ki ga plača investitor; če je odlok ne določi, 100 %.</li>
+    </ul>
+    <p>Ceste in javne površine se zaračunajo vedno, vodovod, kanalizacija, plin in daljinsko ogrevanje pa le, če se hiša nanje priključi. Znesek je odvisen od občine, v nekaterih tudi od cone (Koper ima pet con cest).
+      Okvir je doslej določala uredba iz leta 2019 (Ur. l. RS 20/19), od 28. 3. 2026 pa nova uredba (Ur. l. RS 53/26) po zakonu ZUreP-3; formula ostaja enaka <a href="#vir-kp-uredba-53-26">[15]</a><a href="#vir-kp-uredba-2026">[1]</a>.</p>
+  </section>
+  <section class="prose"><h2>Ali se komunalni prispevek indeksira?</h2>
+    <p>Ne. Odmera se računa s cenami iz veljavnega odloka. Odloki, ki smo jih prebrali v celoti (Ljubljana, Celje, Kranj, Koper, Novo mesto in Ptuj), nimajo določbe o indeksaciji
+      <a href="#vir-kp-lj-ul">[6]</a><a href="#vir-kp-celje-ul">[9]</a><a href="#vir-kp-kranj-ul">[11]</a><a href="#vir-kp-koper">[5]</a><a href="#vir-kp-nm-npb3">[13]</a><a href="#vir-kp-ptuj">[14]</a>,
+      prav tako je nimata zakon ZUreP-3 in nova uredba (Ur. l. RS 53/26) <a href="#vir-kp-uredba-53-26">[15]</a>. Ocene, ki zneskom iz odlokov prištevajo indeksacijo, so zato previsoke.</p>
+  </section>
+  <section class="prose"><h2>Preverite znesek na občini</h2>
+    <p>Zneski so ocena za tipičen primer. Dejanska odmera je odvisna od velikosti parcele in hiše, cone, priključkov in sprememb odloka.
+      Pred nakupom parcele vprašajte občino, koliko bo znašal komunalni prispevek za konkretno parcelo in hišo.</p>
+  </section>
+  <div class="actions">
+    <a class="btn glow" href="../koliko-stane-gradnja-hise/">Izračunajte celotne stroške gradnje <span class="arrow">→</span></a>
+    <a class="btn line" href="../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a>
+    <a class="btn line" href="../cena-montazne-hise/">Cene montažnih hiš</a>
+  </div>
+  <section class="prose"><h2>Viri</h2><ol class="viri"><li id="vir-kp-uredba-2026"><a href="https://www.gov.si/novice/2026-03-24-sprejeta-uredba-programu-opremljanja-in-podlagah-za-odmero-komunalnega-prispevka/" target="_blank" rel="noopener">Sprejeta uredba o programu opremljanja in podlagah za odmero komunalnega prispevka (24. 3. 2026)</a> <span>· Vlada RS</span></li><li id="vir-kp-tolmin"><a href="https://tolmin.si/files/other/news/137/21101305_02_obrazložitev%20Odloka%20o%20komunalnem%20prispevku.pdf" target="_blank" rel="noopener">Obrazložitev Odloka o komunalnem prispevku, Občina Tolmin</a> <span>· Občina Tolmin</span></li><li id="vir-kp-vsevem"><a href="https://vsevem.si/komunalni-prispevek/" target="_blank" rel="noopener">Kalkulator komunalnega prispevka po občinah</a> <span>· Vsevem.si</span></li><li id="vir-kp-24ur-2026"><a href="https://www.24ur.com/novice/dejstva/gradnja-hise-od-14-tisoc-do-20-tisoc-evrov-odvisno-v-kateri-obcini.html" target="_blank" rel="noopener">Gradnja hiše od 14 tisoč do 20 tisoč evrov, odvisno v kateri občini (8. 1. 2026)</a> <span>· 24ur.com</span></li><li id="vir-kp-koper"><a href="https://www.koper.si/wp-content/uploads/2019/12/03-Odlok-komunalni-prispevek-sprejet.pdf" target="_blank" rel="noopener">Odlok o podlagah za odmero komunalnega prispevka za obstoječo komunalno opremo … na območju MO Koper (14. 11. 2019)</a> <span>· Mestna občina Koper</span></li><li id="vir-kp-lj-ul"><a href="https://www.uradni-list.si/glasilo-uradni-list-rs/vsebina/2021-01-1198/" target="_blank" rel="noopener">Odlok o podlagah za odmero komunalnega prispevka za obstoječo komunalno opremo, MO Ljubljana (Ur. l. RS 58/2021)</a> <span>· MO Ljubljana</span></li><li id="vir-kp-vsevem-lj"><a href="https://vsevem.si/komunalni-prispevek/ljubljana/" target="_blank" rel="noopener">Komunalni prispevek Ljubljana</a> <span>· Vsevem.si</span></li><li id="vir-kp-mb-news"><a href="https://mariborinfo.com/novica/lokalno/mariborcane-caka-nova-financna-obremenitev-obcina-pa-si-obeta-dodatni-milijon/232381" target="_blank" rel="noopener">Mariborčane čaka nova finančna obremenitev</a> <span>· Mariborinfo</span></li><li id="vir-kp-celje-ul"><a href="https://www.uradni-list.si/glasilo-uradni-list-rs/vsebina/2021-01-2242/" target="_blank" rel="noopener">Odlok o komunalnem prispevku za obstoječo komunalno opremo, MO Celje (Ur. l. RS 105/21)</a> <span>· MO Celje</span></li><li id="vir-kp-vsevem-ce"><a href="https://vsevem.si/komunalni-prispevek/celje/" target="_blank" rel="noopener">Komunalni prispevek Celje</a> <span>· Vsevem.si</span></li><li id="vir-kp-kranj-ul"><a href="https://www.uradni-list.si/_pdf/2020/Ur/u2020136.pdf" target="_blank" rel="noopener">Odlok o komunalnem prispevku, MO Kranj (Ur. l. RS 136/20)</a> <span>· MO Kranj</span></li><li id="vir-kp-kranj-2023"><a href="https://www.uradni-list.si/glasilo-uradni-list-rs/vsebina/2023-01-3388/" target="_blank" rel="noopener">Odlok o spremembah … MO Kranj (Ur. l. RS 116/23)</a> <span>· MO Kranj</span></li><li id="vir-kp-nm-npb3"><a href="https://www.novomesto.si/mma/-/2024090612105340/" target="_blank" rel="noopener">Odlok o komunalnem prispevku, MO Novo mesto (NPB 3)</a> <span>· MO Novo mesto</span></li><li id="vir-kp-ptuj"><a href="https://ptuj.si/Files/TextContent/107/1704988907119_4.2.%20Veljavni%20odlok.pdf" target="_blank" rel="noopener">Odlok o podlagah za odmero komunalnega prispevka … MO Ptuj (Uradni vestnik MO Ptuj 5/2021)</a> <span>· Mestna občina Ptuj</span></li><li id="vir-kp-uredba-53-26"><a href="https://pisrs.si/api/uradni-list/objava/u20260053.pdf" target="_blank" rel="noopener">Uredba o programu opremljanja … (Ur. l. RS 53/2026)</a> <span>· Vlada RS</span></li></ol></section>
+</main>
+<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../cena-montazne-hise/">Cene montažnih hiš</a><a href="../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../majhne-montazne-hise/">Majhne hiše</a><a href="../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../komunalni-prispevek/">Komunalni prispevek</a><a href="../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../tlorisi-montaznih-his/">Tlorisi</a><a href="../primerjava/">Primerjava</a></nav></div></footer>
+<script src="../compare.js"></script>
+</body>
+</html>

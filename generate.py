@@ -11,6 +11,8 @@ CHEAP = 'najcenejse-montazne-hise'
 SMALL = 'majhne-montazne-hise'
 COMPARE = 'primerjava'
 COSTS = 'koliko-stane-gradnja-hise'
+KP = 'komunalni-prispevek'
+EKO = 'eko-sklad-subvencija-novogradnja'
 ROOT = os.path.dirname(os.path.abspath(__file__))
 os.chdir(ROOT)
 
@@ -107,7 +109,7 @@ BAR = f'''<div class="bar"><div class="wrap">
 FOOT = (f'<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev ({esc(data["collected"])}). '
         'Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p>'
         f'<nav aria-label="Vodiči"><a href="../{GUIDE}/">Cene montažnih hiš</a><a href="../{CHEAP}/">Najcenejše hiše</a><a href="../{SMALL}/">Majhne hiše</a>'
-        f'<a href="../{COSTS}/">Stroški gradnje</a><a href="../{PLANS}/">Tlorisi</a><a href="../{COMPARE}/">Primerjava</a></nav></div></footer>\n<script src="../compare.js"></script>')
+        f'<a href="../{COSTS}/">Stroški gradnje</a><a href="../{KP}/">Komunalni prispevek</a><a href="../{EKO}/">Subvencija Eko sklada</a><a href="../{PLANS}/">Tlorisi</a><a href="../{COMPARE}/">Primerjava</a></nav></div></footer>\n<script src="../compare.js"></script>')
 
 
 def head(title, og_title, desc, url, image, ld):
@@ -328,7 +330,7 @@ def guide():
     if from_price:
         points.append(f'<li><b>Cene »od«.</b> {and_join(from_price)} {verb(from_price, "objavlja", "objavljata", "objavljajo")} '
                       'izhodiščne cene za osnovno izvedbo; dejanska ponudba je lahko višja.</li>')
-    points.append('<li><b>Kaj običajno ni v ceni.</b> Zemljišče, projektna dokumentacija in gradbeno dovoljenje, komunalni prispevek in priključki, '
+    points.append(f'<li><b>Kaj običajno ni v ceni.</b> Zemljišče, projektna dokumentacija in gradbeno dovoljenje, <a href="../{KP}/">komunalni prispevek</a> in priključki, '
                   'zemeljska dela ter zunanja ureditev. Preverite v ponudbi.</li>')
     if unpublished:
         points.append(f'<li><b>Brez objavljenih cen.</b> {and_join(unpublished)} {verb(unpublished, "cen tipskih hiš ne objavlja", "cen tipskih hiš ne objavljata", "cen tipskih hiš ne objavljajo")}; '
@@ -910,6 +912,17 @@ def viri():
     return out
 
 
+SNES_GROUP = {'I': 'naravna izolacija in lesena okna', 'II': 'mineralna izolacija', 'III': 'sintetična izolacija'}
+CONF = {'high': 'uradni podatek', 'medium': 'okvirno', 'low': 'zelo okvirno'}
+
+
+def snes_tiers(snes):
+    """Eko sklad rates (group, rate at QH <= 10, rate at QH <= 15 kWh/m2a), read from the item's text."""
+    t = [(g, int(a), int(b)) for a, b, g in re.findall(r'(\d+)/(\d+)(?: EUR/m2)? group (I+)\b', snes['applies'])]
+    assert len(t) == 3 and min(x[2] for x in t) == snes['value']['min'] and max(x[1] for x in t) == snes['value']['max'], t
+    return t
+
+
 def costs_page():
     url = SITE + COSTS + '/'
     cost = json.load(open('data/stroski.json', encoding='utf-8'))
@@ -932,7 +945,7 @@ def costs_page():
     def cite(*ids):
         return ''.join(f'<a href="#vir-{s}">[{src_num[s]}]</a>' for s in ids)
 
-    conf = {'high': 'uradni podatek', 'medium': 'okvirno', 'low': 'zelo okvirno'}
+    conf = CONF
     nat_min, nat_max = re.search(r'min ([^,]+), max ([^,]+)', nat['basis']).groups()
     covered, of = re.search(r'(\d+) of (\d+) municipalities', nat['basis']).groups()
 
@@ -945,7 +958,7 @@ def costs_page():
         kps.append({'id': slugify(m['obcina']), 'name': m['obcina'], 'lo': lo, 'hi': hi, 'conf': m['confidence'], 'src': m['source_ids'], 'note': note})
         clo, chi = (c['min'], c['max']) if isinstance(c, dict) else (c, c)
         calc_txt = (eur(clo) if clo == chi else eur(clo) + ' – ' + eur(chi)) if c else '—'
-        kp_rows.append(f'<tr><th scope="row">{esc(m["obcina"])}</th><td class="n">{calc_txt}</td><td class="n">{eur(m["vsevem_600_200"])}</td>'
+        kp_rows.append(f'<tr><th scope="row"><a href="../{KP}/{slugify(m["obcina"])}/">{esc(m["obcina"])}</a></th><td class="n">{calc_txt}</td><td class="n">{eur(m["vsevem_600_200"])}</td>'
                        f'<td>{conf[m["confidence"]]} {cite(*m["source_ids"])}</td></tr>')
     ni = {'min': nat['typical'], 'max': nat['typical']}
     kps.append({'id': 'druga', 'name': 'Druga občina (slovensko povprečje)', 'lo': ni['min'], 'hi': ni['max'], 'conf': nat['confidence'], 'src': nat['source_ids'],
@@ -953,12 +966,8 @@ def costs_page():
     kp_opts = ''.join(f'<option value="{k["id"]}"{" selected" if k["id"] == "druga" else ""}>{esc(k["name"])} ({eur(k["lo"]) if k["lo"] == k["hi"] else eur(k["lo"]) + " – " + eur(k["hi"])})</option>'
                       for k in sorted(kps[:-1], key=lambda k: k['name']) + kps[-1:])
 
-    # Eko sklad rates per group I/II/III at QH <= 10 / <= 15 kWh/m2a, read from the item's text.
     snes = items['eko_sklad_snes']
-    tiers_raw = re.findall(r'(\d+)/(\d+)(?: EUR/m2)? group (I+)\b', snes['applies'])
-    assert len(tiers_raw) == 3 and min(int(t[1]) for t in tiers_raw) == snes['value']['min'] and max(int(t[0]) for t in tiers_raw) == snes['value']['max'], tiers_raw
-    group = {'I': 'naravna izolacija in lesena okna', 'II': 'mineralna izolacija', 'III': 'sintetična izolacija'}
-    tiers = [{'rate': int(t[q]), 'label': f'Skupina {t[2]} ({group[t[2]]}), QH ≤ {10 if q == 0 else 15} kWh/m²a: {t[q]} €/m²'} for q in (0, 1) for t in tiers_raw]
+    tiers = [{'rate': t[q], 'label': f'Skupina {t[0]} ({SNES_GROUP[t[0]]}), QH ≤ {10 if q == 1 else 15} kWh/m²a: {t[q]} €/m²'} for q in (1, 2) for t in snes_tiers(snes)]
     tier_opts = ''.join(f'<option value="{i}">{esc(t["label"])}</option>' for i, t in enumerate(tiers))
 
     def stage_has(m, *keys):
@@ -1053,7 +1062,8 @@ def costs_page():
       (ceste, vodovod, kanalizacija, javne površine) iz občinskega odloka: KP = Σ (A<sub>parcela</sub> × Cpo × Dpo + A<sub>BTP</sub> × Cto × Dto × Fn) × psz {cite(*kp['source_ids'][:3])}.
       Po izračunu vsevem.si za {covered} od {of} občin (parcela 600 m², 200 m² BTP) je povprečje {eur(nat['typical'])}, najmanj {eur(nat['min'])} ({nat_min}), največ {eur(nat['max'])} ({nat_max}) {cite(*nat['source_ids'])}.
       Odmera se računa s cenami iz veljavnega odloka. Preverjeni odloki (Ljubljana, Koper, Celje, Kranj, Novo mesto, Ptuj) nimajo določbe o indeksaciji, prav tako je nimata zakon ZUreP-3 in nova uredba (Ur. l. RS 53/26, velja od 28. 3. 2026),
-      ki za tipično novo hišo pravil odmere ne spreminja {cite('kp-uredba-53-26')}. Kalkulator uporablja zneske iz prvega stolpca, kjer jih imamo, sicer izračun vsevem.si; za druge občine povprečje {eur(ni['min'])}.</p>
+      ki za tipično novo hišo pravil odmere ne spreminja {cite('kp-uredba-53-26')}. Kalkulator uporablja zneske iz prvega stolpca, kjer jih imamo, sicer izračun vsevem.si; za druge občine povprečje {eur(ni['min'])}.
+      <a href="../{KP}/">Komunalni prispevek po občinah: formula, izračun in viri</a>.</p>
     <div class="scroll"><table class="tbl">{thead('Občina', 'Po odloku (600 m², 180 m² BTP)', 'Vsevem.si (600 m², 200 m² BTP)', 'Zanesljivost')}<tbody>{''.join(kp_rows)}</tbody></table></div>
   </section>
   <section class="prose"><h2>Koliko stane projektna dokumentacija za hišo?</h2>
@@ -1096,7 +1106,8 @@ def costs_page():
       Subvencija je največ 30 % upravičenih stroškov, ti pa so pri gradnji na ključ največ polovica pogodbene vrednosti, torej največ 15 % cene hiše.
       Projekt, nadzor, zunanja ureditev in sončna elektrarna niso upravičeni stroški.</p>
     <p>Pogoji so strogi: izračun PHPP, potreba po toploti in hladu največ 15 kWh/m²a, zrakotesnost n50 ≤ 0,6, rekuperacija vsaj 80 %, zbiralnik deževnice vsaj 6 m³, sončna elektrarna in vsaj 70 % obnovljivih virov. Brez sončne elektrarne do subvencije niste upravičeni; 10 €/m² manj dobite le, če distributer priključitev elektrarne zavrne {cite('eko-105-cistopis')}.
-      {and_join(subsidized)} {verb(subsidized, 'navaja', 'navajata', 'navajajo')} ceno, ki že upošteva subvencijo, zato je kalkulator pri teh hišah ne odšteje še enkrat.</p>
+      {and_join(subsidized)} {verb(subsidized, 'navaja', 'navajata', 'navajajo')} ceno, ki že upošteva subvencijo, zato je kalkulator pri teh hišah ne odšteje še enkrat.
+      <a href="../{EKO}/">Vodič po subvenciji Eko sklada za novo hišo</a>.</p>
   </section>
   <section class="prose"><h2>Koliko je DDV pri gradnji hiše?</h2>
     <p>Za stanovanjsko hišo velja znižana stopnja {pct(ddv['reduced'])}, če je njena uporabna površina (vsota bivalnih prostorov) največ 250 m² in izvajalec gradnjo obračuna neposredno investitorju
@@ -1117,6 +1128,285 @@ def costs_page():
 {FOOT}
 <script type="application/json" id="calc-data">{calc_json}</script>
 <script>{COSTS_JS}</script>
+</body>
+</html>
+'''
+
+
+COST = json.load(open('data/stroski.json', encoding='utf-8'))
+KPD = COST['komunalni_prispevek']
+GUIDE_CSS = TABLE_CSS + COSTS_CSS + '''
+.prose ul { color: #c9d3e6; padding-left: 20px; margin: 0 0 10px; display: grid; gap: 6px; }
+.formula { font-family: var(--font-data); font-size: 14px; overflow-x: auto; white-space: nowrap; padding: 12px 14px; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); }
+.tbl tfoot th, .tbl tfoot td { border-top: 1px solid var(--line); font-weight: 600; }
+'''
+
+
+def ddate(iso):
+    y, m, d = iso.split('-')
+    return f'{int(d)}. {int(m)}. {y}'
+
+
+def dec(v, n=2):
+    return f'{v:,.{n}f}'.replace(',', ' ').replace('.', ',').replace(' ', '.')
+
+
+def citer():
+    """cite(ids) numbers sources in order of first use; listing() then gives the page's source list with those numbers."""
+    order, by_id = [], {s['id']: s for s in viri()}
+
+    def cite(*ids):
+        order.extend(i for i in ids if i not in order)
+        return ''.join(f'<a href="#vir-{i}">[{order.index(i) + 1}]</a>' for i in ids)
+
+    def listing():
+        return '<ol class="viri">' + ''.join(
+            f'<li id="vir-{i}"><a href="{esc(by_id[i]["url"])}" target="_blank" rel="noopener">{esc(by_id[i]["title"])}</a> <span>· {esc(by_id[i]["publisher"])}</span></li>'
+            for i in order) + '</ol>'
+    return cite, listing
+
+
+def kp_example(m):
+    """(lo, hi, text) for the example case: our odlok calculation (600 m² plot, 180 m² BTP), else vsevem.si's (200 m² BTP)."""
+    c = m.get('calc_600_180')
+    v = c if c is not None else m['vsevem_600_200']
+    lo, hi = (v['min'], v['max']) if isinstance(v, dict) else (v, v)
+    return lo, hi, eur(lo) if lo == hi else f'{eur(lo)} – {eur(hi)}'
+
+
+def kp_calc(m, plot=600, btp=180):
+    """Each variant (Fn, road zone) as (fn, zone, rows, total), rows (item, amount), from the odlok coefficients in the data."""
+    co = m['coefficients']
+    out = []
+    for fn in co['fn']:
+        for zone in co.get('road_zones') or [None]:
+            rows = [(it, (plot * it['cpo'] * co['dpo'] + btp * it['cto'] * co['dto'] * fn) * it['psz']) for it in ([zone] if zone else []) + co['items']]
+            out.append((fn, zone, rows, sum(a for _, a in rows)))
+    lo, hi, _ = kp_example(m)
+    # the coefficients must reproduce the stored figure, so the worked example can't drift from the table
+    assert (round(min(t for *_, t in out)), round(max(t for *_, t in out))) == (lo, hi), (m['obcina'], [t for *_, t in out])
+    return out
+
+
+def article_ld(h1, desc, url):
+    return {'@context': 'https://schema.org', '@type': 'Article', 'headline': h1, 'description': desc, 'inLanguage': 'sl', 'url': url,
+            'dateModified': COST['as_of'], 'image': SITE + 'img/large/riko-mila.jpg', 'author': {'@type': 'Organization', 'name': 'Hišni vodič', 'url': SITE}}
+
+
+def kp_hub():
+    url = SITE + KP + '/'
+    cite, listing = citer()
+    nat = KPD['national_range']
+    nat_min, nat_max = re.search(r'min ([^,]+), max ([^,]+)', nat['basis']).groups()
+    covered, of = re.search(r'(\d+) of (\d+) municipalities', nat['basis']).groups()
+    ms = sorted(KPD['municipalities'], key=lambda m: -kp_example(m)[1])
+    odloki = [m for m in KPD['municipalities'] if m.get('coefficients')]
+    # a function, so its citations are numbered where the table appears, after the lede's
+    rows = lambda: ''.join(f'<tr><th scope="row"><a href="{slugify(m["obcina"])}/">{esc(m["obcina"])}</a></th><td class="n">{kp_example(m)[2]}</td>'
+                   f'<td>{"po odloku, 180 m² BTP" if m.get("calc_600_180") else "vsevem.si, 200 m² BTP"}</td><td>{CONF[m["confidence"]]} {cite(*m["source_ids"])}</td></tr>' for m in ms)
+    h1 = f'Komunalni prispevek za hišo {YEAR}'
+    desc = (f'Komunalni prispevek za novo hišo po občinah: od {eur(nat["min"])} do {eur(nat["max"])}, povprečno {eur(nat["typical"])}. '
+            f'Formula, izračun za {len(ms)} občin in viri.')
+    return f'''{head(f'{h1}: izračun po občinah · Hišni vodič', h1, desc, url, SITE + 'img/large/riko-mila.jpg', article_ld(h1, desc, url)).replace('</head>', '<style>' + GUIDE_CSS + '</style></head>')}
+<body>
+{BAR}
+<main class="wrap page">
+  <div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../{COSTS}/">Stroški gradnje</a> / Komunalni prispevek</div>
+    <div class="head"><div><h1 class="display">{h1}</h1><div class="prov">Izračun po občinah · podatki preverjeni {ddate(COST['as_of'])}</div></div></div>
+  </div>
+  <div class="lede"><p>Komunalni prispevek je del stroškov komunalne opreme (ceste, vodovod, kanalizacija, javne površine), ki ga investitor plača občini.
+    Plačati ga morate za vsako novo hišo, za katero potrebujete gradbeno dovoljenje; občina ga odmeri pred izdajo dovoljenja {cite('kp-uredba-2026', 'kp-tolmin')}.</p>
+    <p>Za {covered} od {of} slovenskih občin je povprečje <b>{eur(nat['typical'])}</b>, najmanj {eur(nat['min'])} ({nat_min}), največ {eur(nat['max'])} ({nat_max}),
+    za parcelo 600 m² in 200 m² bruto tlorisne površine {cite(*nat['source_ids'])}. Po oceni arhitekta za 24ur je to običajno okoli desetina naložbe brez zemljišča {cite('kp-24ur-2026')}.</p></div>
+  <section><h2>Komunalni prispevek po občinah</h2>
+    <div class="scroll"><table class="tbl">{thead('Občina', 'Znesek za primer', 'Osnova', 'Zanesljivost')}<tbody>{rows()}</tbody></table></div>
+    <p class="credit-line">Primer: parcela 600 m² in hiša s 180 m² bruto tlorisne površine (BTP, okoli 150 m² neto), izračunano iz občinskega odloka.
+      Kjer odloka nismo preračunali, je naveden izračun vsevem.si za 200 m² BTP z vso komunalno opremo. Za druge občine kalkulator uporabi povprečje {eur(nat['typical'])}.</p>
+  </section>
+  <section class="prose"><h2>Kako se izračuna komunalni prispevek?</h2>
+    <p>Prispevek se izračuna iz površine parcele, bruto tlorisne površine hiše in cen komunalne opreme iz občinskega odloka {cite('kp-koper', 'kp-tolmin', 'kp-uredba-53-26')}:</p>
+    <p class="formula">KP = Σ (A<sub>parcela</sub> × Cpo × Dpo + A<sub>BTP</sub> × Cto × Dto × Fn) × psz</p>
+    <ul>
+      <li><b>Cpo in Cto</b>: cena posamezne vrste komunalne opreme na m² parcele oziroma na m² BTP, določi jo odlok.</li>
+      <li><b>Dpo in Dto</b>: delež parcele in delež površine objekta, skupaj 1, na primer 0,3 in 0,7 (Koper, Ptuj, Ljubljana, Novo mesto) ali 0,5 in 0,5 (Maribor, Celje, Kranj, Tolmin).</li>
+      <li><b>Fn</b>: faktor namembnosti za enostanovanjske stavbe (CC-SI 1110), na primer 1,0 v Kopru in 0,7 na Ptuju.</li>
+      <li><b>psz</b>: prispevna stopnja zavezanca, delež cene, ki ga plača investitor; če je odlok ne določi, 100 %.</li>
+    </ul>
+    <p>Ceste in javne površine se zaračunajo vedno, vodovod, kanalizacija, plin in daljinsko ogrevanje pa le, če se hiša nanje priključi. Znesek je odvisen od občine, v nekaterih tudi od cone (Koper ima pet con cest).
+      Okvir je doslej določala uredba iz leta 2019 (Ur. l. RS 20/19), od 28. 3. 2026 pa nova uredba (Ur. l. RS 53/26) po zakonu ZUreP-3; formula ostaja enaka {cite('kp-uredba-53-26', 'kp-uredba-2026')}.</p>
+  </section>
+  <section class="prose"><h2>Ali se komunalni prispevek indeksira?</h2>
+    <p>Ne. Odmera se računa s cenami iz veljavnega odloka. Odloki, ki smo jih prebrali v celoti ({and_join([m['obcina'] for m in odloki if m['confidence'] == 'high'])}), nimajo določbe o indeksaciji
+      {cite(*[i for m in odloki if m['confidence'] == 'high' for i in m['source_ids'] if i in ('kp-lj-ul', 'kp-koper', 'kp-celje-ul', 'kp-kranj-ul', 'kp-nm-npb3', 'kp-ptuj')])},
+      prav tako je nimata zakon ZUreP-3 in nova uredba (Ur. l. RS 53/26) {cite('kp-uredba-53-26')}. Ocene, ki zneskom iz odlokov prištevajo indeksacijo, so zato previsoke.</p>
+  </section>
+  <section class="prose"><h2>Preverite znesek na občini</h2>
+    <p>Zneski so ocena za tipičen primer. Dejanska odmera je odvisna od velikosti parcele in hiše, cone, priključkov in sprememb odloka.
+      Pred nakupom parcele vprašajte občino, koliko bo znašal komunalni prispevek za konkretno parcelo in hišo.</p>
+  </section>
+  <div class="actions">
+    <a class="btn glow" href="../{COSTS}/">Izračunajte celotne stroške gradnje <span class="arrow">→</span></a>
+    <a class="btn line" href="../{EKO}/">Subvencija Eko sklada</a>
+    <a class="btn line" href="../{GUIDE}/">Cene montažnih hiš</a>
+  </div>
+  <section class="prose"><h2>Viri</h2>{listing()}</section>
+</main>
+{FOOT}
+</body>
+</html>
+'''
+
+
+KP_IN = {'Ljubljana': 'v Ljubljani', 'Maribor': 'v Mariboru', 'Celje': 'v Celju', 'Kranj': 'v Kranju', 'Koper': 'v Kopru', 'Novo mesto': 'v Novem mestu',
+         'Ptuj': 'na Ptuju', 'Domžale': 'v Domžalah', 'Kamnik': 'v Kamniku', 'Škofja Loka': 'v Škofji Loki', 'Murska Sobota': 'v Murski Soboti',
+         'Brežice': 'v Brežicah', 'Krško': 'v Krškem', 'Grosuplje': 'v Grosupljem'}  # locative case; other municipalities fall back to "v občini X"
+
+
+def kp_page(m):
+    name, sid = m['obcina'], slugify(m['obcina'])
+    url = f'{SITE}{KP}/{sid}/'
+    cite, listing = citer()
+    lo, hi, amount = kp_example(m)
+    co = m.get('coefficients')
+    years = re.findall(r'(\d{4})-\d\d-\d\d', m['as_of'])
+    others = sorted((o for o in KPD['municipalities'] if o is not m), key=lambda o: o['obcina'])
+    h1 = f'Komunalni prispevek {name} {YEAR}'
+    if co:
+        calc = kp_calc(m)
+        fn_txt = ' ali '.join(dec(f, 1) for f in co['fn'])
+        psz = sorted({it['psz'] for it in co['items'] + co.get('road_zones', [])})
+        basis = (f'Izračun po občinskem odloku (sprejet {years[0]}' + (f', spremenjen {years[1]}' if len(years) > 1 else '') + f') {cite(*m["source_ids"])}: '
+                 f'Dpo {dec(co["dpo"], 1)} in Dto {dec(co["dto"], 1)}, faktor namembnosti Fn {fn_txt}, prispevna stopnja '
+                 + ('100 % za vso opremo' if psz == [1] else 'od ' + dec(psz[0] * 100, 0) + ' do ' + dec(psz[-1] * 100, 0) + ' %, odvisno od opreme') + '.')
+        fn, zone, rows, total = calc[0]
+        it, a = rows[0]
+        trs = ''.join(f'<tr><th scope="row">{esc(i["name"])}</th><td class="n">{dec(i["cpo"])}</td><td class="n">{dec(i["cto"])}</td><td class="n">{dec(i["psz"] * 100, 0)} %</td><td class="n">{dec(v)} €</td></tr>' for i, v in rows)
+        variants = ''
+        if len(calc) > 1:
+            variants = ('Z drugimi ' + ('conami cest' if zone else 'faktorji namembnosti') + ' znaša prispevek ' + and_join(
+                [f'{eur(round(t))} ({esc(z["name"]) if z else "Fn " + dec(f, 1)})' for f, z, _, t in calc[1:]]) + '.')
+        example = f'''<section class="prose"><h2>Izračun po korakih</h2>
+    <p>Za parcelo 600 m² in 180 m² BTP{' v coni ' + esc(zone['name'].split()[-1]) if zone else ''}{' s Fn ' + dec(fn, 1) if len(co['fn']) > 1 else ''} se za vsako vrsto opreme izračuna (600 × Cpo × {dec(co['dpo'], 1)} + 180 × Cto × {dec(co['dto'], 1)} × {dec(fn, 1)}) × psz {cite(*co['source_ids'])}.
+      Za {esc(it['name'])}:</p>
+    <p class="formula">(600 × {dec(it['cpo'])} × {dec(co['dpo'], 1)} + 180 × {dec(it['cto'])} × {dec(co['dto'], 1)} × {dec(fn, 1)}) × {dec(it['psz'] * 100, 0)} % = {dec(a)} €</p>
+    <div class="scroll"><table class="tbl">{thead('Oprema', 'Cpo (€/m²)', 'Cto (€/m²)', 'psz', 'Znesek')}<tbody>{trs}</tbody>
+      <tfoot><tr><th scope="row" colspan="4">Skupaj</th><td class="n">{eur(round(total))}</td></tr></tfoot></table></div>
+    <p>{variants}{' Ni upoštevano: ' + esc(co['not_included']) + '.' if co.get('not_included') else ''}</p>
+  </section>'''
+    else:
+        basis = (f'Izračun portala vsevem.si za parcelo 600 m² in 200 m² BTP z vso komunalno opremo, podatki z dne {ddate(m["as_of"])} {cite(*m["source_ids"])}. '
+                 'Odloka nismo preračunali, zato koeficientov ne navajamo; za manjšo hišo ali brez priključka na vso opremo bo znesek nižji.')
+        example = ''
+    why = {'high': 'Znesek smo izračunali iz veljavnega občinskega odloka.',
+           'medium': 'Znesek je izračun zasebnega portala, ne občine, in ni preverjen v odloku.',
+           'low': 'Spremembo odloka smo povzeli po novicah, ker uradno besedilo ni bilo dosegljivo' + (', faktor namembnosti za hiše pa ni potrjen, zato navajamo razpon.' if co and len(co['fn']) > 1 else '.')}[m['confidence']]
+    compare = (f' Za primerjavo: vsevem.si za 200 m² BTP z vso komunalno opremo izračuna {eur(m["vsevem_600_200"])} {cite("kp-vsevem")}.' if m.get('calc_600_180') else '')
+    desc = f'Komunalni prispevek v občini {name} za hišo: {amount} za parcelo 600 m² in {"180" if m.get("calc_600_180") else "200"} m² BTP. Izračun, formula in viri.'
+    page_ = f'''{head(f'{h1}: koliko stane za hišo · Hišni vodič', h1, desc, url, SITE + 'img/large/riko-mila.jpg', article_ld(h1, desc, url)).replace('</head>', '<style>' + GUIDE_CSS + '</style></head>')}
+<body>
+{BAR}
+<main class="wrap page">
+  <div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../{KP}/">Komunalni prispevek</a> / {esc(name)}</div>
+    <div class="head"><div><h1 class="display">{esc(h1)}</h1><div class="prov">Parcela 600 m², hiša {"180" if m.get("calc_600_180") else "200"} m² BTP</div></div></div>
+  </div>
+  <div class="total"><span class="eyebrow">Komunalni prispevek za primer</span><b>{amount}</b><p>Zanesljivost: {CONF[m['confidence']]}. {why}</p></div>
+  <div class="lede"><p>{basis}{compare}</p></div>
+  {example}
+  <section class="prose"><h2>Preverite znesek na občini</h2>
+    <p>To je ocena za tipičen primer. Dejanska odmera je odvisna od velikosti parcele in hiše, priključkov, cone in morebitnih sprememb odloka.
+      Pred nakupom parcele vprašajte občino, koliko bo znašal komunalni prispevek za to parcelo in hišo.</p>
+  </section>
+  <div class="actions">
+    <a class="btn glow" href="../{COSTS}/#kp={sid}">Izračunaj celotne stroške gradnje {esc(KP_IN.get(name, 'v občini ' + name))} <span class="arrow">→</span></a>
+    <a class="btn line" href="../{KP}/">Vse občine</a>
+  </div>
+  <section><h2>Komunalni prispevek v drugih občinah</h2><ul class="siblings">{''.join(f'<li><a href="../{KP}/{slugify(o["obcina"])}/">{esc(o["obcina"])}</a> · {kp_example(o)[2]}</li>' for o in others)}</ul></section>
+  <section class="prose"><h2>Viri</h2>{listing()}</section>
+</main>
+{FOOT}
+</body>
+</html>
+'''
+    return page_.replace('"../', '"../../')  # written one level deeper than the shared bar, footer and head assume
+
+
+def eko_page():
+    url = SITE + EKO + '/'
+    cite, listing = citer()
+    items = {it['key']: it for it in COST['items']}
+    e = items['eko_sklad_snes']
+    tiers = snes_tiers(e)
+    rows = ''.join(f'<tr><th scope="row">Skupina {g} <small>{SNES_GROUP[g]}</small></th><td class="n">{a} €/m²</td><td class="n">{b} €/m²</td>'
+                   f'<td class="n">{eur(min(a * e["max_area_m2"], e["max_eur"]))}</td></tr>' for g, a, b in tiers)
+    top, low = tiers[0][1], tiers[-1][2]
+    stage_has = lambda m, k: k in m['price_stage'].lower()
+    sub = [p['name'] for p in data['providers'] if any(stage_has(m, 'subvencij') for m in p['models'] if m['price_eur'])]
+    plain = sorted(((p, m) for p, m in models if m['price_eur'] and m['area_m2'] and not stage_has(m, 'subvencij') and m['area_m2'] >= e['max_area_m2']), key=lambda pm: pm[1]['price_eur'])
+    p, m = plain[len(plain) // 2]  # a mid-priced house of at least 150 m², its price not already cut by a subsidy
+    cap15 = round(0.3 * 0.5 * m['price_eur'])
+    priced = [o for _, o in models if o['price_eur'] and o['area_m2'] and not stage_has(o, 'subvencij')]
+    binds = sum(1 for o in priced if 0.3 * 0.5 * o['price_eur'] < top * min(o['area_m2'], e['max_area_m2']))
+    ex = lambda r: min(r * e['max_area_m2'], e['max_eur'], cap15)
+    phpp = items['phpp']['value']
+    phpp_txt = eur(phpp) if not isinstance(phpp, dict) else f'{eur(phpp["min"])} – {eur(phpp["max"])}'
+    h1 = f'Subvencija Eko sklada za novo hišo {YEAR}'
+    desc = (f'Eko sklad za novo skoraj ničenergijsko hišo (sNES+) da {low}–{top} € na m², za največ {e["max_area_m2"]} m², torej do {eur(e["max_eur"])}. '
+            'Pogoji, omejitve, primer izračuna in katere cene subvencijo že upoštevajo.')
+    verb = lambda names, one, two, many: one if len(names) == 1 else two if len(names) == 2 else many
+    return f'''{head(f'{h1}: koliko in pod katerimi pogoji · Hišni vodič', h1, desc, url, SITE + 'img/large/riko-mila.jpg', article_ld(h1, desc, url)).replace('</head>', '<style>' + GUIDE_CSS + '.tbl th small { display: block; font-weight: 400; color: var(--mist); font-size: 12.5px; }</style></head>')}
+<body>
+{BAR}
+<main class="wrap page">
+  <div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../{COSTS}/">Stroški gradnje</a> / Subvencija Eko sklada</div>
+    <div class="head"><div><h1 class="display">{h1}</h1><div class="prov">Javni poziv 105SUB-sNESOB23 · stanje {ddate(e['as_of'])}</div></div></div>
+  </div>
+  <div class="lede"><p>Eko sklad po javnem pozivu 105SUB-sNESOB23 daje nepovratno subvencijo za novo skoraj ničenergijsko hišo (sNES+): od {low} do {top} € na m² neto ogrevane površine,
+    za največ {e['max_area_m2']} m² samostoječe hiše (120 m² pri dvojčku ali vrstni hiši), torej <b>do {eur(e['max_eur'])}</b> {cite('eko-105', 'eko-105-cistopis')}.
+    Poziv je odprt, nazadnje spremenjen 12. 3. 2026 {cite('eko-105-spr2026')}.</p></div>
+  <section><h2>Koliko znaša subvencija na m²?</h2>
+    <div class="scroll"><table class="tbl">{thead('Izolacija', 'QH ≤ 10 kWh/m²a', 'QH ≤ 15 kWh/m²a', f'Največ za {e["max_area_m2"]} m²')}<tbody>{rows}</tbody></table></div>
+    <p class="credit-line">QH je letna potreba po toploti za ogrevanje na m². Znesek na m² je odvisen od vrste toplotne izolacije in od QH {cite('eko-105')}. V Triglavskem narodnem parku je subvencija za 25 % višja.</p>
+  </section>
+  <section class="prose"><h2>Omejitve: največ 15 % cene hiše</h2>
+    <p>Subvencija je največ 30 % upravičenih stroškov. Pri gradnji na ključ so upravičeni stroški največ polovica pogodbene vrednosti, zato subvencija ne preseže okoli 15 % cene hiše {cite('eko-105', 'eko-105-cistopis')}.</p>
+    <p><b>Primer:</b> <a href="../{m['slug']}/">{esc(p['name'])} {esc(m['name'])}</a> ima {round(m['area_m2'])} m² in stane {eur(m['price_eur'])}. Subvencija se računa za največ {e['max_area_m2']} m²:
+      pri {top} €/m² je to {eur(top * e['max_area_m2'])}, pri {low} €/m² {eur(low * e['max_area_m2'])}. Meja 15 % cene je {eur(cap15)}{', zato je subvencija omejena nanjo' if ex(top) == cap15 else ' in pri tej hiši ne omejuje'}: dobite
+      {eur(ex(top))} oziroma {eur(ex(low))}. Pri {top} €/m² meja 15 % odloči le pri hiši, ki stane manj kot okoli {eur(round(top / 0.15))} na m²;
+      med {len(priced)} hišami v vodiču z objavljeno ceno brez subvencije {f'je takih {binds}' if binds else 'ni nobene take'}.</p>
+  </section>
+  <section class="prose"><h2>Pogoji za subvencijo</h2>
+    <ul>
+      <li>Izračun energijske bilance s programom PHPP (stane okoli {phpp_txt} {cite(*items['phpp']['source_ids'])}).</li>
+      <li>Letna potreba po toploti za ogrevanje (QH) in hlajenje (QK) največ 15 kWh/m².</li>
+      <li>Zrakotesnost n50 največ 0,6 izmenjave zraka na uro.</li>
+      <li>Prezračevanje z vračanjem toplote (rekuperacija) z izkoristkom vsaj 80 %.</li>
+      <li>Zbiralnik deževnice s prostornino vsaj 6 m³.</li>
+      <li>Sončna elektrarna, ki pokrije porabo elektrike v hiši, je obvezna: brez nje do subvencije niste upravičeni. 10 €/m² manj dobite le, če distributer priključitev elektrarne zavrne {cite('eko-105-cistopis')}.</li>
+      <li>Vsaj 70 % energije iz obnovljivih virov.</li>
+    </ul>
+    <p>Pred oddajo vloge morate imeti <b>pravnomočno gradbeno dovoljenje</b>. Vloge se obravnavajo po vrstnem redu prejema, dokler so sredstva na voljo; poziv ima 5 milijonov evrov {cite('eko-105-spr2026')}.
+      Upravičene so naložbe, začete po 1. 1. 2023, za eno stavbo lahko oddate eno vlogo {cite('eko-105')}.</p>
+    <p>Mnoge tipske montažne hiše teh pogojev brez nadgradenj ne izpolnjujejo, zato pri proizvajalcu vprašajte za izvedbo sNES+.</p>
+  </section>
+  <section class="prose"><h2>Kaj ni upravičen strošek?</h2>
+    <p>Projektna dokumentacija, gradbeni nadzor, zunanja ureditev in sončna elektrarna (od spremembe 12. 3. 2026) {cite('eko-105', 'eko-105-spr2026')}.
+      Za sončno elektrarno lahko pridobite subvencijo Borzena, poleg subvencije lahko najamete kredit Eko sklada. Drugih nepovratnih spodbud Eko sklada za isto hišo, razen za sončno elektrarno, ne morete pridobiti {cite('eko-105')}.</p>
+  </section>
+  <section class="prose"><h2>Cene, ki subvencijo že upoštevajo</h2>
+    <p>{and_join(sub)} {verb(sub, 'navaja', 'navajata', 'navajajo')} ceno, ki je že zmanjšana za subvencijo Eko sklada (oziroma za subvencije in popuste).
+      Pri teh hišah subvencije ne odštejte še enkrat; kalkulator stroškov jo pri njih samodejno izpusti. <a href="../{GUIDE}/">Kaj vključujejo cene posameznih proizvajalcev</a>.</p>
+  </section>
+  <div class="actions">
+    <a class="btn glow" href="../{COSTS}/#snes=1">Izračunajte stroške s subvencijo <span class="arrow">→</span></a>
+    <a class="btn line" href="../{KP}/">Komunalni prispevek</a>
+    <a class="btn line" href="{esc(next(s['url'] for s in viri() if s['id'] == 'eko-105'))}" target="_blank" rel="noopener">Poziv na strani Eko sklada ↗</a>
+  </div>
+  <section class="prose"><h2>Viri</h2>{listing()}</section>
+</main>
+{FOOT}
 </body>
 </html>
 '''
@@ -1147,6 +1437,10 @@ write(COMPARE, compare_page())
 write(CHEAP, cheap_page())
 write(SMALL, small_page())
 write(COSTS, costs_page())
+write(KP, kp_hub())
+for mu in KPD['municipalities']:
+    write(os.path.join(KP, slugify(mu['obcina'])), kp_page(mu))
+write(EKO, eko_page())
 for old, new in MOVED.items():
     assert new in slugs, new
     write(old, moved(new))
@@ -1194,7 +1488,7 @@ def home_faq():
 src = re.sub(r'(<!-- faq -->).*?(<!-- /faq -->)', lambda mo: mo.group(1) + home_faq() + mo.group(2), src, flags=re.S)
 open('index.html', 'w', encoding='utf-8').write(src)
 
-locs = [SITE, SITE + GUIDE + '/', SITE + PLANS + '/', SITE + CHEAP + '/', SITE + SMALL + '/', SITE + COSTS + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
+locs = [SITE, SITE + GUIDE + '/', SITE + PLANS + '/', SITE + CHEAP + '/', SITE + SMALL + '/', SITE + COSTS + '/', SITE + KP + '/'] + [f"{SITE}{KP}/{slugify(mu['obcina'])}/" for mu in KPD['municipalities']] + [SITE + EKO + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
 open('sitemap.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
                                                   ''.join(f'  <url><loc>{l}</loc></url>\n' for l in locs) + '</urlset>\n')
 
