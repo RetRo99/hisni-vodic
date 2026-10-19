@@ -323,12 +323,13 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     if (plot) out.push({ label: 'Zemljišče', lo: plot, hi: plot, tag: 'vaš vnos' });
     const k = D.kp.find(x => x.id === $('kp').value);
     out.push({ label: 'Komunalni prispevek', lo: k.lo, hi: k.hi, conf: k.conf, src: k.src, note: `${k.name}: ${k.note}` });
-    // projekt_paket already covers PID, so pid_dokument is added only when the documentation comes with the house
+    // projekt_paket already covers PID, so pid_dokument is added only when the documentation comes with the house;
+    // the geodetic plan and soil report are the investor's either way, as inputs for the maker's DGD
     const pd = $('pd').checked, snes = $('snes').checked;
-    const docs = sum('Projektna dokumentacija in nadzor', (pd ? ['pid_dokument'] : ['projekt_paket', 'geodetski_nacrt', 'geolosko_porocilo', 'mnenja_soglasja'])
-      .concat(['gradbeni_nadzor', 'kataster_stavb', 'zakolicba', 'varnostni_nacrt', 'energetska_izkaznica'], snes ? ['phpp'] : []),
-      (pd ? 'DGD in PZI v ceni hiše; PID' : 'IDZ, DGD, PZI, PID, geodetski načrt, geološko poročilo, mnenja') +
-      ', gradbeni nadzor, kataster stavb, zakoličba, varnostni načrt, energetska izkaznica' + (snes ? ', PHPP' : '') + ', upravna taksa');
+    const docs = sum('Projektna dokumentacija in nadzor', (pd ? ['pid_dokument'] : ['projekt_paket', 'mnenja_soglasja'])
+      .concat(['geodetski_nacrt', 'geolosko_porocilo', 'gradbeni_nadzor', 'kataster_stavb', 'zakolicba', 'varnostni_nacrt', 'energetska_izkaznica'], snes ? ['phpp'] : []),
+      (pd ? 'DGD in PZI v ceni hiše; PID' : 'IDZ, DGD, PZI, PID, mnenja') +
+      ', geodetski načrt, geološko poročilo, gradbeni nadzor, kataster stavb, zakoličba, varnostni načrt, energetska izkaznica' + (snes ? ', PHPP' : '') + ', upravna taksa');
     const t = I.upravna_taksa_gd, tax = t.value.base + t.value.rate * Math.max(0, h.price - t.value.above) + t.value.application;
     docs.lo += tax; docs.hi += tax; docs.src = docs.src.concat(t.source_ids);
     out.push(docs);
