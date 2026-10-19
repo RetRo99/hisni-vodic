@@ -2,7 +2,7 @@
 """Writes one static page per house model (/<maker>-<model>/index.html), the price guide
 (/cena-montazne-hise/), the house links in the catalog of index.html, and sitemap.xml, all from the
 JSON embedded in index.html. Run after editing that JSON:  python3 generate.py"""
-import collections, datetime, html, json, os, re, statistics, unicodedata
+import collections, datetime, glob, html, json, os, re, statistics, unicodedata
 
 SITE = 'https://hisomer.si/'
 GUIDE = 'cena-montazne-hise'
@@ -70,6 +70,10 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .siblings li { padding: 4px 0; break-inside: avoid; }
 .siblings a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
 .siblings a:hover { color: var(--glow); }
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 14px; }
+.plans a { display: block; border-radius: var(--r); overflow: hidden; background: #fff; box-shadow: 0 0 0 1px var(--line); }
+.plans img { width: 100%; height: auto; display: block; }
+.credit-line { font-size: 13px; color: var(--mist); margin: 10px 0 0; }
 @media (max-width: 899px) { .two { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) {
   .specs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -137,6 +141,8 @@ def page(p, m):
     roof = ROOF.get(m['roof'])
     price = eur(m['price_eur']) if m['price_eur'] is not None else None
     bed, bath = m['bedrooms'], m['bathrooms']
+    # floor plans img/tloris/<slug>-1.jpg, -2.jpg ... (ground floor first), downloaded from the maker's page
+    plans = sorted(glob.glob(f"img/tloris/{m['slug']}-*.jpg"), key=lambda f: int(re.search(r'-(\d+)\.jpg$', f).group(1)))
 
     s1 = f"{name} je {floor_long}" + (f" s površino {area} m²" if area else '') + f" proizvajalca {p['name']}."
     rooms = [f"{n} {plural(n, w + 'o', w + 'i', w + 'e', w)}" for n, w in ((bed, 'spalnic'), (bath, 'kopalnic')) if n]
@@ -147,7 +153,8 @@ def page(p, m):
     desc_bits = [b for b in [f'{area} m²' if area else '', f"{bed} {plural(bed, 'spalnica', 'spalnici', 'spalnice', 'spalnic')}" if bed else '',
                              f'{roof} streha' if roof else ''] if b]
     desc = f"{name}: montažna hiša" + (', ' + ', '.join(desc_bits) if desc_bits else '') + \
-        (f". Cena {price} in kaj vključuje." if price else '. Cena na povpraševanje.') + ' Primerjava s tipskimi hišami drugih slovenskih proizvajalcev.'
+        (f". Cena {price} in kaj vključuje." if price else '. Cena na povpraševanje.') + \
+        (' Tloris in primerjava' if plans else ' Primerjava') + ' s tipskimi hišami drugih slovenskih proizvajalcev.'
     image_abs = SITE + (img.replace('img/', 'img/large/') if img else 'img/large/riko-mila.jpg')
     ld = {'@context': 'https://schema.org', '@type': 'Product', 'name': name, 'url': url, 'image': image_abs, 'description': s1,
           'category': 'Montažna hiša', 'brand': {'@type': 'Brand', 'name': p['name']}}
@@ -161,6 +168,10 @@ def page(p, m):
                 ''.join(f'<li><a href="../{o["slug"]}/">{esc(o["name"])}</a></li>' for o in siblings) + '</ul></section>') if siblings else ''
     note = ' Opomba: ' + esc(', '.join(m['flags'])) + '.' if m['flags'] else ''
     stage = esc(m['price_stage']) if price else 'Proizvajalec cene ne objavlja.'
+    plans_html = ('<section><h2>Tloris</h2><div class="plans">' + ''.join(
+        f'<a href="../{f}"><img src="../{f}" alt="Tloris {esc(name)}' + (f', etaža {i}' if len(plans) > 1 else '') + '" loading="lazy"></a>'
+        for i, f in enumerate(plans, 1)) + f'</div><p class="credit-line">Tloris: {esc(p["name"])}, '
+        f'<a href="{esc(m["url"])}" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a></p></section>') if plans else ''
     title = f"{name} – cena, tloris, m² · Hišni vodič"
     return f'''{head(title, name + ' – cena in lastnosti', desc, url, image_abs, ld)}
 <body>
@@ -175,11 +186,12 @@ def page(p, m):
   </div>
   {photo}
   <dl class="specs">{cell('Etaže', floor_short)}{cell('Površina', f'{area} m²' if area else '—')}{cell('Spalnice', bed or '—')}{cell('Kopalnice', bath or '—')}{cell('Streha', roof or '—')}</dl>
-  <div class="lede"><p>{esc(s1)} {esc(s2)}</p><p>{esc(s3)}{note} Tloris, opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../{GUIDE}/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
+  <div class="lede"><p>{esc(s1)} {esc(s2)}</p><p>{esc(s3)}{note} {'Opis' if plans else 'Tloris, opis'} in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../{GUIDE}/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
   <div class="actions">
     <a class="btn glow" href="{SITE}#kviz">Ali vam pristaja? Rešite kviz <span class="arrow">→</span></a>
-    <a class="btn line" href="{esc(m['url'])}" target="_blank" rel="noopener">Tloris in podrobnosti pri proizvajalcu ↗</a>
+    <a class="btn line" href="{esc(m['url'])}" target="_blank" rel="noopener">{'Podrobnosti' if plans else 'Tloris in podrobnosti'} pri proizvajalcu ↗</a>
   </div>
+  {plans_html}
   <div class="two">
     <section class="maker-info"><h2>O proizvajalcu {esc(p['name'])}</h2><p>{esc(p.get('description', ''))}</p>{maker_link}</section>
     <div class="edge"><div class="eyebrow">Prednost proizvajalca {esc(p['name'])}</div>{esc(p.get('edge') or '')}{facts_html}</div>

@@ -100,6 +100,10 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .siblings li { padding: 4px 0; break-inside: avoid; }
 .siblings a { color: var(--ink); text-decoration-color: var(--line); text-underline-offset: 3px; }
 .siblings a:hover { color: var(--glow); }
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 14px; }
+.plans a { display: block; border-radius: var(--r); overflow: hidden; background: #fff; box-shadow: 0 0 0 1px var(--line); }
+.plans img { width: 100%; height: auto; display: block; }
+.credit-line { font-size: 13px; color: var(--mist); margin: 10px 0 0; }
 @media (max-width: 899px) { .two { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) {
   .specs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
