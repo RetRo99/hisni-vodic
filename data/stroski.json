@@ -1,0 +1,552 @@
+{
+  "_readme": "Costs that a prefab house price usually leaves out, for the 'full cost' calculator on hisomer.si. Each entry in 'items': key, label (Slovenian), unit ('EUR' = per house, 'EUR/m2' = per m2 of the stated area, 'EUR/kW', 'EUR/m2_neto' = per m2 of net heated area), value OR {min, max}, optional 'typical', 'vat' ('incl' = DDV included, 'excl' = DDV excluded, 'unknown' = source does not say), applies (when it applies), confidence (high = official tariff or legal text; medium = several market sources agree; low = single market source or forum), source_ids (see data/stroski-viri.md) and as_of (date of the source data). 'komunalni_prispevek' is separate: the formula, per-municipality amounts for a reference case and a national range. The reference case is a 600 m2 building plot and a house with 150 m2 net floor area; komunalni prispevek is legally charged on BRUTO floor area (BTP), so 150 m2 neto is converted to BTP = 180 m2 with the 1.2 factor the odloki themselves use when BTP is unknown. Amounts in 'calc_600_180' were computed by us from the odlok values (formula below), at the odlok's prices without indexation, connecting to roads, water, sewer and public areas (plus waste where the odlok charges it), but not to gas or district heating. 'vsevem_600_200' amounts are a third-party calculator's results for 600 m2 plot / 200 m2 BTP, all equipment types connected. Money in EUR. Accessed 2026-10-19.",
+  "as_of": "2026-10-19",
+  "reference_case": {
+    "plot_m2": 600,
+    "net_floor_m2": 150,
+    "btp_m2": 180,
+    "btp_note": "BTP = neto x 1.2 (fallback rule in Koper and Ptuj odloki, sources kp-koper, kp-ptuj)"
+  },
+  "komunalni_prispevek": {
+    "label": "Komunalni prispevek",
+    "formula": "KP = sum over equipment i of (A_parcela x Cpo(i) x Dpo + A_BTP x Cto(i) x Dto x Fn) x psz(i)",
+    "formula_notes": "Cpo/Cto = EUR per m2 of plot / per m2 BTP for each equipment type, set in each municipality's odlok. Dpo + Dto = 1 (e.g. 0.3/0.7 in Koper, Ptuj, Ljubljana, Novo mesto; 0.5/0.5 in Maribor, Celje, Kranj, Tolmin). Fn = faktor namembnosti for CC-SI 1110 enostanovanjske stavbe, set by the odlok (1.0 Koper, 0.7 Ptuj). psz = prispevna stopnja zavezanca, 100 % if the odlok sets none. Roads and public areas are always charged; water, sewer, gas, district heating only if the house connects. Framework: Uredba 20/19 under ZUreP-2; replaced by Uredba Ur. l. RS 53/26 (in force 28. 3. 2026, under ZUreP-3). Existing municipal odloki were adopted under the 2019 rules.",
+    "source_ids": [
+      "kp-koper",
+      "kp-ptuj",
+      "kp-tolmin",
+      "kp-uredba-2026",
+      "kp-vsevem"
+    ],
+    "unit": "EUR",
+    "applies": "Always for a new house that needs a gradbeno dovoljenje; assessed by the municipality before the permit. Amount depends on municipality and, in some, on the zone (Koper has 5 road zones).",
+    "national_range": {
+      "min": 1584,
+      "max": 35341,
+      "typical": 8028,
+      "unit": "EUR",
+      "basis": "vsevem.si, 204 of 212 municipalities, 600 m2 plot / 200 m2 BTP, all equipment, odlok prices without indexation; min Kobilje, max Piran, typical = average",
+      "source_ids": [
+        "kp-vsevem"
+      ],
+      "as_of": "2026-06-12",
+      "confidence": "medium"
+    },
+    "share_of_investment_note": "24ur (8. 1. 2026, quoting an architect): komunalni prispevek is typically about 10 % of the investment excluding the plot.",
+    "municipalities": [
+      {
+        "obcina": "Ljubljana",
+        "calc_600_180": {
+          "min": 18755,
+          "max": 21992
+        },
+        "vsevem_600_200": 31748,
+        "note": "min/max = Fn 0.7 vs 1.0 (Fn for 1110 not confirmed). Odlok 2021 prices; vsevem estimates +33 % with indexation to 2025. 24ur (Jan 2026) reports almost 19,600 EUR for 200 m2 / 600 m2.",
+        "source_ids": [
+          "kp-vsevem-lj",
+          "kp-24ur-2026"
+        ],
+        "as_of": "2021-04-29 odlok",
+        "confidence": "medium"
+      },
+      {
+        "obcina": "Maribor",
+        "calc_600_180": {
+          "min": 8814,
+          "max": 9583
+        },
+        "vsevem_600_200": 10832,
+        "note": "min/max = Fn 0.7 vs 1.0. The 2024 amendment deleted the psz article; the old psz rates are used here, so treat as uncertain.",
+        "source_ids": [
+          "kp-vsevem-mb"
+        ],
+        "as_of": "2019-12-24 odlok, amended 2024-04-16",
+        "confidence": "low"
+      },
+      {
+        "obcina": "Celje",
+        "calc_600_180": 14229,
+        "vsevem_600_200": 16536,
+        "note": "Fn 1 (default; odlok's Fn table not seen). Without gas and district heating.",
+        "source_ids": [
+          "kp-vsevem-ce"
+        ],
+        "as_of": "2021-07-17 odlok",
+        "confidence": "medium"
+      },
+      {
+        "obcina": "Kranj",
+        "calc_600_180": 12666,
+        "vsevem_600_200": 13278,
+        "note": "Fn 1 (default). Cpo/Cto equal to the national Pravilnik averages.",
+        "source_ids": [
+          "kp-vsevem-kr"
+        ],
+        "as_of": "2020-10-21 odlok, amended 2023-12-02",
+        "confidence": "medium"
+      },
+      {
+        "obcina": "Koper",
+        "calc_600_180": {
+          "min": 22426,
+          "max": 28075
+        },
+        "vsevem_600_200": 29074,
+        "note": "Range over the 5 road zones (CES1 lowest, CES4 highest; CES3 = 27,531). Fn 1, psz 100 %, Dpo/Dto 0.3/0.7, read from the odlok.",
+        "source_ids": [
+          "kp-koper",
+          "kp-vsevem"
+        ],
+        "as_of": "2019-11-14 odlok",
+        "confidence": "high"
+      },
+      {
+        "obcina": "Novo mesto",
+        "calc_600_180": 11042,
+        "vsevem_600_200": 11860,
+        "note": "Fn 1. Vsevem estimates +33 % with indexation to 2025.",
+        "source_ids": [
+          "kp-vsevem-nm"
+        ],
+        "as_of": "2021-03-17 odlok",
+        "confidence": "medium"
+      },
+      {
+        "obcina": "Ptuj",
+        "calc_600_180": 6930,
+        "vsevem_600_200": 9271,
+        "note": "Computed from the odlok (Fn 0.7, Dpo/Dto 0.3/0.7, psz 95/75/51/80 %). Vsevem's figure is higher; difference not explained.",
+        "source_ids": [
+          "kp-ptuj",
+          "kp-vsevem"
+        ],
+        "as_of": "2021-04-24 odlok",
+        "confidence": "high"
+      },
+      {
+        "obcina": "Domžale",
+        "vsevem_600_200": 13861,
+        "source_ids": [
+          "kp-vsevem"
+        ],
+        "as_of": "2026-06-12",
+        "confidence": "medium"
+      },
+      {
+        "obcina": "Kamnik",
+        "vsevem_600_200": 9535,
+        "source_ids": [
+          "kp-vsevem"
+        ],
+        "as_of": "2026-06-12",
+        "confidence": "medium"
+      },
+      {
+        "obcina": "Škofja Loka",
+        "vsevem_600_200": 9003,
+        "source_ids": [
+          "kp-vsevem"
+        ],
+        "as_of": "2026-06-12",
+        "confidence": "medium"
+      },
+      {
+        "obcina": "Murska Sobota",
+        "vsevem_600_200": 9234,
+        "source_ids": [
+          "kp-vsevem"
+        ],
+        "as_of": "2026-06-12",
+        "confidence": "medium"
+      },
+      {
+        "obcina": "Brežice",
+        "vsevem_600_200": 4901,
+        "source_ids": [
+          "kp-vsevem"
+        ],
+        "as_of": "2026-06-12",
+        "confidence": "medium"
+      },
+      {
+        "obcina": "Krško",
+        "vsevem_600_200": 5765,
+        "source_ids": [
+          "kp-vsevem"
+        ],
+        "as_of": "2026-06-12",
+        "confidence": "medium"
+      },
+      {
+        "obcina": "Grosuplje",
+        "vsevem_600_200": 22873,
+        "source_ids": [
+          "kp-vsevem"
+        ],
+        "as_of": "2026-06-12",
+        "confidence": "medium"
+      }
+    ]
+  },
+  "items": [
+    {
+      "key": "projekt_izp",
+      "label": "Izhodišča / idejna zasnova (IZP, DPP, IDZ)",
+      "unit": "EUR",
+      "value": {
+        "min": 900,
+        "max": 1900
+      },
+      "vat": "unknown",
+      "applies": "Before the permit project; often part of the architect's package.",
+      "confidence": "medium",
+      "source_ids": [
+        "pd-omisli",
+        "pd-primerjam"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "projekt_dgd",
+      "label": "Projekt za gradbeno dovoljenje (DGD)",
+      "unit": "EUR",
+      "value": {
+        "min": 2500,
+        "max": 6300
+      },
+      "typical": 4000,
+      "vat": "unknown",
+      "applies": "Always (needed for gradbeno dovoljenje). Some prefab makers include it in the price; check the offer.",
+      "confidence": "medium",
+      "source_ids": [
+        "pd-omisli",
+        "pd-primerjam",
+        "pd-glog"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "projekt_pzi",
+      "label": "Projekt za izvedbo (PZI)",
+      "unit": "EUR",
+      "value": {
+        "min": 2500,
+        "max": 6300
+      },
+      "typical": 4200,
+      "vat": "unknown",
+      "applies": "Needed to build and for the Eko sklad sNES+ subsidy (area is taken from PZI). Prefab makers often draw their own execution plans.",
+      "confidence": "medium",
+      "source_ids": [
+        "pd-omisli",
+        "pd-primerjam",
+        "pd-glog"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "projekt_paket",
+      "label": "Celotna projektna dokumentacija (IDZ, DGD, PZI, PID)",
+      "unit": "EUR",
+      "value": {
+        "min": 9000,
+        "max": 18000
+      },
+      "vat": "unknown",
+      "applies": "Use instead of the separate items when the visitor has no documentation in the house price.",
+      "confidence": "medium",
+      "source_ids": [
+        "pd-omisli",
+        "gh-omisli-2026"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "geodetski_nacrt",
+      "label": "Geodetski načrt",
+      "unit": "EUR",
+      "value": {
+        "min": 380,
+        "max": 690
+      },
+      "typical": 500,
+      "vat": "unknown",
+      "applies": "Needed as a base for DGD.",
+      "confidence": "low",
+      "source_ids": [
+        "pd-primerjam"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "geolosko_porocilo",
+      "label": "Geološko-geomehansko poročilo",
+      "unit": "EUR",
+      "value": {
+        "min": 380,
+        "max": 560
+      },
+      "typical": 500,
+      "vat": "unknown",
+      "applies": "Commonly required for the foundation design; omisli calls it mandatory for the permit.",
+      "confidence": "low",
+      "source_ids": [
+        "pd-primerjam",
+        "pd-omisli"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "mnenja_soglasja",
+      "label": "Mnenja in soglasja",
+      "unit": "EUR",
+      "value": 600,
+      "vat": "unknown",
+      "applies": "Opinions from elektro, vodovod, water authority, telecom during the permit process.",
+      "confidence": "low",
+      "source_ids": [
+        "pd-glog"
+      ],
+      "as_of": "2026-09-16"
+    },
+    {
+      "key": "gradbeni_nadzor",
+      "label": "Gradbeni nadzor",
+      "unit": "EUR",
+      "value": 2500,
+      "vat": "unknown",
+      "applies": "Mandatory supervision during construction.",
+      "confidence": "low",
+      "source_ids": [
+        "pd-glog"
+      ],
+      "as_of": "2026-09-16"
+    },
+    {
+      "key": "pid_posnetek",
+      "label": "PID in geodetski posnetek",
+      "unit": "EUR",
+      "value": 1500,
+      "vat": "unknown",
+      "applies": "After construction, for the uporabno dovoljenje and entry in the land register.",
+      "confidence": "low",
+      "source_ids": [
+        "pd-glog"
+      ],
+      "as_of": "2026-09-16"
+    },
+    {
+      "key": "prikljucek_elektrika_11kw",
+      "label": "Omrežnina za priključno moč, 11 kW (3 x 16 A)",
+      "unit": "EUR",
+      "value": 1014.69,
+      "vat": "incl",
+      "applies": "One-off fee to the network operator for a new connection; 75.61 EUR/kW without DDV at low voltage. Building the physical connection (cable, meter cabinet) is extra and not covered here.",
+      "confidence": "high",
+      "source_ids": [
+        "el-eles-2026"
+      ],
+      "as_of": "2026-03-01"
+    },
+    {
+      "key": "prikljucek_elektrika_17kw",
+      "label": "Omrežnina za priključno moč, 17 kW (3 x 25 A)",
+      "unit": "EUR",
+      "value": 1568.15,
+      "vat": "incl",
+      "applies": "Typical for a house with a heat pump. Same notes as 11 kW.",
+      "confidence": "high",
+      "source_ids": [
+        "el-eles-2026"
+      ],
+      "as_of": "2026-03-01"
+    },
+    {
+      "key": "prikljucek_elektrika_22kw",
+      "label": "Omrežnina za priključno moč, 22 kW (3 x 32 A)",
+      "unit": "EUR",
+      "value": 2029.37,
+      "vat": "incl",
+      "applies": "Larger houses, EV charging.",
+      "confidence": "high",
+      "source_ids": [
+        "el-eles-2026"
+      ],
+      "as_of": "2026-03-01"
+    },
+    {
+      "key": "prikljucek_elektrika_per_kw",
+      "label": "Omrežnina za priključno moč (na kW)",
+      "unit": "EUR/kW",
+      "value": 75.61,
+      "vat": "excl",
+      "applies": "Low voltage (NN), 2026 tariff.",
+      "confidence": "high",
+      "source_ids": [
+        "el-eles-2026"
+      ],
+      "as_of": "2026-03-01"
+    },
+    {
+      "key": "prikljucek_voda",
+      "label": "Vodovodni priključek",
+      "unit": "EUR",
+      "value": {
+        "min": 1600,
+        "max": 2500
+      },
+      "vat": "unknown",
+      "applies": "If a public water main is near the plot. Varies with distance to the main.",
+      "confidence": "low",
+      "source_ids": [
+        "pr-mojmojster"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "prikljucek_kanalizacija",
+      "label": "Kanalizacijski priključek",
+      "unit": "EUR",
+      "value": {
+        "min": 2000,
+        "max": 3500
+      },
+      "vat": "unknown",
+      "applies": "If public sewer is available; includes house sewer to the public line, supervision and fees per source.",
+      "confidence": "low",
+      "source_ids": [
+        "pr-mojmojster"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "mkcn",
+      "label": "Mala komunalna čistilna naprava (MKČN), naprava",
+      "unit": "EUR",
+      "value": 5739,
+      "vat": "incl",
+      "applies": "Instead of the sewer connection where no public sewer exists. Retail price of one 4-6 PE device (ROTO MBBR); excavation and installation extra. Many municipalities co-fund MKČN through their own calls.",
+      "confidence": "low",
+      "source_ids": [
+        "pr-merkur-mkcn"
+      ],
+      "as_of": "2026-10-19"
+    },
+    {
+      "key": "prikljucki_skupaj",
+      "label": "Priključki skupaj (elektrika, voda, kanalizacija, internet)",
+      "unit": "EUR",
+      "value": {
+        "min": 3000,
+        "max": 8000
+      },
+      "vat": "unknown",
+      "applies": "Rough total when the visitor does not pick individual connections.",
+      "confidence": "low",
+      "source_ids": [
+        "gh-primerjam-2025"
+      ],
+      "as_of": "2025"
+    },
+    {
+      "key": "temeljna_plosca_m2",
+      "label": "Temeljna plošča",
+      "unit": "EUR/m2",
+      "value": {
+        "min": 100,
+        "max": 150
+      },
+      "vat": "unknown",
+      "applies": "Per m2 of slab (about the ground-floor footprint). Only when the maker's price is 'brez temeljne plošče'; usually not in the base price.",
+      "confidence": "medium",
+      "source_ids": [
+        "tp-omisli",
+        "gh-primerjam-2025"
+      ],
+      "as_of": "2025-10-23"
+    },
+    {
+      "key": "temeljna_plosca_hisa",
+      "label": "Temeljna plošča (hiša ~150 m2)",
+      "unit": "EUR",
+      "value": {
+        "min": 8000,
+        "max": 12000
+      },
+      "vat": "unknown",
+      "applies": "Per-house figure for a 150 m2 house. Primerjam's price box gives 12,500-18,800 EUR per 100 m2, so the per-house range is soft.",
+      "confidence": "medium",
+      "source_ids": [
+        "gh-primerjam-2025"
+      ],
+      "as_of": "2025"
+    },
+    {
+      "key": "zemeljska_dela",
+      "label": "Izkop in zemeljska dela",
+      "unit": "EUR",
+      "value": {
+        "min": 5000,
+        "max": 30000
+      },
+      "typical": 5000,
+      "vat": "unknown",
+      "applies": "About 5,000 EUR on easy ground; over 30,000 EUR on rock. Rough.",
+      "confidence": "low",
+      "source_ids": [
+        "gh-omisli-2026",
+        "gh-primerjam-2025"
+      ],
+      "as_of": "2026-01-29"
+    },
+    {
+      "key": "zunanja_ureditev",
+      "label": "Zunanja ureditev (dovoz, tlakovanje, zelenice)",
+      "unit": "EUR",
+      "value": {
+        "min": 4000,
+        "max": 13100
+      },
+      "vat": "unknown",
+      "applies": "Very rough. Omisli's sample budget uses 13,100 EUR; asphalting ~400 m2 is about 4,000 EUR. No reliable Slovenian figure found for fences.",
+      "confidence": "low",
+      "source_ids": [
+        "gh-omisli-2026"
+      ],
+      "as_of": "2026-01-29"
+    },
+    {
+      "key": "eko_sklad_snes",
+      "label": "Eko sklad subvencija za sNES+ novogradnjo (odbitek)",
+      "unit": "EUR/m2_neto",
+      "value": {
+        "min": 90,
+        "max": 170
+      },
+      "max_area_m2": 150,
+      "max_eur": 25500,
+      "vat": "n/a",
+      "applies": "Negative item (subsidy). Javni poziv 105SUB-sNESOB23, open, amended 12. 3. 2026. Per m2 of net heated and ventilated area, max 150 m2 for a detached house (120 m2 for a semi-detached/row house). 170/150 EUR/m2 group I (natural insulation + wooden windows), 130/110 group II (mineral), 100/90 group III (synthetic), for QH <= 10 / <= 15 kWh/m2a. Capped at 30 % of eligible costs; for a turnkey build eligible costs are at most 50 % of the contract value. Requires PHPP, QH and QK <= 15 kWh/m2a, n50 <= 0.6, recuperation >= 80 %, rainwater tank >= 6 m3, PV covering the building's electricity, >= 70 % renewables. PV itself is not eligible (Borzen PV subsidy can be added). -10 EUR/m2 if PV connection was refused.",
+      "confidence": "high",
+      "source_ids": [
+        "eko-105"
+      ],
+      "as_of": "2026-03-17"
+    },
+    {
+      "key": "ddv_stopnja",
+      "label": "DDV za stanovanjsko hišo",
+      "unit": "rate",
+      "value": {
+        "reduced": 0.095,
+        "general": 0.22
+      },
+      "applies": "9.5 % if the house is a stanovanjski objekt for permanent living 'kot del socialne politike': uporabna površina (sum of living rooms) <= 250 m2 for an enostanovanjska stavba, and the supply/construction is invoiced directly to the investor as a construction service (SKD F). Otherwise 22 %. For a prefab house sold with assembly to the investor this is the usual reading; a kit sold without assembly, and items like kitchens or built-in wardrobes, may be 22 %. Confirm with the maker or FURS.",
+      "confidence": "medium",
+      "source_ids": [
+        "ddv-pravilnik-54"
+      ],
+      "as_of": "2026-01-01"
+    }
+  ]
+}

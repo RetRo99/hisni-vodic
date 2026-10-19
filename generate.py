@@ -10,6 +10,7 @@ PLANS = 'tlorisi-montaznih-his'
 CHEAP = 'najcenejse-montazne-hise'
 SMALL = 'majhne-montazne-hise'
 COMPARE = 'primerjava'
+COSTS = 'koliko-stane-gradnja-hise'
 ROOT = os.path.dirname(os.path.abspath(__file__))
 os.chdir(ROOT)
 
@@ -106,7 +107,7 @@ BAR = f'''<div class="bar"><div class="wrap">
 FOOT = (f'<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev ({esc(data["collected"])}). '
         'Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p>'
         f'<nav aria-label="Vodiči"><a href="../{GUIDE}/">Cene montažnih hiš</a><a href="../{CHEAP}/">Najcenejše hiše</a><a href="../{SMALL}/">Majhne hiše</a>'
-        f'<a href="../{PLANS}/">Tlorisi</a><a href="../{COMPARE}/">Primerjava</a></nav></div></footer>\n<script src="../compare.js"></script>')
+        f'<a href="../{COSTS}/">Stroški gradnje</a><a href="../{PLANS}/">Tlorisi</a><a href="../{COMPARE}/">Primerjava</a></nav></div></footer>\n<script src="../compare.js"></script>')
 
 
 def head(title, og_title, desc, url, image, ld):
@@ -217,6 +218,7 @@ def page(p, m):
         for i, f in enumerate(plans, 1)) + f'</div><p class="credit-line">Tloris: {esc(p["name"])}, '
         f'<a href="{esc(m["url"])}" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a> · <a href="../{PLANS}/">Vsi tlorisi</a></p></section>') if plans else ''
     title = f"{name} – cena, tloris, m² · Hišni vodič"
+    costs_link = f'<a class="btn line" href="../{COSTS}/#h={m["slug"]}">Izračunaj celotne stroške gradnje</a>' if price else ''
     return f'''{head(title, name + ' – cena in lastnosti', desc, url, image_abs, ld)}
 <body>
 {BAR}
@@ -234,7 +236,7 @@ def page(p, m):
   <div class="actions">
     <a class="btn glow" href="{SITE}#kviz">Ali vam pristaja? Rešite kviz <span class="arrow">→</span></a>
     <a class="btn line" href="{esc(m['url'])}" target="_blank" rel="noopener">{'Podrobnosti' if plans else 'Tloris in podrobnosti'} pri proizvajalcu ↗</a>
-    <button type="button" class="btn line cmp" data-slug="{m['slug']}">+ Primerjaj</button>
+    <button type="button" class="btn line cmp" data-slug="{m['slug']}">+ Primerjaj</button>{costs_link}
   </div>
   {plans_html}
   <div class="two">
@@ -356,6 +358,7 @@ def guide():
   <div class="actions">
     <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
     <a class="btn line" href="../{CHEAP}/">Najcenejše montažne hiše</a>
+    <a class="btn line" href="../{COSTS}/">Kalkulator stroškov gradnje</a>
     <a class="btn line" href="../#katalog">Vse hiše v katalogu</a>
   </div>
 </main>
@@ -747,6 +750,345 @@ def small_page():
 '''
 
 
+COSTS_CSS = '''
+.page > * { min-width: 0; }
+.calc { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+@media (min-width: 960px) { .calc { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; } }
+.form { display: grid; gap: 16px; background: var(--dusk); border-radius: var(--r); box-shadow: 0 0 0 1px var(--line); padding: 20px; min-width: 0; }
+.form label, .form .f { display: grid; gap: 6px; font-size: 14px; color: var(--mist); min-width: 0; }
+.form select, .form input[type=number] { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
+.form label.ck { display: flex; gap: 10px; align-items: flex-start; color: var(--ink); cursor: pointer; }
+.form .ck input { margin: 4px 0 0; accent-color: var(--glow); flex: none; }
+.form small { font-size: 12.5px; line-height: 1.45; color: var(--mist); }
+.sub { display: grid; gap: 12px; padding: 14px; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); }
+.sub[hidden] { display: none; }
+.res { display: grid; gap: 16px; min-width: 0; }
+.total { padding: 20px; border-radius: var(--r); background: linear-gradient(160deg, rgba(255,196,119,.14), rgba(255,157,77,.04)); box-shadow: inset 0 0 0 1px var(--glow); }
+.total b { display: block; font: 800 clamp(28px, 5vw, 46px)/1.1 var(--font-display); font-stretch: 108%; color: var(--glow); font-variant-numeric: tabular-nums; margin-top: 6px; }
+.total p { margin: 8px 0 0; font-size: 13px; color: var(--mist); }
+.lines tbody th { white-space: normal; font-weight: 600; }
+.lines th small { display: block; font-weight: 400; color: var(--mist); font-size: 12.5px; margin-top: 2px; }
+.lines .cmp { margin-left: 6px; }
+.lines td { text-align: right; }
+.lines td small { display: block; font-size: 12px; color: var(--mist); white-space: nowrap; margin-top: 4px; }
+.lines td small a { color: var(--mist); }
+.share { display: block; height: 4px; border-radius: 4px; background: var(--line); margin-top: 8px; overflow: hidden; }
+.share i { display: block; height: 100%; background: var(--glow); }
+.share i.neg { background: #7fd1a8; }
+@media (max-width: 640px) { .lines th, .lines td { padding: 10px; } .lines td.n, .lines td small { white-space: normal; } .lines tbody th { width: 52%; } }
+.tools { display: flex; flex-wrap: wrap; gap: 12px; }
+.prose { max-width: 48em; }
+.prose p { color: #c9d3e6; margin: 0 0 10px; }
+.prose a, .viri a { color: var(--ink); text-underline-offset: 3px; }
+.viri { margin: 0; padding-left: 22px; color: #c9d3e6; display: grid; gap: 8px; font-size: 14px; overflow-wrap: anywhere; }
+.viri span { color: var(--mist); }
+'''
+COSTS_JS = r'''
+(function () {
+  const D = JSON.parse(document.getElementById('calc-data').textContent);
+  const I = D.items, $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // by hand: sl-SI number formatting leaves 4-digit numbers ungrouped (1655), the rest of the site writes 1.655
+  const eur = n => (n < 0 ? '−' : '') + String(Math.round(Math.abs(n))).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '\u00a0€';
+  const span = (lo, hi) => Math.round(lo) === Math.round(hi) ? eur(lo) : eur(lo) + ' – ' + eur(hi);
+  const rng = k => { const v = I[k].value; return typeof v === 'object' ? [v.min, v.max] : [v, v]; };
+  const RANK = { low: 0, medium: 1, high: 2 }, TAG = { high: 'uradni podatek', medium: 'okvirno', low: 'zelo okvirno' };
+  const houses = Object.fromEntries(D.houses.map(h => [h.slug, h]));
+  const num = id => Math.max(0, parseFloat($(id).value) || 0);
+  const FIELDS = ['h', 'cp', 'ca', 'cf', 'cs', 'plot', 'kp', 'kw', 'san', 'pd', 'zem', 'zu', 'snes', 'tier'];
+  const CUSTOM = ['cp', 'ca', 'cf', 'cs'];
+  const val = id => $(id).type === 'checkbox' ? ($(id).checked ? '1' : '0') : $(id).value;
+
+  // Several items in one line: sum the ranges, keep the weakest confidence and all sources.
+  function sum(label, keys, note) {
+    return { label, note, lo: keys.reduce((a, k) => a + rng(k)[0], 0), hi: keys.reduce((a, k) => a + rng(k)[1], 0),
+      conf: keys.map(k => I[k].confidence).reduce((a, b) => RANK[a] <= RANK[b] ? a : b),
+      src: [...new Set(keys.flatMap(k => I[k].source_ids))] };
+  }
+
+  function lines(h) {
+    const out = [{ label: 'Hiša', lo: h.price, hi: h.price, tag: h.slug ? 'cena proizvajalca' : 'vaša ponudba', house: h, note: h.stage }];
+    if (h.slab) {
+      // shortcut: slab ≈ ground floor = net m² / floors, +15 % for walls; use the real footprint if the data ever has it
+      const m2 = h.area / h.floors * 1.15, [a, b] = rng('temeljna_plosca_m2');
+      out.push({ ...sum('Temeljna plošča', ['temeljna_plosca_m2']), lo: m2 * a, hi: m2 * b, note: `približno ${Math.round(m2)} m² × ${a}–${b} €/m²` });
+    }
+    const plot = num('plot');
+    if (plot) out.push({ label: 'Zemljišče', lo: plot, hi: plot, tag: 'vaš vnos' });
+    const k = D.kp.find(x => x.id === $('kp').value);
+    out.push({ label: 'Komunalni prispevek', lo: k.lo, hi: k.hi, conf: k.conf, src: k.src, note: `${k.name}: ${k.note}` });
+    // projekt_paket already covers PID, so pid_posnetek is not added on top
+    out.push($('pd').checked ? sum('Projektna dokumentacija in nadzor', ['gradbeni_nadzor'], 'dokumentacija v ceni hiše, prištet le gradbeni nadzor')
+      : sum('Projektna dokumentacija in nadzor', ['projekt_paket', 'geodetski_nacrt', 'geolosko_porocilo', 'mnenja_soglasja', 'gradbeni_nadzor'],
+        'IDZ, DGD, PZI, PID, geodetski načrt, geološko poročilo, mnenja, gradbeni nadzor'));
+    const mkcn = $('san').value === 'mkcn';
+    out.push(sum('Priključki', ['prikljucek_elektrika_' + $('kw').value + 'kw', 'prikljucek_voda', mkcn ? 'mkcn' : 'prikljucek_kanalizacija'],
+      `elektrika ${$('kw').value} kW (${eur(rng('prikljucek_elektrika_' + $('kw').value + 'kw')[0])}), voda, ` + (mkcn ? 'MKČN brez vgradnje' : 'kanalizacija')));
+    const [zl, zh] = rng('zemeljska_dela'), z = $('zem').value;
+    out.push({ ...sum('Zemeljska dela', ['zemeljska_dela']), ...(z === 'l' ? { lo: I.zemeljska_dela.typical, hi: I.zemeljska_dela.typical, note: 'lahek teren' }
+      : z === 't' ? { lo: zh, hi: zh, note: 'zahteven teren, skala: ' + eur(zh) + ' ali več' } : { note: 'od lahkega do skalnatega terena' }) });
+    if ($('zu').checked) out.push(sum('Zunanja ureditev', ['zunanja_ureditev'], 'dovoz, tlakovanje, zelenice; brez ograje'));
+    if ($('snes').checked) {
+      const e = I.eko_sklad_snes, rate = D.tiers[+$('tier').value].rate;
+      // the call caps the grant at 30 % of eligible costs, and eligible costs at 50 % of a turnkey contract: 15 % of the price
+      const byArea = rate * Math.min(h.area, e.max_area_m2), cap = Math.min(e.max_eur, 0.3 * 0.5 * h.price), s = h.sub ? 0 : Math.min(byArea, cap);
+      out.push({ ...sum('Subvencija Eko sklada', ['eko_sklad_snes']), lo: -s, hi: -s, note: h.sub ? 'cena te hiše že upošteva subvencijo, zato je ne odštejemo še enkrat'
+        : `${rate} €/m² × ${Math.round(Math.min(h.area, e.max_area_m2))} m²` + (cap < byArea ? `, omejeno na ${cap === e.max_eur ? 'najvišji znesek' : '15 % cene hiše'}` : '') });
+    }
+    return out;
+  }
+
+  function render() {
+    const custom = $('h').value === 'lastna';
+    $('custom').hidden = !custom;
+    $('tierbox').hidden = !$('snes').checked;
+    const p = new URLSearchParams();
+    for (const id of FIELDS) if ((custom || !CUSTOM.includes(id)) && (id !== 'tier' || $('snes').checked) && (id !== 'plot' || num('plot'))) p.set(id, val(id));
+    history.replaceState(null, '', '#' + p.toString());
+    const h = custom ? { price: num('cp'), area: num('ca'), floors: +$('cf').value, slab: !$('cs').checked, sub: false, name: 'Lastna ponudba' } : houses[$('h').value];
+    if (!h.price || !h.area) {
+      $('total').innerHTML = '<span class="eyebrow">Skupaj</span><b>—</b><p>Vpišite ceno in neto površino hiše.</p>';
+      $('lines').innerHTML = '';
+      return;
+    }
+    const ls = lines(h), lo = ls.reduce((a, l) => a + l.lo, 0), hi = ls.reduce((a, l) => a + l.hi, 0);
+    const mids = ls.map(l => (l.lo + l.hi) / 2), mid = mids.reduce((a, b) => a + b, 0);
+    $('total').innerHTML = `<span class="eyebrow">Skupaj</span><b>${Math.round(lo) === Math.round(hi) ? 'približno ' + eur(lo) : 'od ' + eur(lo) + ' do ' + eur(hi)}</b>
+      <p>${esc(h.name)}, ${Math.round(h.area)} m² neto · na m² od ${eur(lo / h.area)} do ${eur(hi / h.area)}</p>`;
+    $('lines').innerHTML = `<table class="tbl lines"><thead><tr><th scope="col">Postavka</th><th scope="col" style="text-align:right">Znesek</th></tr></thead><tbody>${ls.map((l, i) => {
+      const name = l.house && l.house.slug ? `<a href="../${l.house.slug}/">${esc(l.house.name)}</a><button type="button" class="cmp sm" data-slug="${l.house.slug}">+ Primerjaj</button>` : '';
+      const src = (l.src || []).map(s => `<a href="#vir-${s}">[${D.srcNum[s]}]</a>`).join('');
+      const pct = mid > 0 ? Math.min(100, Math.abs(mids[i]) / mid * 100) : 0;
+      return `<tr><th scope="row">${l.label}${name ? '<small>' + name + '</small>' : ''}${l.note ? `<small>${esc(l.note)}</small>` : ''}
+        <span class="share" title="${Math.round(pct)} % skupaj"><i class="${mids[i] < 0 ? 'neg' : ''}" style="width:${pct.toFixed(1)}%"></i></span></th>
+        <td class="n">${span(l.lo, l.hi)}<small>${l.tag || TAG[l.conf]} ${src}</small></td></tr>`;
+    }).join('')}</tbody></table>`;
+    window.HVCompare.refresh();
+  }
+
+  const q = new URLSearchParams(location.hash.slice(1));
+  for (const id of FIELDS) {
+    if (!q.has(id)) continue;
+    const el = $(id), before = el.value;
+    if (el.type === 'checkbox') el.checked = q.get(id) === '1';
+    else { el.value = q.get(id); if (el.tagName === 'SELECT' && !el.value) el.value = before; }
+  }
+  $('calc').addEventListener('input', render);
+  $('calc').addEventListener('change', render);
+  $('copy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(location.href); $('copy').textContent = 'Povezava kopirana ✓'; setTimeout(() => { $('copy').textContent = 'Kopiraj povezavo'; }, 2500); }
+    catch (e) { window.prompt('Kopirajte povezavo:', location.href); }
+  });
+  render();
+})();
+'''
+
+# English words in the source titles of data/stroski-viri.md, shown in Slovenian on the page.
+VIRI_SL = {'forum, May 2021': 'forum, maj 2021', 'modified ': 'spremenjen ', 'updated ': 'posodobljeno '}
+
+
+def viri():
+    """Sources from the table in data/stroski-viri.md: id, title, URL, publisher (without its English remarks in brackets)."""
+    out = []
+    for line in open('data/stroski-viri.md', encoding='utf-8'):
+        cells = [c.strip() for c in line.strip().strip('|').split(' | ')]
+        if len(cells) == 5 and cells[2].startswith('http'):
+            title = cells[1]
+            for a, b in VIRI_SL.items():
+                title = title.replace(a, b)
+            out.append({'id': cells[0], 'title': title, 'url': cells[2], 'publisher': re.sub(r'\s*\(.*?\)', '', cells[3])})
+    return out
+
+
+def costs_page():
+    url = SITE + COSTS + '/'
+    cost = json.load(open('data/stroski.json', encoding='utf-8'))
+    items = {it['key']: it for it in cost['items']}
+    kp = cost['komunalni_prispevek']
+    nat = kp['national_range']
+    sources = viri()
+    src_num = {s['id']: i for i, s in enumerate(sources, 1)}
+    used = {s for it in cost['items'] for s in it['source_ids']} | set(kp['source_ids']) | {s for m in kp['municipalities'] for s in m['source_ids']}
+    assert used <= set(src_num), used - set(src_num)
+
+    def rng(key):
+        v = items[key]['value']
+        return (v['min'], v['max']) if isinstance(v, dict) else (v, v)
+
+    def span(key):
+        a, b = rng(key)
+        return eur(round(a)) if a == b else eur(round(a)) + ' – ' + eur(round(b))
+
+    def cite(*ids):
+        return ''.join(f'<a href="#vir-{s}">[{src_num[s]}]</a>' for s in ids)
+
+    conf = {'high': 'uradni podatek', 'medium': 'okvirno', 'low': 'zelo okvirno'}
+    nat_min, nat_max = re.search(r'min ([^,]+), max ([^,]+)', nat['basis']).groups()
+    covered, of = re.search(r'(\d+) of (\d+) municipalities', nat['basis']).groups()
+
+    # Komunalni prispevek: our odlok calculation (600 m² plot, 180 m² BTP) where we have it, else vsevem.si's figure (600 m², 200 m² BTP).
+    kps, kp_rows = [], []
+    for m in kp['municipalities']:
+        c = m.get('calc_600_180')
+        lo, hi = (c['min'], c['max']) if isinstance(c, dict) else (c, c) if c else (m['vsevem_600_200'], m['vsevem_600_200'])
+        note = 'parcela 600 m², 180 m² BTP, cene odloka brez indeksacije' if c else 'izračun vsevem.si za parcelo 600 m² in 200 m² BTP'
+        kps.append({'id': slugify(m['obcina']), 'name': m['obcina'], 'lo': lo, 'hi': hi, 'conf': m['confidence'], 'src': m['source_ids'], 'note': note})
+        calc_txt = (eur(lo) if lo == hi else eur(lo) + ' – ' + eur(hi)) if c else '—'
+        kp_rows.append(f'<tr><th scope="row">{esc(m["obcina"])}</th><td class="n">{calc_txt}</td><td class="n">{eur(m["vsevem_600_200"])}</td>'
+                       f'<td>{conf[m["confidence"]]} {cite(*m["source_ids"])}</td></tr>')
+    kps.append({'id': 'druga', 'name': 'Druga občina (slovensko povprečje)', 'lo': nat['typical'], 'hi': nat['typical'], 'conf': nat['confidence'], 'src': nat['source_ids'],
+                'note': f'povprečje {covered} občin, razpon od {eur(nat["min"])} ({nat_min}) do {eur(nat["max"])} ({nat_max})'})
+    kp_opts = ''.join(f'<option value="{k["id"]}"{" selected" if k["id"] == "druga" else ""}>{esc(k["name"])} ({eur(k["lo"]) if k["lo"] == k["hi"] else eur(k["lo"]) + " – " + eur(k["hi"])})</option>'
+                      for k in sorted(kps[:-1], key=lambda k: k['name']) + kps[-1:])
+
+    # Eko sklad rates per group I/II/III at QH <= 10 / <= 15 kWh/m2a, read from the item's text.
+    snes = items['eko_sklad_snes']
+    tiers_raw = re.findall(r'(\d+)/(\d+)(?: EUR/m2)? group (I+)\b', snes['applies'])
+    assert len(tiers_raw) == 3 and min(int(t[1]) for t in tiers_raw) == snes['value']['min'] and max(int(t[0]) for t in tiers_raw) == snes['value']['max'], tiers_raw
+    group = {'I': 'naravna izolacija in lesena okna', 'II': 'mineralna izolacija', 'III': 'sintetična izolacija'}
+    tiers = [{'rate': int(t[q]), 'label': f'Skupina {t[2]} ({group[t[2]]}), QH ≤ {10 if q == 0 else 15} kWh/m²a: {t[q]} €/m²'} for q in (0, 1) for t in tiers_raw]
+    tier_opts = ''.join(f'<option value="{i}">{esc(t["label"])}</option>' for i, t in enumerate(tiers))
+
+    def stage_has(m, *keys):
+        return any(k in m['price_stage'].lower() for k in keys)
+
+    priced = [(p, m) for p, m in models if m['price_eur'] and m['area_m2']]
+    houses = [{'slug': m['slug'], 'name': f"{p['name']} {m['name']}", 'price': m['price_eur'], 'area': m['area_m2'], 'floors': m['floors'],
+               'stage': m['price_stage'], 'slab': stage_has(m, 'brez temeljne plošče'), 'sub': stage_has(m, 'subvencij')} for p, m in priced]
+    plain = sorted((h for h in houses if not h['sub']), key=lambda h: h['price'])
+    default = plain[len(plain) // 2]['slug']  # a mid-priced house whose price is not already cut by a subsidy
+    house_opts = ''.join(f'<optgroup label="{esc(p["name"])}">' + ''.join(
+        f'<option value="{m["slug"]}"{" selected" if m["slug"] == default else ""}>{esc(m["name"])} · {eur(m["price_eur"])}</option>'
+        for m in p['models'] if m['price_eur'] and m['area_m2']) + '</optgroup>' for p in data['providers'] if any(m['price_eur'] and m['area_m2'] for m in p['models'])) + \
+        '<option value="lastna">Lastna ponudba</option>'
+
+    calc_json = json.dumps({'houses': houses, 'items': items, 'kp': kps, 'tiers': tiers, 'srcNum': src_num}, ensure_ascii=False).replace('</', '<\\/')
+
+    makers_by = lambda *keys: [p['name'] for p in data['providers'] if any(stage_has(m, *keys) for m in p['models'] if m['price_eur'])]
+    no_slab, subsidized = makers_by('brez temeljne plošče'), makers_by('subvencij')
+    no_slab_n = sum(1 for h in houses if h['slab'])
+    verb = lambda names, one, two, many: one if len(names) == 1 else two if len(names) == 2 else many
+    eles = items['prikljucek_elektrika_per_kw']['value']
+    eles_txt = f'{eles:.2f}'.replace('.', ',')
+    el = lambda kw: eur(round(items[f'prikljucek_elektrika_{kw}kw']['value']))
+    mn, mx = rng('zemeljska_dela')
+    ddv = items['ddv_stopnja']['value']
+    pct = lambda r: f'{r * 100:g}'.replace('.', ',') + ' %'
+    slab_lo, slab_hi = rng('temeljna_plosca_m2')
+    t_rates = sorted({t['rate'] for t in tiers}, reverse=True)
+
+    desc = (f'Kalkulator stroškov gradnje montažne hiše: komunalni prispevek povprečno {eur(nat["typical"])} (od {eur(nat["min"])} do {eur(nat["max"])}), '
+            f'projektna dokumentacija {span("projekt_paket")}, priključki, temeljna plošča {slab_lo}–{slab_hi} €/m² in subvencija Eko sklada do {eur(snes["max_eur"])}.')
+    h1 = 'Koliko stane gradnja montažne hiše?'
+    ld = {'@context': 'https://schema.org', '@type': 'Article', 'headline': h1, 'description': desc, 'inLanguage': 'sl', 'url': url,
+          'dateModified': cost['as_of'], 'image': SITE + 'img/large/riko-mila.jpg', 'author': {'@type': 'Organization', 'name': 'Hišni vodič', 'url': SITE}}
+    viri_html = ''.join(f'<li id="vir-{s["id"]}"><a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["title"])}</a> <span>· {esc(s["publisher"])}</span></li>' for s in sources)
+    sewer = span('prikljucek_kanalizacija')
+    y, mo, d = cost['as_of'].split('-')
+    checked = f'{int(d)}. {int(mo)}. {y}'
+    return f'''{head(f'Koliko stane gradnja montažne hiše {YEAR}? Kalkulator stroškov · Hišni vodič', h1, desc, url, ld['image'], ld).replace('</head>', '<style>' + TABLE_CSS + COSTS_CSS + '</style></head>')}
+<body>
+{BAR}
+<main class="wrap page">
+  <div>
+    <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../{GUIDE}/">Cene</a> / Stroški gradnje</div>
+    <div class="head"><div><h1 class="display">{h1}</h1><div class="prov">Kalkulator stroškov gradnje · podatki: {esc(data['collected'])}</div></div></div>
+  </div>
+  <div class="lede"><p>Cena montažne hiše ne pove, koliko boste plačali skupaj. Kalkulator ceni izbrane hiše prišteje, kar je običajno ni v ceni:
+    zemljišče, komunalni prispevek, projektno dokumentacijo in nadzor, priključke, temeljno ploščo, zemeljska dela in zunanjo ureditev, ter odšteje subvencijo Eko sklada.
+    Pri vsaki postavki je naveden vir in kako zanesljiva je številka.</p></div>
+  <div class="calc">
+    <form class="form" id="calc" onsubmit="return false">
+      <label>Hiša<select id="h">{house_opts}</select></label>
+      <div class="sub" id="custom" hidden>
+        <label>Cena hiše (€)<input type="number" id="cp" inputmode="numeric" min="0" step="1000"></label>
+        <label>Neto površina (m²)<input type="number" id="ca" inputmode="numeric" min="0" step="1"></label>
+        <label>Etaže<select id="cf"><option value="1">pritličje</option><option value="1.5">z mansardo</option><option value="2">pritličje in nadstropje</option></select></label>
+        <label class="ck"><input type="checkbox" id="cs"> Temeljna plošča je vključena v ceno</label>
+      </div>
+      <label>Zemljišče (€)<input type="number" id="plot" inputmode="numeric" min="0" step="1000" placeholder="0"><small>Neobvezno; pustite prazno, če parcelo že imate.</small></label>
+      <label>Občina (komunalni prispevek)<select id="kp">{kp_opts}</select>
+        <small>Ocena za tipičen primer: parcela okoli 600 m² in hiša okoli 150 m² neto. Cene iz odlokov so pred indeksacijo, zato je odmera lahko 8 do 33 % višja.</small></label>
+      <label>Priključna moč elektrike<select id="kw"><option value="11">11 kW (3 × 16 A)</option><option value="17" selected>17 kW (3 × 25 A), s toplotno črpalko</option><option value="22">22 kW (3 × 32 A)</option></select></label>
+      <label>Odpadne vode<select id="san"><option value="kan">Javna kanalizacija (priključek)</option><option value="mkcn">Mala čistilna naprava (MKČN)</option></select>
+        <small>Pri MKČN je upoštevana le cena naprave; izkop in vgradnja sta dodatni strošek.</small></label>
+      <label class="ck"><input type="checkbox" id="pd"> Projektna dokumentacija je že vključena v ceno hiše</label>
+      <label>Zemeljska dela<select id="zem"><option value="l">Lahek teren</option><option value="n" selected>Ne vem</option><option value="t">Zahteven teren (skala)</option></select></label>
+      <label class="ck"><input type="checkbox" id="zu" checked> Zunanja ureditev (dovoz, tlakovanje, zelenice)</label>
+      <label class="ck"><input type="checkbox" id="snes"> Gradil bom po standardu sNES+ (Eko sklad)</label>
+      <div class="sub" id="tierbox" hidden>
+        <label>Izolacija in potreba po toploti<select id="tier">{tier_opts}</select></label>
+        <small>Hiša mora biti skoraj pasivna: izračun PHPP, potreba po toploti in hladu največ 15 kWh/m²a, zrakotesnost n50 ≤ 0,6, rekuperacija z izkoristkom vsaj 80 %,
+          zbiralnik deževnice vsaj 6 m³ in sončna elektrarna. Mnoge tipske hiše teh pogojev brez nadgradenj ne izpolnjujejo.</small>
+      </div>
+    </form>
+    <div class="res">
+      <div class="total" id="total" aria-live="polite"></div>
+      <div class="scroll" id="lines"></div>
+      <p class="credit-line">Večina tržnih cen ne navaja, ali vključujejo DDV. Za hišo z uporabno površino do 250 m² velja {pct(ddv['reduced'])} DDV, če gradnjo izvajalec obračuna neposredno investitorju kot gradbeno storitev, sicer {pct(ddv['general'])}.</p>
+      <div class="tools"><button type="button" class="btn line" id="copy">Kopiraj povezavo</button></div>
+    </div>
+  </div>
+  <section class="prose"><h2>Komunalni prispevek po občinah</h2>
+    <p>Komunalni prispevek plačate občini pred izdajo gradbenega dovoljenja. Izračuna se iz površine parcele in bruto tlorisne površine hiše (BTP) ter cen komunalne opreme
+      (ceste, vodovod, kanalizacija, javne površine) iz občinskega odloka: KP = Σ (A<sub>parcela</sub> × Cpo × Dpo + A<sub>BTP</sub> × Cto × Dto × Fn) × psz {cite(*kp['source_ids'][:3])}.
+      Po izračunu vsevem.si za {covered} od {of} občin (parcela 600 m², 200 m² BTP) je povprečje {eur(nat['typical'])}, najmanj {eur(nat['min'])} ({nat_min}), največ {eur(nat['max'])} ({nat_max}) {cite(*nat['source_ids'])}.
+      Cene v odlokih so večinoma iz let 2019–2021 in se ob odmeri lahko indeksirajo, zato je dejanski znesek lahko 8 do 33 % višji. Od 28. 3. 2026 velja nova uredba (Ur. l. RS 53/26) {cite('kp-uredba-2026')}.</p>
+    <div class="scroll"><table class="tbl">{thead('Občina', 'Naš izračun (600 m², 180 m² BTP)', 'Vsevem.si (600 m², 200 m² BTP)', 'Zanesljivost')}<tbody>{''.join(kp_rows)}</tbody></table></div>
+  </section>
+  <section class="prose"><h2>Koliko stane projektna dokumentacija za hišo?</h2>
+    <p>Za gradbeno dovoljenje potrebujete projekt DGD ({span('projekt_dgd')}, običajno okoli {eur(items['projekt_dgd']['typical'])}), za gradnjo še projekt za izvedbo PZI ({span('projekt_pzi')}),
+      pred tem izhodišča oziroma idejno zasnovo ({span('projekt_izp')}). Celotna dokumentacija (IDZ, DGD, PZI, PID) stane {span('projekt_paket')} {cite(*items['projekt_paket']['source_ids'])}.</p>
+    <p>Posebej plačate geodetski načrt ({span('geodetski_nacrt')}), geološko-geomehansko poročilo ({span('geolosko_porocilo')}), mnenja in soglasja (okoli {span('mnenja_soglasja')})
+      ter obvezni gradbeni nadzor (okoli {span('gradbeni_nadzor')}) {cite('pd-primerjam', 'pd-glog')}. Nekateri proizvajalci montažnih hiš del dokumentacije vključijo v ceno; preverite ponudbo.</p>
+  </section>
+  <section class="prose"><h2>Koliko stanejo priključki za hišo?</h2>
+    <p>Za nov priključek na elektro omrežje plačate omrežnino za priključno moč: {eles_txt} €/kW brez DDV pri nizki napetosti (cenik ELES 2026) {cite('el-eles-2026')}.
+      Z DDV to znese {el(11)} za 11 kW, {el(17)} za 17 kW, kolikor običajno potrebuje hiša s toplotno črpalko, in {el(22)} za 22 kW. Izvedba priključka (kabel, merilna omarica) ni vključena.</p>
+    <p>Vodovodni priključek stane {span('prikljucek_voda')}, kanalizacijski {sewer} {cite('pr-mojmojster')}. Kjer javne kanalizacije ni, potrebujete malo komunalno čistilno napravo:
+      naprava za 4–6 PE stane okoli {span('mkcn')} brez izkopa in vgradnje {cite('pr-merkur-mkcn')}; številne občine jo sofinancirajo. Vsi priključki skupaj po oceni stanejo {span('prikljucki_skupaj')} {cite('gh-primerjam-2025')}.</p>
+  </section>
+  <section class="prose"><h2>Koliko stane temeljna plošča?</h2>
+    <p>Temeljna plošča stane {slab_lo}–{slab_hi} € na m² {cite('tp-omisli')}, za hišo s 150 m² ocene navajajo {span('temeljna_plosca_hisa')} {cite('gh-primerjam-2025')}.
+      Ni vključena v ceno, ki jo {verb(no_slab, 'navaja', 'navajata', 'navajajo')} {and_join(no_slab)} ({no_slab_n} {plural(no_slab_n, 'hiša', 'hiši', 'hiše', 'hiš')} v vodiču), zato jo kalkulator tem hišam prišteje.
+      Površino plošče oceni kot tloris pritličja (neto površina, deljena s številom etaž) in 15 % za stene.</p>
+  </section>
+  <section class="prose"><h2>Koliko stanejo zemeljska dela in zunanja ureditev?</h2>
+    <p>Izkop in zemeljska dela stanejo okoli {eur(items['zemeljska_dela']['typical'])} na lahkem terenu, na skali pa več kot {eur(mx)} {cite('gh-omisli-2026')}.
+      Zunanja ureditev (dovoz, tlakovanje, zelenice) stane {span('zunanja_ureditev')}; asfaltiranje približno 400 m² dovoza okoli 4.000 € {cite('gh-omisli-2026')}. Za ograje zanesljivega slovenskega podatka nismo našli.</p>
+  </section>
+  <section class="prose"><h2>Subvencija Eko sklada za novogradnjo</h2>
+    <p>Eko sklad po javnem pozivu 105SUB-sNESOB23 subvencionira skoraj ničenergijske hiše (sNES+): {', '.join(str(r) for r in t_rates[:-1])} ali {t_rates[-1]} € na m² neto ogrevane površine,
+      odvisno od vrste izolacije in potrebe po toploti, za največ {snes['max_area_m2']} m² samostoječe hiše, torej do {eur(snes['max_eur'])} {cite('eko-105')}.
+      Subvencija je največ 30 % upravičenih stroškov, ti pa so pri gradnji na ključ največ polovica pogodbene vrednosti, torej največ 15 % cene hiše.
+      Projekt, nadzor, zunanja ureditev in sončna elektrarna niso upravičeni stroški.</p>
+    <p>Pogoji so strogi: izračun PHPP, potreba po toploti in hladu največ 15 kWh/m²a, zrakotesnost n50 ≤ 0,6, rekuperacija vsaj 80 %, zbiralnik deževnice vsaj 6 m³, sončna elektrarna in vsaj 70 % obnovljivih virov.
+      {and_join(subsidized)} {verb(subsidized, 'navaja', 'navajata', 'navajajo')} ceno, ki že upošteva subvencijo, zato je kalkulator pri teh hišah ne odšteje še enkrat.</p>
+  </section>
+  <section class="prose"><h2>Koliko je DDV pri gradnji hiše?</h2>
+    <p>Za stanovanjsko hišo velja znižana stopnja {pct(ddv['reduced'])}, če je njena uporabna površina (vsota bivalnih prostorov) največ 250 m² in izvajalec gradnjo obračuna neposredno investitorju
+      kot gradbeno storitev {cite('ddv-pravilnik-54')}. Sicer velja {pct(ddv['general'])}. Za hišo v kompletu brez montaže ter za kuhinjo in vgradne omare je lahko stopnja {pct(ddv['general'])}; preverite pri proizvajalcu ali na FURS.
+      Večina tržnih cen v tem kalkulatorju ne navaja, ali vključujejo DDV.</p>
+  </section>
+  <section class="prose"><h2>Viri</h2><ol class="viri">{viri_html}</ol>
+    <p class="credit-line">Vsi viri so bili pregledani {checked}. Komunalni prispevek je najmanj natančna številka: odloki ga računajo od bruto površine, ki jo ocenimo kot 1,2 × neto,
+      cone, faktorji za stanovanjske hiše in olajšave pa znesek spremenijo. Tržne cene (dokumentacija, priključki, plošča, zemeljska dela, zunanja ureditev) so z gradbenih portalov z neznanim vzorcem; uporabite jih kot razpon, ne kot ponudbo.
+      Noben aktualen vir ne pove, kateri proizvajalci imajo projektno dokumentacijo v ceni. Pri elektriki je upoštevana le omrežnina za priključno moč. Cen priključkov za optiko in plin ter vgradnje MKČN nismo našli.</p>
+  </section>
+  <div class="actions">
+    <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
+    <a class="btn line" href="../{GUIDE}/">Primerjava cen</a>
+    <a class="btn line" href="../{COMPARE}/">Primerjava hiš</a>
+  </div>
+</main>
+{FOOT}
+<script type="application/json" id="calc-data">{calc_json}</script>
+<script>{COSTS_JS}</script>
+</body>
+</html>
+'''
+
+
 # Old addresses Google may already know, as instant redirects to the new ones.
 MOVED = {f'kager-vita-nova-{k}-family': f'kager-vita-nova-{k}-linija' for k in ('classic', 'edition', 'urbana', 'modern')}
 
@@ -771,6 +1113,7 @@ write(PLANS, plans_page())
 write(COMPARE, compare_page())
 write(CHEAP, cheap_page())
 write(SMALL, small_page())
+write(COSTS, costs_page())
 for old, new in MOVED.items():
     assert new in slugs, new
     write(old, moved(new))
@@ -818,7 +1161,7 @@ def home_faq():
 src = re.sub(r'(<!-- faq -->).*?(<!-- /faq -->)', lambda mo: mo.group(1) + home_faq() + mo.group(2), src, flags=re.S)
 open('index.html', 'w', encoding='utf-8').write(src)
 
-locs = [SITE, SITE + GUIDE + '/', SITE + PLANS + '/', SITE + CHEAP + '/', SITE + SMALL + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
+locs = [SITE, SITE + GUIDE + '/', SITE + PLANS + '/', SITE + CHEAP + '/', SITE + SMALL + '/', SITE + COSTS + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
 open('sitemap.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
                                                   ''.join(f'  <url><loc>{l}</loc></url>\n' for l in locs) + '</urlset>\n')
 
