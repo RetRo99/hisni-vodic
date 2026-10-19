@@ -1261,7 +1261,7 @@ COSTS_JS = r'''
       <div><span>Skupaj obresti</span><b>${eur(paid - P)}</b></div><div><span>Skupaj vrnete</span><b>${eur(paid)}</b></div></div>
       <p class="fnote">Za ta obrok potrebujete neto dohodek gospodinjstva vsaj <b>~${eur(need)}/mesec</b>: obroki vseh kreditov smejo biti največ ${F.dsti} % neto dohodka,
         po plačilu pa vam mora ostati vsaj ${eur(F.minCs)} (več z vzdrževanimi družinskimi člani). Drugi krediti potrebni dohodek povečajo.</p>
-      ${value ? `<p class="fnote">Kredit je <b>${Math.round(ltv)} %</b> vrednosti nepremičnine (${plot ? 'hiša in zemljišče' : 'cena hiše, zemljišča niste vpisali'}, ${eur(value)}).
+      ${value ? `<p class="fnote">Kredit je <b>${Math.round(ltv)} %</b> vrednosti nepremičnine (ocena: celotna naložba ${plot ? 'z zemljiščem' : 'brez zemljišča, ki ga niste vpisali'}, ${eur(value)}).
         ${ltv > F.ltv ? `To je več od ${F.ltv} %, kolikor Banka Slovenije priporoča za dom, v katerem boste živeli; banka lahko zahteva več lastnih sredstev ali dodatno zavarovanje.` : `Banka Slovenije priporoča največ ${F.ltv} % za dom, v katerem boste živeli.`}</p>` : ''}
       <p class="fnote">${$('snes').checked ? 'Ker gradite hišo sNES+, lahko' : 'Če gradite skoraj ničenergijsko hišo sNES+, lahko'} del zneska dobite kot kredit Eko sklada:
         ${pc(e.rate)} fiksno, do ${eur(e.max)} in do ${e.years} let${$('snes').checked ? ` (za ${eur(Math.min(P, e.max))} približno ${eur(eA)} na mesec)` : ''}. <a href="${esc(e.url)}" target="_blank" rel="noopener">Javni poziv Eko sklada</a></p>`;
@@ -1360,7 +1360,9 @@ COSTS_JS = r'''
         ${mids[i] ? `<span class="share" title="${Math.round(pct)} % stroškov"><i class="${mids[i] < 0 ? 'neg' : ''}" style="width:${pct.toFixed(1)}%${color[i] ? ';background:' + color[i] : ''}"></i></span>` : ''}</th>
         <td class="n">${l.txt || span(l.lo, l.hi)}<small>${l.tag || TAG[l.conf]}</small></td></tr>`;
     }).join('')}</tbody></table>`;
-    finance(exact ? lo : Math.round(mid / 100) * 100, h.price + num('plot'), h);
+    // a bank values a finished house at roughly the whole investment, so LTV is measured against the total (plot included)
+    const tot = exact ? lo : Math.round(mid / 100) * 100;
+    finance(tot, tot, h);
     window.HVCompare.refresh();
   }
 
