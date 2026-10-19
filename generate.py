@@ -54,6 +54,7 @@ slugs = [m['slug'] for _, m in models]
 assert len(set(slugs)) == len(slugs), 'duplicate slug'
 
 COST = json.load(open('data/stroski.json', encoding='utf-8'))
+FIN = json.load(open('data/financiranje.json', encoding='utf-8'))
 SLAB = next(i for i in COST['items'] if i['key'] == 'temeljna_plosca_m2')['value']
 SLAB_MID = (SLAB['min'] + SLAB['max']) / 2
 INFO = {i['id']: i for i in json.load(open('data/proizvajalci-info.json', encoding='utf-8'))}
@@ -187,6 +188,10 @@ GLOSS = [
     (r'\bIV\. (?:gradbena )?faza\b', 'IV. faza', 'stopnja gradnje: zunaj dokončana hiša z delom notranjih del; natančen obseg je v popisu del proizvajalca'),
     (r'sNES[+⁺]', 'sNES+', 'skoraj ničenergijska stavba po pogojih Eko sklada, pogoj za subvencijo za novo hišo'),
     (r'(?i:\bdelni ključ\b)', 'delni ključ', 'hiša z instalacijami in delom notranjih del, brez dela končne opreme; obseg določi proizvajalec'),
+    (r'\bDSTI\b', 'DSTI', 'razmerje med obroki vseh kreditov in neto dohodkom; Banka Slovenije ga omejuje na največ 50 %'),
+    (r'\bLTV\b', 'LTV', 'razmerje med zneskom kredita in vrednostjo nepremičnine, zastavljene za kredit'),
+    (r'\bEURIBOR\b', 'EURIBOR', 'medbančna obrestna mera v evroobmočju; spremenljiva obrestna mera je EURIBOR in pribitek banke'),
+    (r'(?i:\banuitet\w*)', 'anuiteta', 'enak mesečni obrok, ki vsebuje obresti in del glavnice'),
     (r'(?i:\bna ključ\b)', 'na ključ', 'vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje'),
 ]
 GLOSS_SKIP = {'script', 'style', 'title', 'select', 'option', 'textarea', 'abbr', 'button', 'summary', 'dialog'}
@@ -1198,6 +1203,22 @@ COSTS_CSS = '''
 .prose a, .viri a { color: var(--ink); text-underline-offset: 3px; }
 .viri { margin: 0; padding-left: 22px; color: #c9d3e6; display: grid; gap: 8px; font-size: 14px; overflow-wrap: anywhere; }
 .viri span { color: var(--mist); }
+#kredit .tbl th small { display: block; font-weight: 400; font-size: 12.5px; color: var(--mist); margin-top: 2px; }
+#kredit .tbl td:last-child { font-size: 13.5px; color: #c9d3e6; }
+@media (min-width: 641px) { #kredit .tbl td:last-child { min-width: 16em; } }
+.fin { display: grid; gap: 14px; min-width: 0; margin-top: 12px; }
+.fin h2 { margin: 0; }
+.fin .form { grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); align-items: start; }
+.fstats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 12px; }
+.fstats > div { padding: 14px 16px; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); min-width: 0; }
+.fstats .fmain { background: linear-gradient(160deg, rgba(255,196,119,.14), rgba(255,157,77,.04)); box-shadow: inset 0 0 0 1px var(--glow); }
+.fstats span { display: block; font: 500 11px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); }
+.fstats b { display: block; font: 700 22px/1.2 var(--font-display); font-variant-numeric: tabular-nums; margin-top: 6px; color: var(--ink); }
+.fstats .fmain b { font-size: 30px; color: var(--glow); }
+.fstats small { display: block; font-size: 12.5px; color: var(--mist); margin-top: 4px; }
+.fnote { margin: 12px 0 0; font-size: 14px; line-height: 1.5; color: #c9d3e6; }
+.fnote b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.fnote a, .fin .credit-line a { color: var(--ink); text-underline-offset: 3px; }
 '''
 COSTS_JS = r'''
 (function () {
@@ -1213,12 +1234,38 @@ COSTS_JS = r'''
   // amounts are typed as 185000 or 185.000 (thousands with dots, decimals with a comma) and shown grouped after editing
   const num = id => Math.max(0, parseFloat($(id).value.replace(/[\s.€]/g, '').replace(',', '.')) || 0);
   const group = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  const NUMS = ['cp', 'ca', 'plot', 'pa'];
+  const NUMS = ['cp', 'ca', 'plot', 'pa', 'lf', 'lk'];
   const fmt = id => { const n = num(id); if (n && Number.isInteger(n)) $(id).value = group(n); };
-  const FIELDS = ['h', 'cp', 'ca', 'cf', 'cs', 'plot', 'kp', 'pa', 'kw', 'san', 'pd', 'zem', 'zu', 'snes', 'tier'];
+  const FIELDS = ['h', 'cp', 'ca', 'cf', 'cs', 'plot', 'kp', 'pa', 'kw', 'san', 'pd', 'zem', 'zu', 'snes', 'tier', 'lf', 'lk', 'it', 'ir', 'lt'];
+  const F = D.fin, pc = v => String(Math.round(v * 100) / 100).replace('.', ',') + ' %';
+  const rate = () => Math.max(0, parseFloat($('ir').value.replace(',', '.')) || 0);
+  // the loan follows the total until it is typed in; an empty field goes back to the total
+  let lkSet = false;
   const CUSTOM = ['cp', 'ca', 'cf', 'cs'];
   const COLORS = ['#ffc477', '#ff9d4d', '#9fe0b5', '#8fb8ff', '#c9a7ff', '#ff9d8a', '#e8d98a', '#93a3c0'];
-  const val = id => $(id).type === 'checkbox' ? ($(id).checked ? '1' : '0') : NUMS.includes(id) ? String(num(id) || '') : $(id).value;
+  const val = id => $(id).type === 'checkbox' ? ($(id).checked ? '1' : '0') : NUMS.includes(id) ? String(num(id) || '') : id === 'ir' ? String(rate()) : $(id).value;
+  const skip = id => (id === 'tier' && !$('snes').checked) || (['plot', 'lf'].includes(id) && !num(id)) || (id === 'lk' && !lkSet);
+
+  // anuiteta: P·r / (1 − (1 + r)^−n), r the monthly rate, n the number of months
+  const annuity = (P, pct, years) => { const r = pct / 1200, n = years * 12; return r ? P * r / (1 - Math.pow(1 + r, -n)) : P / n; };
+  function finance(total, value, h) {
+    if (!lkSet) $('lk').value = total == null ? '' : group(Math.max(0, total - num('lf')));
+    const P = num('lk'), pct = rate(), years = +$('lt').value;
+    if (!P) { $('fout').innerHTML = '<p class="fnote">Vpišite znesek kredita.</p>'; return; }
+    const A = annuity(P, pct, years), paid = A * years * 12;
+    // DSTI: the instalment is at most this share of net income, and the minimum creditworthiness must remain after it
+    const need = Math.ceil(Math.max(A / (F.dsti / 100), A + F.minCs) / 10) * 10;
+    const ltv = value ? P / value * 100 : 0, plot = num('plot');
+    const e = F.eko, eA = annuity(Math.min(P, e.max), e.rate, e.years);
+    $('fout').innerHTML = `<div class="fstats"><div class="fmain"><span>Mesečni obrok</span><b>${eur(A)}</b><small>${eur(P)} · ${pc(pct)} · ${years} let</small></div>
+      <div><span>Skupaj obresti</span><b>${eur(paid - P)}</b></div><div><span>Skupaj vrnete</span><b>${eur(paid)}</b></div></div>
+      <p class="fnote">Za ta obrok potrebujete neto dohodek gospodinjstva vsaj <b>~${eur(need)}/mesec</b>: obroki vseh kreditov smejo biti največ ${F.dsti} % neto dohodka,
+        po plačilu pa vam mora ostati vsaj ${eur(F.minCs)} (več z vzdrževanimi družinskimi člani). Drugi krediti potrebni dohodek povečajo.</p>
+      ${value ? `<p class="fnote">Kredit je <b>${Math.round(ltv)} %</b> vrednosti nepremičnine (${plot ? 'hiša in zemljišče' : 'cena hiše, zemljišča niste vpisali'}, ${eur(value)}).
+        ${ltv > F.ltv ? `To je več od ${F.ltv} %, kolikor Banka Slovenije priporoča za dom, v katerem boste živeli; banka lahko zahteva več lastnih sredstev ali dodatno zavarovanje.` : `Banka Slovenije priporoča največ ${F.ltv} % za dom, v katerem boste živeli.`}</p>` : ''}
+      <p class="fnote">${$('snes').checked ? 'Ker gradite hišo sNES+, lahko' : 'Če gradite skoraj ničenergijsko hišo sNES+, lahko'} del zneska dobite kot kredit Eko sklada:
+        ${pc(e.rate)} fiksno, do ${eur(e.max)} in do ${e.years} let${$('snes').checked ? ` (za ${eur(Math.min(P, e.max))} približno ${eur(eA)} na mesec)` : ''}. <a href="${esc(e.url)}" target="_blank" rel="noopener">Javni poziv Eko sklada</a></p>`;
+  }
 
   // Several items in one line: sum the ranges, keep the weakest confidence and all sources.
   function sum(label, keys, note) {
@@ -1281,13 +1328,14 @@ COSTS_JS = r'''
     $('custom').hidden = !custom;
     $('tierbox').hidden = !$('snes').checked;
     const p = new URLSearchParams();
-    for (const id of FIELDS) if ((custom || !CUSTOM.includes(id)) && (id !== 'tier' || $('snes').checked) && (id !== 'plot' || num('plot'))) p.set(id, val(id));
+    for (const id of FIELDS) if ((custom || !CUSTOM.includes(id)) && !skip(id)) p.set(id, val(id));
     history.replaceState(null, '', '#' + p.toString());
     const h = custom ? { price: num('cp'), area: num('ca'), floors: +$('cf').value, slab: !$('cs').checked, sub: false, name: 'Lastna ponudba' } : houses[$('h').value];
     if (!h.price || !h.area) {
       $('total').innerHTML = '<span class="eyebrow">Skupaj</span><b>—</b><p>Vpišite ceno in neto površino hiše.</p>';
       $('lines').innerHTML = '';
       $('stotal').innerHTML = '<span>Vpišite ceno in površino hiše</span>';
+      finance(null, 0, h);
       return;
     }
     const ls = lines(h), lo = ls.reduce((a, l) => a + l.lo, 0), hi = ls.reduce((a, l) => a + l.hi, 0);
@@ -1312,6 +1360,7 @@ COSTS_JS = r'''
         ${mids[i] ? `<span class="share" title="${Math.round(pct)} % stroškov"><i class="${mids[i] < 0 ? 'neg' : ''}" style="width:${pct.toFixed(1)}%${color[i] ? ';background:' + color[i] : ''}"></i></span>` : ''}</th>
         <td class="n">${l.txt || span(l.lo, l.hi)}<small>${l.tag || TAG[l.conf]}</small></td></tr>`;
     }).join('')}</tbody></table>`;
+    finance(exact ? lo : Math.round(mid / 100) * 100, h.price + num('plot'), h);
     window.HVCompare.refresh();
   }
 
@@ -1321,6 +1370,8 @@ COSTS_JS = r'''
   function load() {
     const q = new URLSearchParams(location.hash.slice(1));
     $('calc').reset();
+    $('fin').reset();
+    lkSet = q.has('lk');
     for (const id of FIELDS) {
       if (!q.has(id)) continue;
       const el = $(id), before = el.value;
@@ -1328,6 +1379,8 @@ COSTS_JS = r'''
       else { el.value = q.get(id); if (el.tagName === 'SELECT' && !el.value) el.value = before; }
     }
     if (!q.has('pd')) $('pd').checked = docsIn();
+    if (q.has('ir')) $('ir').value = $('ir').value.replace('.', ',');
+    else $('ir').value = String($('it').value === 'v' ? F.var : F.fix).replace('.', ',');
     NUMS.forEach(fmt);
   }
   load();
@@ -1337,8 +1390,9 @@ COSTS_JS = r'''
   // mobile: a bar with the total while the form is on screen, gone once the result itself is in view
   if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { $('stotal').hidden = e.isIntersecting; }).observe($('res'));
   $('h').addEventListener('change', () => { $('pd').checked = docsIn(); });
-  $('calc').addEventListener('input', render);
-  $('calc').addEventListener('change', render);
+  $('lk').addEventListener('input', () => { lkSet = $('lk').value.trim() !== ''; });
+  $('it').addEventListener('change', () => { $('ir').value = String($('it').value === 'v' ? F.var : F.fix).replace('.', ','); });
+  for (const f of ['calc', 'fin']) { $(f).addEventListener('input', render); $(f).addEventListener('change', render); }
   $('copy').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(location.href); $('copy').textContent = 'Povezava kopirana ✓'; setTimeout(() => { $('copy').textContent = 'Kopiraj povezavo'; }, 2500); }
     catch (e) { window.prompt('Kopirajte povezavo:', location.href); }
@@ -1399,6 +1453,25 @@ def costs_page():
         return ''.join(f'<a href="#vir-{s}">[{src_num[s]}]</a>' for s in ids)
 
     conf = CONF
+    # Financing: rates as the banks publish them (data/financiranje.json), the calculator default is the middle of the typical range
+    lim, eko, typ, avg, eurib = FIN['limits'], FIN['eko_sklad'], FIN['typical'], FIN['average_rate'], FIN['euribor_6m']
+    banks = [b for b in FIN['banks'] if b.get('fixed') or b.get('variable_margin')]
+    fin_used = {s for b in FIN['banks'] for s in b['source_ids']} | {s for x in (lim, eko, avg, eurib) for s in x['source_ids']}
+    assert fin_used <= set(src_num), fin_used - set(src_num)
+    max_term = lim['max_maturity_years'] or max(b['max_term_years'] for b in FIN['banks'])  # Banka Slovenije sets none, so the banks' longest
+    terms = [y for y in typ['terms_years'] if y <= max_term]
+    rate_txt = lambda v: f'{v:.2f}'.replace('.', ',') + ' %'
+    rr = lambda r: rate_txt(r['min']) if r['min'] == r['max'] else rate_txt(r['min'])[:-2] + '–' + rate_txt(r['max'])
+    fin_def = {k: round((typ[k]['min'] + typ[k]['max']) / 2, 1) for k in ('fixed', 'variable')}
+    fin_data = {'fix': fin_def['fixed'], 'var': fin_def['variable'], 'dsti': lim['dsti_max'], 'minCs': lim['min_creditworthiness_eur'], 'ltv': lim['ltv_recommended'],
+                'eko': {'rate': eko['rate_fixed'], 'max': eko['max_eur'], 'years': eko['max_term_years'], 'url': eko['url']}}
+    bank_rows = ''.join(
+        f'<tr><th scope="row">{esc(b["bank"])}<small>cenik {ddate(b["valid_from"])}</small></th>'
+        f'<td class="n">{rr(b["fixed"]) if b.get("fixed") else "—"}<small>{esc(b.get("fixed_term", ""))}</small></td>'
+        f'<td class="n">{esc(b["variable_ref"])} + {rr(b["variable_margin"])}</td><td class="n">{b["max_term_years"]} let</td>'
+        f'<td>{esc(b["conditions"])} {cite(*b["source_ids"])}</td></tr>' for b in banks)
+    no_rates = [b for b in FIN['banks'] if b not in banks]
+    fin_cite = cite(*[s for b in banks for s in b['source_ids']], *lim['source_ids'])
     nat_min, nat_max = re.search(r'min ([^,]+), max ([^,]+)', nat['basis']).groups()
     covered, of = re.search(r'(\d+) of (\d+) municipalities', nat['basis']).groups()
 
@@ -1444,7 +1517,7 @@ def costs_page():
         for m in sorted((m for m in p['models'] if m['price_eur'] and m['area_m2']), key=lambda m: (m['area_m2'], m['name']))) + '</optgroup>' for p in data['providers'] if any(m['price_eur'] and m['area_m2'] for m in p['models'])) + \
         '<option value="lastna">Lastna ponudba</option>'
 
-    calc_json = json.dumps({'houses': houses, 'items': items, 'kp': kps, 'tiers': tiers, 'srcNum': src_num}, ensure_ascii=False).replace('</', '<\\/')
+    calc_json = json.dumps({'houses': houses, 'items': items, 'kp': kps, 'tiers': tiers, 'srcNum': src_num, 'fin': fin_data}, ensure_ascii=False).replace('</', '<\\/')
 
     makers_by = lambda *keys: [p['name'] for p in data['providers'] if any(stage_has(m, *keys) for m in p['models'] if m['price_eur'])]
     no_slab, subsidized = makers_by('brez temeljne plošče'), makers_by('subvencij')
@@ -1483,7 +1556,7 @@ def costs_page():
   </div>
   <div class="lede"><p>Cena montažne hiše ne pove, koliko boste plačali skupaj. Kalkulator ceni izbrane hiše prišteje, kar je običajno ni v ceni:
     zemljišče, komunalni prispevek, projektno dokumentacijo in nadzor, priključke, temeljno ploščo, zemeljska dela in zunanjo ureditev, ter odšteje subvencijo Eko sklada.
-    Pri vsaki postavki je naveden vir in kako zanesljiva je številka.</p></div>
+    Pri vsaki postavki je naveden vir in kako zanesljiva je številka. Na koncu izračuna še mesečni obrok stanovanjskega kredita in dohodek, ki ga zanj potrebujete.</p></div>
   <div class="calc">
     <form class="form" id="calc" onsubmit="return false">
       <label>Hiša<select id="h">{house_opts}</select></label>
@@ -1517,6 +1590,19 @@ def costs_page():
       <div class="total" id="total" aria-live="polite"></div>
       <div class="scroll" id="lines"></div>
       <p class="credit-line">Večina tržnih cen ne navaja, ali vključujejo DDV. Za hišo z uporabno površino do 250 m² velja {pct(ddv['reduced'])} DDV, če gradnjo izvajalec obračuna neposredno investitorju kot gradbeno storitev, sicer {pct(ddv['general'])}.</p>
+      <section class="fin" aria-labelledby="fin-h"><h2 id="fin-h">Koliko bo znašal obrok kredita?</h2>
+        <form class="form" id="fin" onsubmit="return false">
+          <label>Lastna sredstva (€)<input type="text" id="lf" inputmode="numeric" autocomplete="off" placeholder="0"></label>
+          <label>Znesek kredita (€)<input type="text" id="lk" inputmode="numeric" autocomplete="off"><small>Najverjetnejši skupni znesek, zmanjšan za lastna sredstva. Lahko ga spremenite; izbrišite ga za samodejni izračun.</small></label>
+          <label>Vrsta obrestne mere<select id="it"><option value="f">fiksna</option><option value="v">spremenljiva</option></select></label>
+          <label>Obrestna mera (%)<input type="text" id="ir" inputmode="decimal" autocomplete="off" value="{f'{fin_def["fixed"]:g}'.replace('.', ',')}">
+            <small>Privzeto sredina običajnega razpona: fiksna {rr(typ['fixed'])}, spremenljiva {rr(typ['variable'])} (6M EURIBOR {rate_txt(eurib['value'])} in pribitek {rr(typ['variable_margin'])}).</small></label>
+          <label>Doba odplačila<select id="lt">{''.join(f'<option value="{y}"{" selected" if y == 25 else ""}>{y} let</option>' for y in terms)}</select></label>
+        </form>
+        <div id="fout" aria-live="polite"></div>
+        <p class="credit-line">Informativni izračun, ne ponudba banke. Obrok je anuiteta z enako obrestno mero vso dobo; stroški odobritve, vodenja in zavarovanja niso všteti.
+          Obrestne mere so iz objavljenih pogojev bank na dan {ddate(FIN['as_of'])}, pravila za DSTI in LTV od Banke Slovenije {fin_cite}. <a href="#kredit">Obrestne mere po bankah</a></p>
+      </section>
       <div class="tools"><button type="button" class="btn line" id="copy">Kopiraj povezavo</button></div>
     </div>
   </div>
@@ -1577,6 +1663,20 @@ def costs_page():
     <p>Za stanovanjsko hišo velja znižana stopnja {pct(ddv['reduced'])}, če je njena uporabna površina (vsota bivalnih prostorov) največ 250 m² in izvajalec gradnjo obračuna neposredno investitorju
       kot gradbeno storitev {cite('ddv-pravilnik-54')}. Sicer velja {pct(ddv['general'])}. Za hišo v kompletu brez montaže ter za kuhinjo in vgradne omare je lahko stopnja {pct(ddv['general'])}; preverite pri proizvajalcu ali na FURS.
       Večina tržnih cen v tem kalkulatorju ne navaja, ali vključujejo DDV.</p>
+  </section>
+  <section class="prose" id="kredit"><h2>Koliko stane kredit za hišo?</h2>
+    <p>Banke objavljajo izhodiščne obrestne mere za stanovanjske kredite; dejanska je odvisna od komitentstva, zavarovanja in ocene banke. Fiksna obrestna mera ostane enaka vso dobo,
+      spremenljiva je EURIBOR in pribitek banke, zato se obrok spreminja. 6M EURIBOR je bil septembra 2026 v povprečju {rate_txt(eurib['value'])} {cite(*eurib['source_ids'])}.
+      Povprečna obrestna mera za nove stanovanjske kredite v Sloveniji je bila avgusta 2026 {rate_txt(avg['all'])}, pri spremenljivi obrestni meri {rate_txt(avg['variable'])}, pri fiksni za več kot 10 let {rate_txt(avg['fixed_over_10y'])} {cite(*avg['source_ids'])}.</p>
+    <div class="scroll"><table class="tbl">{thead('Banka', 'Fiksna', 'Spremenljiva', 'Najdaljša doba', 'Pogoji')}<tbody>{bank_rows}</tbody></table></div>
+    <p>{and_join([b['bank'] for b in no_rates])} na svojih straneh obrestnih mer ne {verb(no_rates, 'navaja', 'navajata', 'navajajo')} v obliki, ki bi jo lahko preverili
+      (OTP banka: do 350.000 €, fiksna do 20 let, spremenljiva do 30 let, brez stroškov odobritve {cite('fin-otp')}; Sparkasse: do 400.000 €, do 30 let, do 80 % vrednosti nepremičnine {cite('fin-sparkasse')}).
+      Za Addiko Bank in UniCredit aktualnih obrestnih mer za stanovanjske kredite nismo našli.</p>
+    <p><b>Pravila Banke Slovenije.</b> Obroki vseh kreditov smejo znašati največ {lim['dsti_max']} % neto dohodka (DSTI), ne glede na višino dohodka, in po plačilu obrokov vam mora ostati vsaj {eur(lim['min_creditworthiness_eur'])} na mesec, več z vzdrževanimi družinskimi člani.
+      Za razmerje med kreditom in vrednostjo nepremičnine (LTV) Banka Slovenije priporoča največ {lim['ltv_recommended']} % za dom, v katerem boste živeli, sicer {lim['ltv_recommended_other']} %. Ročnosti stanovanjskih kreditov ne omejuje; banke jih odobrijo do {max_term} let {cite(*lim['source_ids'])}.</p>
+    <p><b>Kredit Eko sklada.</b> Za gradnjo skoraj ničenergijske hiše sNES+ Eko sklad po pozivu {eko['call']} odobri kredit s fiksno obrestno mero {rate_txt(eko['rate_fixed'])}, od {eur(eko['min_eur'])} do {eur(eko['max_eur'])} in z dobo do {eko['max_term_years']} let;
+      sklenitev stane 1,5 % (od 40 do 175 €), vodenje 45 € na leto. Kredit lahko dobite poleg subvencije, ne pa za nakup že dokončane hiše {cite(*eko['source_ids'])}.
+      <a href="{esc(eko['url'])}" target="_blank" rel="noopener">Javni poziv {eko['call']} na strani Eko sklada</a>.</p>
   </section>
   <section class="prose"><h2>Viri</h2><ol class="viri">{viri_html}</ol>
     <p class="credit-line">Vsi viri so bili pregledani {checked}. Okvirne cene z gradbenih portalov so se pri preverjanju izkazale za prenizke ali nepopolne, zato kalkulator, kjer je mogoče, uporablja cenike posameznih del in dejanske ponudbe.
@@ -2023,6 +2123,8 @@ def about_page():
       ter cenikih posameznih del (temeljna plošča, priključki, dokumentacija). Okvirne cene z gradbenih portalov so se pri preverjanju izkazale za prenizke ali nepopolne,
       zato jih ne uporabljamo kot končne številke. Pri vsaki postavki sta navedena vir in zanesljivost: uradni podatek, okvirno ali zelo okvirno.</p>
     <p>Komunalni prispevek za občine z odlokom izračunamo po formuli iz odloka za vašo parcelo in hišo; za druge je naveden znesek za primer. <a href="../{KP}/">Komunalni prispevek po občinah</a></p>
+    <p>Obrestne mere za izračun obroka kredita preverjamo v objavljenih cenikih bank, pravila za kredite pa pri Banki Slovenije in Eko skladu; zadnjič {ddate(FIN['as_of'])}.
+      Banke, ki obrestnih mer ne objavljajo, navedemo brez številk. <a href="../{COSTS}/#kredit">Obrestne mere po bankah</a></p>
   </section>
   <section class="prose"><h2>Kako pogosto posodabljamo</h2>
     <p>Cene hiš preverjamo mesečno, stroške gradnje četrtletno. Zadnje preverjanje: cene hiš {esc(data['collected'])}, stroški gradnje {ddate(COST['as_of'])},

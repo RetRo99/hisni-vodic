@@ -1,0 +1,139 @@
+{
+  "_readme": "Housing-loan terms for the financing step of the full-cost calculator on hisomer.si. Rates in % a year, as published by each bank (only numbers its own page or rate sheet states; null = not published there). 'fixed' and 'variable_margin' are {min, max} over the bank's client conditions (komitent with salary and insurance = min, others = max) for the stated terms; variable = reference EURIBOR + margin. 'typical' is our calculator default: 'fixed' spans the published fixed rates for 20-30 year loans to clients, 'variable' = EURIBOR 6M (monthly average) + the typical margin range. Banka Slovenije limits are in 'limits'. Sources in data/stroski-viri.md. Accessed 2026-10-19.",
+  "as_of": "2026-10-19",
+  "banks": [
+    {
+      "bank": "NLB",
+      "product": "NLB Stanovanjski kredit (do 20 let), NLB Osnovni hipotekarni kredit (20-30 let)",
+      "valid_from": "2026-06-01",
+      "fixed": {"min": 4.0, "max": 4.7},
+      "fixed_term": "nad 10 do 20 let (stanovanjski kredit)",
+      "fixed_30y": {"min": 4.0, "max": 4.6},
+      "fixed_green_30y": {"min": 3.5, "max": 3.8},
+      "variable_margin": {"min": 1.45, "max": 1.95},
+      "variable_ref": "6M EURIBOR",
+      "max_term_years": 30,
+      "max_ltv": null,
+      "fees": "brez stroškov odobritve; vodenje 5 EUR na mesec",
+      "conditions": "najnižje obrestne mere z rednimi prilivi in življenjskim zavarovanjem pri NLB Viti; Zeleni hipotekarni kredit 3,20-3,80 % fiksno",
+      "source_ids": ["fin-nlb-om"]
+    },
+    {
+      "bank": "Intesa Sanpaolo Bank",
+      "product": "Stanovanjski kredit za komitente",
+      "valid_from": "2026-10-08",
+      "fixed": {"min": 3.65, "max": 4.05},
+      "fixed_term": "od 181 do 360 mesecev (3,65 % do 20 let, 4,00-4,05 % nad 20 let)",
+      "variable_margin": {"min": 1.0, "max": 1.2},
+      "variable_ref": "6M EURIBOR",
+      "max_term_years": 30,
+      "max_ltv": null,
+      "fees": null,
+      "conditions": "izhodiščne obrestne mere (\"od\") za komitente; za nekomitente višje (npr. 4,65 % fiksno pri 121-180 mesecih)",
+      "source_ids": ["fin-isp-om"]
+    },
+    {
+      "bank": "Gorenjska banka",
+      "product": "Stanovanjski kredit v EUR",
+      "valid_from": "2026-05-18",
+      "fixed": {"min": 3.6, "max": 3.6},
+      "fixed_term": "nad 10 do 20 let (nad 20 let fiksne ni v ponudbi)",
+      "variable_margin": {"min": 1.6, "max": 1.7},
+      "variable_ref": "6M EURIBOR",
+      "max_term_years": 30,
+      "max_ltv": null,
+      "fees": null,
+      "conditions": "za komitente s plačo na računu pri banki, sicer +1,0 odstotne točke; nad 20 let le z zastavo nepremičnine",
+      "source_ids": ["fin-gbkr-om"]
+    },
+    {
+      "bank": "Delavska hranilnica",
+      "product": "Stanovanjski kredit s hipotekarnim zavarovanjem",
+      "valid_from": "2026-10-19",
+      "fixed": {"min": 3.5, "max": 3.5},
+      "fixed_term": "nad 120 do 240 mesecev (nad 240 mesecev fiksne ni, kombinirana 3,30 % prvih 10 let)",
+      "variable_margin": {"min": 1.1, "max": 1.2},
+      "variable_ref": "6M EURIBOR",
+      "max_term_years": 30,
+      "max_ltv": 75,
+      "max_ltv_note": "obrestna mera +1 odstotna točka, če kredit presega 75 % vrednosti nepremičnine",
+      "fees": null,
+      "conditions": "za imetnike paketnih računov z življenjskim zavarovanjem, sicer višje; zeleni kredit -0,2 odstotne točke",
+      "source_ids": ["fin-dh-om"]
+    },
+    {
+      "bank": "OTP banka",
+      "product": "Stanovanjski kredit",
+      "valid_from": null,
+      "fixed": null,
+      "fixed_term": "fiksna do 20 let",
+      "variable_margin": null,
+      "variable_ref": "3M EURIBOR",
+      "max_term_years": 30,
+      "max_amount_eur": 350000,
+      "max_ltv": null,
+      "fees": "brez stroškov odobritve do preklica",
+      "conditions": "obrestne mere na spletni strani niso objavljene v statični obliki",
+      "source_ids": ["fin-otp"]
+    },
+    {
+      "bank": "Sparkasse",
+      "product": "Stanovanjski kredit",
+      "valid_from": null,
+      "fixed": null,
+      "variable_margin": null,
+      "max_term_years": 30,
+      "max_amount_eur": 400000,
+      "max_ltv": 80,
+      "fees": "brez stroškov ocene nepremičnine do 500.000 EUR in pravnega pregleda",
+      "conditions": "obrestnih mer stran ne navaja",
+      "source_ids": ["fin-sparkasse"]
+    }
+  ],
+  "not_found": ["Addiko Bank (javni cenik stanovanjskih kreditov je iz leta 2017)", "UniCredit (izvleček sklepa o obrestnih merah 1. 9. 2026 stanovanjskih kreditov ne navaja)"],
+  "limits": {
+    "dsti_max": 50,
+    "dsti_note": "en sam prag za vse dohodke (od 1. 7. 2023 brez razredov po dohodku): letni obroki vseh kreditov največ 50 % letnega neto dohodka; banka sme vsako četrtletje do 3 % stanovanjskih kreditov odobriti nad pragom",
+    "min_creditworthiness_eur": 745,
+    "min_creditworthiness_note": "po vseh obrokih mora kreditojemalcu ostati vsaj 745 EUR na mesec, več za vzdrževane družinske člane",
+    "ltv_recommended": 80,
+    "ltv_recommended_other": 70,
+    "ltv_note": "priporočilo, ne zavezujoča omejitev: 80 % za nepremičnino, v kateri boste živeli, sicer 70 %",
+    "max_maturity_years": null,
+    "maturity_note": "Banka Slovenije ročnosti stanovanjskih kreditov ne omejuje; banke jih odobrijo do 30 let",
+    "source_ids": ["fin-bsi-makro"]
+  },
+  "average_rate": {
+    "month": "2026-08",
+    "all": 3.22,
+    "variable": 3.33,
+    "fixed_over_10y": 3.24,
+    "basis": "povprečna obrestna mera za nove stanovanjske kredite gospodinjstvom v Sloveniji (statistika obrestnih mer MFI, ki jo Banka Slovenije poroča ECB)",
+    "source_ids": ["fin-ecb-mir"]
+  },
+  "euribor_6m": {
+    "value": 2.92,
+    "month": "2026-09",
+    "basis": "mesečno povprečje 6M EURIBOR",
+    "source_ids": ["fin-ecb-euribor"]
+  },
+  "eko_sklad": {
+    "call": "87OB26",
+    "rate_fixed": 1.2,
+    "max_eur": 100000,
+    "min_eur": 1500,
+    "max_term_years": 20,
+    "fees": "sklenitev 1,5 % (najmanj 40, največ 175 EUR), vodenje 45 EUR na leto, zavarovanje 0,83-1,68 % zavarovalne osnove",
+    "applies": "gradnja skoraj ničenergijske hiše sNES+ (ne nakup dokončane); poleg subvencije 105SUB-sNESOB23; status odprt, spremenjen 1. 10. 2026",
+    "url": "https://www.ekosklad.si/prebivalstvo/pridobite-spodbudo/objava/javni-poziv-87ob26-kreditiranje-okoljskih-nalozb-obcanov",
+    "source_ids": ["eko-87ob26"]
+  },
+  "typical": {
+    "fixed": {"min": 3.5, "max": 4.05},
+    "fixed_basis": "objavljene fiksne obrestne mere za komitente pri 20-30 letih: Delavska hranilnica 3,50 %, Gorenjska banka 3,60 %, Intesa Sanpaolo 3,65-4,05 %, NLB 4,00 %",
+    "variable_margin": {"min": 1.0, "max": 1.7},
+    "variable": {"min": 3.92, "max": 4.62},
+    "variable_basis": "6M EURIBOR 2,92 % (povprečje septembra 2026) + pribitek 1,00-1,70 %",
+    "terms_years": [20, 25, 30]
+  }
+}
