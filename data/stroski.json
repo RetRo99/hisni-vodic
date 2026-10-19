@@ -30,7 +30,11 @@
         "kp-vsevem"
       ],
       "as_of": "2026-06-12",
-      "confidence": "medium"
+      "confidence": "medium",
+      "indexed": {
+        "min": 9000,
+        "max": 10000
+      }
     },
     "share_of_investment_note": "24ur (8. 1. 2026, quoting an architect): komunalni prispevek is typically about 10 % of the investment excluding the plot.",
     "municipalities": [
@@ -41,13 +45,17 @@
           "max": 21992
         },
         "vsevem_600_200": 31748,
-        "note": "min/max = Fn 0.7 vs 1.0 (Fn for 1110 not confirmed). Odlok 2021 prices; vsevem estimates +33 % with indexation to 2025. 24ur (Jan 2026) reports almost 19,600 EUR for 200 m2 / 600 m2.",
+        "note": "min/max = Fn 0.7 vs 1.0 (Fn for 1110 not confirmed). Odlok 2021 prices; vsevem estimates +33 % with indexation to 2025. 24ur (Jan 2026) reports almost 19,600 EUR for 200 m2 / 600 m2. Indexed x 1.25-1.33.",
         "source_ids": [
           "kp-vsevem-lj",
           "kp-24ur-2026"
         ],
         "as_of": "2021-04-29 odlok",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 23444,
+          "max": 29249
+        }
       },
       {
         "obcina": "Maribor",
@@ -56,34 +64,47 @@
           "max": 9583
         },
         "vsevem_600_200": 10832,
-        "note": "min/max = Fn 0.7 vs 1.0. The 2024 amendment deleted the psz article; the old psz rates are used here, so treat as uncertain.",
+        "note": "min/max = Fn 0.7 vs 1.0. The 2024 amendment deleted the psz article; the old psz rates are used here, so treat as uncertain. Indexed 11,000-14,000: 24ur reports 14-18k for MB, CE, KR; the psz article was repealed in MUV 6/2024.",
         "source_ids": [
-          "kp-vsevem-mb"
+          "kp-vsevem-mb",
+          "kp-24ur-2026"
         ],
         "as_of": "2019-12-24 odlok, amended 2024-04-16",
-        "confidence": "low"
+        "confidence": "low",
+        "indexed": {
+          "min": 11000,
+          "max": 14000
+        }
       },
       {
         "obcina": "Celje",
         "calc_600_180": 14229,
         "vsevem_600_200": 16536,
-        "note": "Fn 1 (default; odlok's Fn table not seen). Without gas and district heating.",
+        "note": "Fn 1 (default; odlok's Fn table not seen). Without gas and district heating. Indexed x 1.15-1.3.",
         "source_ids": [
           "kp-vsevem-ce"
         ],
         "as_of": "2021-07-17 odlok",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 16363,
+          "max": 18498
+        }
       },
       {
         "obcina": "Kranj",
         "calc_600_180": 12666,
         "vsevem_600_200": 13278,
-        "note": "Fn 1 (default). Cpo/Cto equal to the national Pravilnik averages.",
+        "note": "Fn 1 (default). Cpo/Cto equal to the national Pravilnik averages. Indexed x 1.15-1.3.",
         "source_ids": [
           "kp-vsevem-kr"
         ],
         "as_of": "2020-10-21 odlok, amended 2023-12-02",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 14566,
+          "max": 16466
+        }
       },
       {
         "obcina": "Koper",
@@ -92,36 +113,48 @@
           "max": 28075
         },
         "vsevem_600_200": 29074,
-        "note": "Range over the 5 road zones (CES1 lowest, CES4 highest; CES3 = 27,531). Fn 1, psz 100 %, Dpo/Dto 0.3/0.7, read from the odlok.",
+        "note": "Range over the 5 road zones (CES1 lowest, CES4 highest; CES3 = 27,531). Fn 1, psz 100 %, Dpo/Dto 0.3/0.7, read from the odlok. Used as the indexed figure (vsevem: +49 % with indexation of the 2019 odlok); 24ur suggests the lower road-class values are closer to what is charged.",
         "source_ids": [
           "kp-koper",
           "kp-vsevem"
         ],
         "as_of": "2019-11-14 odlok",
-        "confidence": "high"
+        "confidence": "high",
+        "indexed": {
+          "min": 22426,
+          "max": 28075
+        }
       },
       {
         "obcina": "Novo mesto",
         "calc_600_180": 11042,
         "vsevem_600_200": 11860,
-        "note": "Fn 1. Vsevem estimates +33 % with indexation to 2025.",
+        "note": "Fn 1. Vsevem estimates +33 % with indexation to 2025. Indexed x 1.15-1.3.",
         "source_ids": [
           "kp-vsevem-nm"
         ],
         "as_of": "2021-03-17 odlok",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 12698,
+          "max": 14355
+        }
       },
       {
         "obcina": "Ptuj",
         "calc_600_180": 6930,
         "vsevem_600_200": 9271,
-        "note": "Computed from the odlok (Fn 0.7, Dpo/Dto 0.3/0.7, psz 95/75/51/80 %). Vsevem's figure is higher; difference not explained.",
+        "note": "Computed from the odlok (Fn 0.7, Dpo/Dto 0.3/0.7, psz 95/75/51/80 %). Vsevem's figure is higher; difference not explained. Kept as is; matches 24ur.",
         "source_ids": [
           "kp-ptuj",
           "kp-vsevem"
         ],
         "as_of": "2021-04-24 odlok",
-        "confidence": "high"
+        "confidence": "high",
+        "indexed": {
+          "min": 6930,
+          "max": 6930
+        }
       },
       {
         "obcina": "Domžale",
@@ -130,7 +163,11 @@
           "kp-vsevem"
         ],
         "as_of": "2026-06-12",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 13861,
+          "max": 17326
+        }
       },
       {
         "obcina": "Kamnik",
@@ -139,7 +176,11 @@
           "kp-vsevem"
         ],
         "as_of": "2026-06-12",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 9535,
+          "max": 11919
+        }
       },
       {
         "obcina": "Škofja Loka",
@@ -148,7 +189,11 @@
           "kp-vsevem"
         ],
         "as_of": "2026-06-12",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 9003,
+          "max": 11254
+        }
       },
       {
         "obcina": "Murska Sobota",
@@ -157,7 +202,11 @@
           "kp-vsevem"
         ],
         "as_of": "2026-06-12",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 9234,
+          "max": 11542
+        }
       },
       {
         "obcina": "Brežice",
@@ -166,7 +215,11 @@
           "kp-vsevem"
         ],
         "as_of": "2026-06-12",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 4901,
+          "max": 6126
+        }
       },
       {
         "obcina": "Krško",
@@ -175,7 +228,11 @@
           "kp-vsevem"
         ],
         "as_of": "2026-06-12",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 5765,
+          "max": 7206
+        }
       },
       {
         "obcina": "Grosuplje",
@@ -184,9 +241,14 @@
           "kp-vsevem"
         ],
         "as_of": "2026-06-12",
-        "confidence": "medium"
+        "confidence": "medium",
+        "indexed": {
+          "min": 22873,
+          "max": 28591
+        }
       }
-    ]
+    ],
+    "indexation_note": "Assessments are indexed (GZS \"ostala nizka gradnja\" index from the odlok's adoption year): vsevem estimates +33 % for Ljubljana 2021-2025 and +49 % for Koper's 2019 odlok. The calculator uses \"indexed\"; calc_600_180 stays the unindexed odlok figure. Uredba 53/26 (in force 28. 3. 2026) may change the rules."
   },
   "items": [
     {
@@ -194,15 +256,15 @@
       "label": "Izhodišča / idejna zasnova (IZP, DPP, IDZ)",
       "unit": "EUR",
       "value": {
-        "min": 900,
-        "max": 1900
+        "min": 1000,
+        "max": 2500
       },
       "vat": "unknown",
       "applies": "Before the permit project; often part of the architect's package.",
       "confidence": "medium",
       "source_ids": [
-        "pd-omisli",
-        "pd-primerjam"
+        "marh-cenik",
+        "pd-omisli"
       ],
       "as_of": "2026"
     },
@@ -211,17 +273,16 @@
       "label": "Projekt za gradbeno dovoljenje (DGD)",
       "unit": "EUR",
       "value": {
-        "min": 2500,
-        "max": 6300
+        "min": 3500,
+        "max": 8000
       },
-      "typical": 4000,
       "vat": "unknown",
       "applies": "Always (needed for gradbeno dovoljenje). Some prefab makers include it in the price; check the offer.",
       "confidence": "medium",
       "source_ids": [
-        "pd-omisli",
-        "pd-primerjam",
-        "pd-glog"
+        "marh-cenik",
+        "2amv-cenik",
+        "gh-omisli-2026"
       ],
       "as_of": "2026"
     },
@@ -230,17 +291,14 @@
       "label": "Projekt za izvedbo (PZI)",
       "unit": "EUR",
       "value": {
-        "min": 2500,
-        "max": 6300
+        "min": 3000,
+        "max": 7000
       },
-      "typical": 4200,
       "vat": "unknown",
       "applies": "Needed to build and for the Eko sklad sNES+ subsidy (area is taken from PZI). Prefab makers often draw their own execution plans.",
       "confidence": "medium",
       "source_ids": [
-        "pd-omisli",
-        "pd-primerjam",
-        "pd-glog"
+        "marh-cenik"
       ],
       "as_of": "2026"
     },
@@ -253,11 +311,13 @@
         "max": 18000
       },
       "vat": "unknown",
-      "applies": "Use instead of the separate items when the visitor has no documentation in the house price.",
+      "applies": "Use instead of the separate items when the visitor has no documentation in the house price. Jelovica values the DGD+PZI it includes at up to 15,000 EUR incl. DDV (jelovica-paket); NOAH buyers without included documentation pay about 8,700 EUR for DGD+PZI+PID (mhe-noah).",
       "confidence": "medium",
       "source_ids": [
         "pd-omisli",
-        "gh-omisli-2026"
+        "gh-omisli-2026",
+        "marh-cenik",
+        "mhe-noah"
       ],
       "as_of": "2026"
     },
@@ -266,41 +326,42 @@
       "label": "Geodetski načrt",
       "unit": "EUR",
       "value": {
-        "min": 380,
-        "max": 690
+        "min": 500,
+        "max": 850
       },
-      "typical": 500,
-      "vat": "unknown",
+      "vat": "incl",
       "applies": "Needed as a base for DGD.",
-      "confidence": "low",
+      "confidence": "high",
       "source_ids": [
-        "pd-primerjam"
+        "geometri-cenik",
+        "jkplog-cenik"
       ],
-      "as_of": "2026"
+      "as_of": "2026-10-19"
     },
     {
       "key": "geolosko_porocilo",
       "label": "Geološko-geomehansko poročilo",
       "unit": "EUR",
       "value": {
-        "min": 380,
-        "max": 560
+        "min": 400,
+        "max": 800
       },
-      "typical": 500,
       "vat": "unknown",
-      "applies": "Commonly required for the foundation design; omisli calls it mandatory for the permit.",
-      "confidence": "low",
+      "applies": "Including a test pit. Commonly required for the foundation design. Difficult ground (slope, fill, high groundwater) can cost far more.",
+      "confidence": "medium",
       "source_ids": [
-        "pd-primerjam",
-        "pd-omisli"
+        "mm-geomeh"
       ],
-      "as_of": "2026"
+      "as_of": "2026-10-19"
     },
     {
       "key": "mnenja_soglasja",
       "label": "Mnenja in soglasja",
       "unit": "EUR",
-      "value": 600,
+      "value": {
+        "min": 300,
+        "max": 900
+      },
       "vat": "unknown",
       "applies": "Opinions from elektro, vodovod, water authority, telecom during the permit process.",
       "confidence": "low",
@@ -313,27 +374,135 @@
       "key": "gradbeni_nadzor",
       "label": "Gradbeni nadzor",
       "unit": "EUR",
-      "value": 2500,
+      "value": {
+        "min": 3000,
+        "max": 6000
+      },
       "vat": "unknown",
-      "applies": "Mandatory supervision during construction.",
-      "confidence": "low",
+      "applies": "Mandatory supervision during construction; usually 1.5-3 % of the build value (zurnal-nadzor). Confidence medium-high.",
+      "confidence": "medium",
       "source_ids": [
-        "pd-glog"
+        "zurnal-nadzor",
+        "gh-omisli-2026",
+        "marh-cenik"
       ],
       "as_of": "2026-09-16"
     },
     {
-      "key": "pid_posnetek",
-      "label": "PID in geodetski posnetek",
+      "key": "pid_dokument",
+      "label": "Projekt izvedenih del (PID)",
       "unit": "EUR",
-      "value": 1500,
+      "value": {
+        "min": 1000,
+        "max": 1800
+      },
       "vat": "unknown",
-      "applies": "After construction, for the uporabno dovoljenje and entry in the land register.",
-      "confidence": "low",
+      "applies": "About 20 % of the DGD fee. projekt_paket already includes PID, so add this only when the documentation is in the house price.",
+      "confidence": "medium",
       "source_ids": [
-        "pd-glog"
+        "marh-cenik"
       ],
-      "as_of": "2026-09-16"
+      "as_of": "2026"
+    },
+    {
+      "key": "kataster_stavb",
+      "label": "Elaborat za vpis v kataster stavb",
+      "unit": "EUR",
+      "value": {
+        "min": 650,
+        "max": 1000
+      },
+      "vat": "unknown",
+      "applies": "After construction, for the entry in the building cadastre. Always added.",
+      "confidence": "medium",
+      "source_ids": [
+        "geometri-cenik",
+        "pd-primerjam"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "zakolicba",
+      "label": "Zakoličba objekta",
+      "unit": "EUR",
+      "value": {
+        "min": 300,
+        "max": 550
+      },
+      "vat": "incl",
+      "applies": "Staking out the house on the plot before building. Always added.",
+      "confidence": "high",
+      "source_ids": [
+        "jkplog-cenik",
+        "geometri-cenik"
+      ],
+      "as_of": "2026-10-19"
+    },
+    {
+      "key": "varnostni_nacrt",
+      "label": "Varnostni načrt",
+      "unit": "EUR",
+      "value": {
+        "min": 250,
+        "max": 600
+      },
+      "vat": "unknown",
+      "applies": "Safety plan for the building site. A safety coordinator is usually not needed for a house under 350 m2. Always added.",
+      "confidence": "medium",
+      "source_ids": [
+        "projvarnost-vn"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "upravna_taksa_gd",
+      "label": "Upravna taksa za gradbeno dovoljenje",
+      "unit": "formula",
+      "value": {
+        "base": 271.8,
+        "rate": 0.0001,
+        "above": 42000,
+        "application": 4.5
+      },
+      "vat": "n/a",
+      "applies": "271.80 EUR + 0.01 % of the building value above 42,000 EUR + 4.50 EUR for the application; about 297 EUR for a 250,000 EUR house. Young families solving their housing problem may be exempt. Confidence medium-high.",
+      "confidence": "medium",
+      "source_ids": [
+        "netteblog-gd"
+      ],
+      "as_of": "2026-09-11"
+    },
+    {
+      "key": "energetska_izkaznica",
+      "label": "Energetska izkaznica",
+      "unit": "EUR",
+      "value": {
+        "min": 250,
+        "max": 450
+      },
+      "vat": "unknown",
+      "applies": "Needed for the uporabno dovoljenje. Always added.",
+      "confidence": "medium",
+      "source_ids": [
+        "mm-ei"
+      ],
+      "as_of": "2026"
+    },
+    {
+      "key": "phpp",
+      "label": "Izračun PHPP",
+      "unit": "EUR",
+      "value": {
+        "min": 400,
+        "max": 650
+      },
+      "vat": "unknown",
+      "applies": "Passive-house calculation required for the Eko sklad sNES+ subsidy; added only when sNES+ is chosen.",
+      "confidence": "medium",
+      "source_ids": [
+        "arhim-phpp"
+      ],
+      "as_of": "2026"
     },
     {
       "key": "prikljucek_elektrika_11kw",
@@ -388,20 +557,42 @@
       "as_of": "2026-03-01"
     },
     {
+      "key": "prikljucek_elektrika_izvedba",
+      "label": "Izgradnja elektro priključka (projekt, soglasje, PMO, kabel, izkop)",
+      "unit": "EUR",
+      "value": {
+        "min": 1500,
+        "max": 3500
+      },
+      "typical": 2200,
+      "vat": "unknown",
+      "applies": "The investor finances and builds the physical connection (egor-izgradnja-prikljucka); a 2021 forum example totals 3,680 EUR including 1,067 EUR omrežnina. Always added next to the omrežnina. Confidence medium-low.",
+      "confidence": "low",
+      "source_ids": [
+        "egor-izgradnja-prikljucka",
+        "slotech-priklop-elektrike"
+      ],
+      "as_of": "2026"
+    },
+    {
       "key": "prikljucek_voda",
       "label": "Vodovodni priključek",
       "unit": "EUR",
       "value": {
-        "min": 1600,
-        "max": 2500
+        "min": 2000,
+        "max": 3500
       },
       "vat": "unknown",
-      "applies": "If a public water main is near the plot. Varies with distance to the main.",
-      "confidence": "low",
+      "applies": "If a public water main is near the plot. Covers the meter shaft, meter, montaža, the operator's survey and the trench. Varies with distance to the main.",
+      "confidence": "medium",
       "source_ids": [
-        "pr-mojmojster"
+        "kranj-cenik-montaznih-del",
+        "kraski-cenik-prikljuckov",
+        "pr-mojmojster",
+        "tophisa-prikljucki"
       ],
-      "as_of": "2026"
+      "as_of": "2026",
+      "typical": 2500
     },
     {
       "key": "prikljucek_kanalizacija",
@@ -409,44 +600,71 @@
       "unit": "EUR",
       "value": {
         "min": 2000,
-        "max": 3500
+        "max": 4000
       },
       "vat": "unknown",
-      "applies": "If public sewer is available; includes house sewer to the public line, supervision and fees per source.",
-      "confidence": "low",
+      "applies": "If public sewer is available. The user pays for building the house sewer to the public line and its supervision.",
+      "confidence": "medium",
       "source_ids": [
+        "kranj-kanalizacija",
         "pr-mojmojster"
       ],
-      "as_of": "2026"
+      "as_of": "2026",
+      "typical": 2800
     },
     {
       "key": "mkcn",
-      "label": "Mala komunalna čistilna naprava (MKČN), naprava",
+      "label": "Mala komunalna čistilna naprava (MKČN), vgrajena",
       "unit": "EUR",
-      "value": 5739,
-      "vat": "incl",
-      "applies": "Instead of the sewer connection where no public sewer exists. Retail price of one 4-6 PE device (ROTO MBBR); excavation and installation extra. Many municipalities co-fund MKČN through their own calls.",
-      "confidence": "low",
+      "value": {
+        "min": 7500,
+        "max": 10500
+      },
+      "vat": "unknown",
+      "applies": "Instead of the sewer connection where no public sewer exists. Device about 5,700 EUR (ROTO MBBR 4-6 PE, pr-merkur-mkcn) plus excavation, installation and soakaway 2,000-4,000 EUR (mojmojster-mkcn-2026). Municipal co-funding (e.g. Koper 40 %, max 1,500 EUR) is mostly for existing buildings, so it is not subtracted.",
+      "confidence": "medium",
       "source_ids": [
-        "pr-merkur-mkcn"
+        "pr-merkur-mkcn",
+        "mojmojster-mkcn-2026"
       ],
-      "as_of": "2026-10-19"
+      "as_of": "2026-10-19",
+      "typical": 8500
+    },
+    {
+      "key": "prikljucek_telekom",
+      "label": "Telekomunikacijski priključek",
+      "unit": "EUR",
+      "value": {
+        "min": 300,
+        "max": 800
+      },
+      "vat": "unknown",
+      "applies": "Fibre or copper connection to the house. Always added. No priced source found; rough estimate from the research.",
+      "confidence": "low",
+      "source_ids": [],
+      "as_of": "2026"
     },
     {
       "key": "prikljucki_skupaj",
       "label": "Priključki skupaj (elektrika, voda, kanalizacija, internet)",
       "unit": "EUR",
       "value": {
-        "min": 3000,
-        "max": 8000
+        "min": 7000,
+        "max": 13000
       },
       "vat": "unknown",
-      "applies": "Rough total when the visitor does not pick individual connections.",
-      "confidence": "low",
+      "applies": "Electricity (omrežnina and build), water, sewer and telecom together. Off-grid with an MKČN: 13,000-18,000 EUR.",
+      "confidence": "medium",
       "source_ids": [
-        "gh-primerjam-2025"
+        "pr-mojmojster",
+        "tophisa-prikljucki",
+        "slotech-priklop-elektrike"
       ],
-      "as_of": "2025"
+      "as_of": "2026",
+      "offgrid": {
+        "min": 13000,
+        "max": 18000
+      }
     },
     {
       "key": "temeljna_plosca_m2",
@@ -503,34 +721,44 @@
       "label": "Izkop in zemeljska dela",
       "unit": "EUR",
       "value": {
-        "min": 5000,
-        "max": 30000
+        "min": 6000,
+        "max": 20000
       },
-      "typical": 5000,
+      "typical": 8000,
       "vat": "unknown",
-      "applies": "About 5,000 EUR on easy ground; over 30,000 EUR on rock. Rough.",
+      "applies": "Easy ground 6,000-10,000 EUR (typical 8,000); unknown ground 6,000-20,000; difficult ground (rock, slope) 20,000 EUR or more, counted as 20,000-30,000. Build-up for a ~140 m2 footprint: excavation ~1,200, haul-off and landfill 1,000-1,500, gravel bed 2,100-2,500, trenches ~1,400, geotextile and compaction ~400, plus DDV. Confidence medium-low.",
       "confidence": "low",
       "source_ids": [
-        "gh-omisli-2026",
-        "gh-primerjam-2025"
+        "primerjam-izkopi-2026",
+        "slb-cenik-strojev-2025"
       ],
-      "as_of": "2026-01-29"
+      "as_of": "2026",
+      "easy": {
+        "min": 6000,
+        "max": 10000
+      },
+      "hard": {
+        "min": 20000,
+        "max": 30000
+      }
     },
     {
       "key": "zunanja_ureditev",
       "label": "Zunanja ureditev (dovoz, tlakovanje, zelenice)",
       "unit": "EUR",
       "value": {
-        "min": 4000,
-        "max": 13100
+        "min": 8000,
+        "max": 25000
       },
       "vat": "unknown",
-      "applies": "Very rough. Omisli's sample budget uses 13,100 EUR; asphalting ~400 m2 is about 4,000 EUR. No reliable Slovenian figure found for fences.",
+      "applies": "Basic case (60 m2 asphalt, 20 m2 terrace, 80 m panel fence at ~50 EUR/m, 300 m2 lawn, stormwater soakaway) about 10,000 EUR; a nicer one 20,000-25,000 EUR. Confidence low-medium.",
       "confidence": "low",
       "source_ids": [
-        "gh-omisli-2026"
+        "omisli-tlakovanje-2026",
+        "ograje-kocevar-cenik"
       ],
-      "as_of": "2026-01-29"
+      "as_of": "2026",
+      "typical": 12000
     },
     {
       "key": "eko_sklad_snes",
@@ -565,5 +793,16 @@
       ],
       "as_of": "2026-01-01"
     }
-  ]
+  ],
+  "docs_included": {
+    "makers": [
+      "lumar",
+      "jelovica"
+    ],
+    "source_ids": [
+      "lumar-vkljuceno",
+      "jelovica-paket"
+    ],
+    "note": "Lumar and Jelovica say DGD and PZI are included in the house price, so the calculator pre-ticks \"documentation included\" for their houses."
+  }
 }

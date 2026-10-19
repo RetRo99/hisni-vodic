@@ -817,17 +817,22 @@ COSTS_JS = r'''
     if (plot) out.push({ label: 'Zemljišče', lo: plot, hi: plot, tag: 'vaš vnos' });
     const k = D.kp.find(x => x.id === $('kp').value);
     out.push({ label: 'Komunalni prispevek', lo: k.lo, hi: k.hi, conf: k.conf, src: k.src, note: `${k.name}: ${k.note}` });
-    // projekt_paket already covers PID, so pid_posnetek is not added on top
-    out.push($('pd').checked ? sum('Projektna dokumentacija in nadzor', ['gradbeni_nadzor'], 'dokumentacija v ceni hiše, prištet le gradbeni nadzor')
-      : sum('Projektna dokumentacija in nadzor', ['projekt_paket', 'geodetski_nacrt', 'geolosko_porocilo', 'mnenja_soglasja', 'gradbeni_nadzor'],
-        'IDZ, DGD, PZI, PID, geodetski načrt, geološko poročilo, mnenja, gradbeni nadzor'));
-    const mkcn = $('san').value === 'mkcn';
-    out.push(sum('Priključki', ['prikljucek_elektrika_' + $('kw').value + 'kw', 'prikljucek_voda', mkcn ? 'mkcn' : 'prikljucek_kanalizacija'],
-      `elektrika ${$('kw').value} kW (${eur(rng('prikljucek_elektrika_' + $('kw').value + 'kw')[0])}), voda, ` + (mkcn ? 'MKČN brez vgradnje' : 'kanalizacija')));
-    const [zl, zh] = rng('zemeljska_dela'), z = $('zem').value;
-    out.push({ ...sum('Zemeljska dela', ['zemeljska_dela']), ...(z === 'l' ? { lo: I.zemeljska_dela.typical, hi: I.zemeljska_dela.typical, note: 'lahek teren' }
-      : z === 't' ? { lo: zh, hi: zh, note: 'zahteven teren, skala: ' + eur(zh) + ' ali več' } : { note: 'od lahkega do skalnatega terena' }) });
-    if ($('zu').checked) out.push(sum('Zunanja ureditev', ['zunanja_ureditev'], 'dovoz, tlakovanje, zelenice; brez ograje'));
+    // projekt_paket already covers PID, so pid_dokument is added only when the documentation comes with the house
+    const pd = $('pd').checked, snes = $('snes').checked;
+    const docs = sum('Projektna dokumentacija in nadzor', (pd ? ['pid_dokument'] : ['projekt_paket', 'geodetski_nacrt', 'geolosko_porocilo', 'mnenja_soglasja'])
+      .concat(['gradbeni_nadzor', 'kataster_stavb', 'zakolicba', 'varnostni_nacrt', 'energetska_izkaznica'], snes ? ['phpp'] : []),
+      (pd ? 'DGD in PZI v ceni hiše; PID' : 'IDZ, DGD, PZI, PID, geodetski načrt, geološko poročilo, mnenja') +
+      ', gradbeni nadzor, kataster stavb, zakoličba, varnostni načrt, energetska izkaznica' + (snes ? ', PHPP' : '') + ', upravna taksa');
+    const t = I.upravna_taksa_gd, tax = t.value.base + t.value.rate * Math.max(0, h.price - t.value.above) + t.value.application;
+    docs.lo += tax; docs.hi += tax; docs.src = docs.src.concat(t.source_ids);
+    out.push(docs);
+    const mkcn = $('san').value === 'mkcn', el = 'prikljucek_elektrika_' + $('kw').value + 'kw';
+    out.push(sum('Priključki', [el, 'prikljucek_elektrika_izvedba', 'prikljucek_voda', mkcn ? 'mkcn' : 'prikljucek_kanalizacija', 'prikljucek_telekom'],
+      `elektrika ${$('kw').value} kW (omrežnina ${eur(rng(el)[0])} in izvedba), voda, ` + (mkcn ? 'MKČN z vgradnjo' : 'kanalizacija') + ', telekomunikacije'));
+    const z = $('zem').value, ze = I.zemeljska_dela;
+    out.push({ ...sum('Zemeljska dela', ['zemeljska_dela']), ...(z === 'l' ? { lo: ze.easy.min, hi: ze.easy.max, note: 'lahek teren' }
+      : z === 't' ? { lo: ze.hard.min, hi: ze.hard.max, note: 'zahteven teren, skala: ' + eur(ze.hard.min) + ' ali več' } : { note: 'od lahkega do zahtevnega terena' }) });
+    if ($('zu').checked) out.push(sum('Zunanja ureditev', ['zunanja_ureditev'], 'dovoz, tlakovanje, terasa, ograja, zelenica, ponikovalnica'));
     if ($('snes').checked) {
       const e = I.eko_sklad_snes, rate = D.tiers[+$('tier').value].rate;
       // the call caps the grant at 30 % of eligible costs, and eligible costs at 50 % of a turnkey contract: 15 % of the price
@@ -866,6 +871,8 @@ COSTS_JS = r'''
     window.HVCompare.refresh();
   }
 
+  // Lumar and Jelovica include DGD and PZI in the price: tick the box for their houses unless the link says otherwise
+  const docsIn = () => { const h = houses[$('h').value]; return !!(h && h.docs); };
   const q = new URLSearchParams(location.hash.slice(1));
   for (const id of FIELDS) {
     if (!q.has(id)) continue;
@@ -873,6 +880,8 @@ COSTS_JS = r'''
     if (el.type === 'checkbox') el.checked = q.get(id) === '1';
     else { el.value = q.get(id); if (el.tagName === 'SELECT' && !el.value) el.value = before; }
   }
+  if (!q.has('pd')) $('pd').checked = docsIn();
+  $('h').addEventListener('change', () => { $('pd').checked = docsIn(); });
   $('calc').addEventListener('input', render);
   $('calc').addEventListener('change', render);
   $('copy').addEventListener('click', async () => {
@@ -930,14 +939,16 @@ def costs_page():
     kps, kp_rows = [], []
     for m in kp['municipalities']:
         c = m.get('calc_600_180')
-        lo, hi = (c['min'], c['max']) if isinstance(c, dict) else (c, c) if c else (m['vsevem_600_200'], m['vsevem_600_200'])
-        note = 'parcela 600 m², 180 m² BTP, cene odloka brez indeksacije' if c else 'izračun vsevem.si za parcelo 600 m² in 200 m² BTP'
+        lo, hi = m['indexed']['min'], m['indexed']['max']  # the calculator uses the indexed estimate, the table shows both
+        note = ('izračun po odloku za parcelo 600 m² in 180 m² BTP' if c else 'izračun vsevem.si za parcelo 600 m² in 200 m² BTP') + ', z indeksacijo'
         kps.append({'id': slugify(m['obcina']), 'name': m['obcina'], 'lo': lo, 'hi': hi, 'conf': m['confidence'], 'src': m['source_ids'], 'note': note})
-        calc_txt = (eur(lo) if lo == hi else eur(lo) + ' – ' + eur(hi)) if c else '—'
+        clo, chi = (c['min'], c['max']) if isinstance(c, dict) else (c, c)
+        calc_txt = (eur(clo) if clo == chi else eur(clo) + ' – ' + eur(chi)) if c else '—'
         kp_rows.append(f'<tr><th scope="row">{esc(m["obcina"])}</th><td class="n">{calc_txt}</td><td class="n">{eur(m["vsevem_600_200"])}</td>'
-                       f'<td>{conf[m["confidence"]]} {cite(*m["source_ids"])}</td></tr>')
-    kps.append({'id': 'druga', 'name': 'Druga občina (slovensko povprečje)', 'lo': nat['typical'], 'hi': nat['typical'], 'conf': nat['confidence'], 'src': nat['source_ids'],
-                'note': f'povprečje {covered} občin, razpon od {eur(nat["min"])} ({nat_min}) do {eur(nat["max"])} ({nat_max})'})
+                       f'<td class="n">{eur(lo) if lo == hi else eur(lo) + " – " + eur(hi)}</td><td>{conf[m["confidence"]]} {cite(*m["source_ids"])}</td></tr>')
+    ni = nat['indexed']
+    kps.append({'id': 'druga', 'name': 'Druga občina (slovensko povprečje)', 'lo': ni['min'], 'hi': ni['max'], 'conf': nat['confidence'], 'src': nat['source_ids'],
+                'note': f'povprečje {covered} občin z indeksacijo; brez nje {eur(nat["typical"])}, razpon od {eur(nat["min"])} ({nat_min}) do {eur(nat["max"])} ({nat_max})'})
     kp_opts = ''.join(f'<option value="{k["id"]}"{" selected" if k["id"] == "druga" else ""}>{esc(k["name"])} ({eur(k["lo"]) if k["lo"] == k["hi"] else eur(k["lo"]) + " – " + eur(k["hi"])})</option>'
                       for k in sorted(kps[:-1], key=lambda k: k['name']) + kps[-1:])
 
@@ -954,7 +965,8 @@ def costs_page():
 
     priced = [(p, m) for p, m in models if m['price_eur'] and m['area_m2']]
     houses = [{'slug': m['slug'], 'name': f"{p['name']} {m['name']}", 'price': m['price_eur'], 'area': m['area_m2'], 'floors': m['floors'],
-               'stage': m['price_stage'], 'slab': stage_has(m, 'brez temeljne plošče'), 'sub': stage_has(m, 'subvencij')} for p, m in priced]
+               'stage': m['price_stage'], 'slab': stage_has(m, 'brez temeljne plošče'), 'sub': stage_has(m, 'subvencij'),
+               'docs': p['id'] in cost['docs_included']['makers']} for p, m in priced]
     plain = sorted((h for h in houses if not h['sub']), key=lambda h: h['price'])
     default = plain[len(plain) // 2]['slug']  # a mid-priced house whose price is not already cut by a subsidy
     house_opts = ''.join(f'<optgroup label="{esc(p["name"])}">' + ''.join(
@@ -971,14 +983,19 @@ def costs_page():
     eles = items['prikljucek_elektrika_per_kw']['value']
     eles_txt = f'{eles:.2f}'.replace('.', ',')
     el = lambda kw: eur(round(items[f'prikljucek_elektrika_{kw}kw']['value']))
-    mn, mx = rng('zemeljska_dela')
+    ze = items['zemeljska_dela']
+    tx = items['upravna_taksa_gd']['value']
+    comma = lambda v: f'{v:.2f}'.replace('.', ',')
+    tax_250 = eur(round(tx['base'] + tx['rate'] * (250000 - tx['above']) + tx['application']))
+    docs_makers = [p['name'] for p in data['providers'] if p['id'] in cost['docs_included']['makers']]
+    pr = items['prikljucki_skupaj']
     ddv = items['ddv_stopnja']['value']
     pct = lambda r: f'{r * 100:g}'.replace('.', ',') + ' %'
     slab_lo, slab_hi = rng('temeljna_plosca_m2')
     t_rates = sorted({t['rate'] for t in tiers}, reverse=True)
 
-    desc = (f'Kalkulator stroškov gradnje montažne hiše: komunalni prispevek povprečno {eur(nat["typical"])} (od {eur(nat["min"])} do {eur(nat["max"])}), '
-            f'projektna dokumentacija {span("projekt_paket")}, priključki, temeljna plošča {slab_lo}–{slab_hi} €/m² in subvencija Eko sklada do {eur(snes["max_eur"])}.')
+    desc = (f'Kalkulator stroškov gradnje montažne hiše: komunalni prispevek z indeksacijo okoli {eur(ni["min"])} – {eur(ni["max"])}, '
+            f'projektna dokumentacija {span("projekt_paket")}, priključki {span("prikljucki_skupaj")}, temeljna plošča {slab_lo}–{slab_hi} €/m² in subvencija Eko sklada do {eur(snes["max_eur"])}.')
     h1 = 'Koliko stane gradnja montažne hiše?'
     ld = {'@context': 'https://schema.org', '@type': 'Article', 'headline': h1, 'description': desc, 'inLanguage': 'sl', 'url': url,
           'dateModified': cost['as_of'], 'image': SITE + 'img/large/riko-mila.jpg', 'author': {'@type': 'Organization', 'name': 'Hišni vodič', 'url': SITE}}
@@ -1008,13 +1025,14 @@ def costs_page():
       </div>
       <label>Zemljišče (€)<input type="number" id="plot" inputmode="numeric" min="0" step="1000" placeholder="0"><small>Neobvezno; pustite prazno, če parcelo že imate.</small></label>
       <label>Občina (komunalni prispevek)<select id="kp">{kp_opts}</select>
-        <small>Ocena za tipičen primer: parcela okoli 600 m² in hiša okoli 150 m² neto. Cene iz odlokov so pred indeksacijo, zato je odmera lahko 8 do 33 % višja.</small></label>
+        <small>Ocena za tipičen primer: parcela okoli 600 m² in hiša okoli 150 m² neto, s cenami iz odloka, indeksiranimi do danes. Dejanska odmera je odvisna od cone in olajšav.</small></label>
       <label>Priključna moč elektrike<select id="kw"><option value="11">11 kW (3 × 16 A)</option><option value="17" selected>17 kW (3 × 25 A), s toplotno črpalko</option><option value="22">22 kW (3 × 32 A)</option></select></label>
       <label>Odpadne vode<select id="san"><option value="kan">Javna kanalizacija (priključek)</option><option value="mkcn">Mala čistilna naprava (MKČN)</option></select>
-        <small>Pri MKČN je upoštevana le cena naprave; izkop in vgradnja sta dodatni strošek.</small></label>
+        <small>Pri MKČN je upoštevana vgrajena naprava: naprava, izkop, vgradnja in ponikovalnica.</small></label>
       <label class="ck"><input type="checkbox" id="pd"> Projektna dokumentacija je že vključena v ceno hiše</label>
+      <small>{and_join(docs_makers)} {verb(docs_makers, 'navaja', 'navajata', 'navajajo')}, da sta projekta DGD in PZI vključena v ceno, zato je pri {verb(docs_makers, 'njegovih', 'njunih', 'njihovih')} hišah polje že označeno {cite(*cost['docs_included']['source_ids'])}. Spremenite ga, če vaša ponudba pravi drugače.</small>
       <label>Zemeljska dela<select id="zem"><option value="l">Lahek teren</option><option value="n" selected>Ne vem</option><option value="t">Zahteven teren (skala)</option></select></label>
-      <label class="ck"><input type="checkbox" id="zu" checked> Zunanja ureditev (dovoz, tlakovanje, zelenice)</label>
+      <label class="ck"><input type="checkbox" id="zu" checked> Zunanja ureditev (dovoz, tlakovanje, ograja, zelenica)</label>
       <label class="ck"><input type="checkbox" id="snes"> Gradil bom po standardu sNES+ (Eko sklad)</label>
       <div class="sub" id="tierbox" hidden>
         <label>Izolacija in potreba po toploti<select id="tier">{tier_opts}</select></label>
@@ -1033,20 +1051,30 @@ def costs_page():
     <p>Komunalni prispevek plačate občini pred izdajo gradbenega dovoljenja. Izračuna se iz površine parcele in bruto tlorisne površine hiše (BTP) ter cen komunalne opreme
       (ceste, vodovod, kanalizacija, javne površine) iz občinskega odloka: KP = Σ (A<sub>parcela</sub> × Cpo × Dpo + A<sub>BTP</sub> × Cto × Dto × Fn) × psz {cite(*kp['source_ids'][:3])}.
       Po izračunu vsevem.si za {covered} od {of} občin (parcela 600 m², 200 m² BTP) je povprečje {eur(nat['typical'])}, najmanj {eur(nat['min'])} ({nat_min}), največ {eur(nat['max'])} ({nat_max}) {cite(*nat['source_ids'])}.
-      Cene v odlokih so večinoma iz let 2019–2021 in se ob odmeri lahko indeksirajo, zato je dejanski znesek lahko 8 do 33 % višji. Od 28. 3. 2026 velja nova uredba (Ur. l. RS 53/26) {cite('kp-uredba-2026')}.</p>
-    <div class="scroll"><table class="tbl">{thead('Občina', 'Naš izračun (600 m², 180 m² BTP)', 'Vsevem.si (600 m², 200 m² BTP)', 'Zanesljivost')}<tbody>{''.join(kp_rows)}</tbody></table></div>
+      Cene v odlokih so večinoma iz let 2019–2021, odmere pa se indeksirajo (indeks GZS za ostalo nizko gradnjo od leta sprejetja odloka): vsevem.si ocenjuje +33 % za Ljubljano (2021–2025) in +49 % za koprski odlok iz leta 2019 {cite('kp-vsevem-lj', 'kp-vsevem')}.
+      Kalkulator zato uporablja indeksirane ocene iz zadnjega stolpca, za druge občine {eur(ni['min'])} – {eur(ni['max'])}. Od 28. 3. 2026 velja nova uredba (Ur. l. RS 53/26), ki lahko pravila odmere spremeni {cite('kp-uredba-2026')}.</p>
+    <div class="scroll"><table class="tbl">{thead('Občina', 'Po odloku (600 m², 180 m² BTP)', 'Vsevem.si (600 m², 200 m² BTP)', 'Z indeksacijo', 'Zanesljivost')}<tbody>{''.join(kp_rows)}</tbody></table></div>
   </section>
   <section class="prose"><h2>Koliko stane projektna dokumentacija za hišo?</h2>
-    <p>Za gradbeno dovoljenje potrebujete projekt DGD ({span('projekt_dgd')}, običajno okoli {eur(items['projekt_dgd']['typical'])}), za gradnjo še projekt za izvedbo PZI ({span('projekt_pzi')}),
-      pred tem izhodišča oziroma idejno zasnovo ({span('projekt_izp')}). Celotna dokumentacija (IDZ, DGD, PZI, PID) stane {span('projekt_paket')} {cite(*items['projekt_paket']['source_ids'])}.</p>
-    <p>Posebej plačate geodetski načrt ({span('geodetski_nacrt')}), geološko-geomehansko poročilo ({span('geolosko_porocilo')}), mnenja in soglasja (okoli {span('mnenja_soglasja')})
-      ter obvezni gradbeni nadzor (okoli {span('gradbeni_nadzor')}) {cite('pd-primerjam', 'pd-glog')}. Nekateri proizvajalci montažnih hiš del dokumentacije vključijo v ceno; preverite ponudbo.</p>
+    <p>Za gradbeno dovoljenje potrebujete projekt DGD ({span('projekt_dgd')}) {cite(*items['projekt_dgd']['source_ids'])}, za gradnjo še projekt za izvedbo PZI ({span('projekt_pzi')}),
+      pred tem idejno zasnovo ({span('projekt_izp')}) {cite(*items['projekt_izp']['source_ids'])}. Celotna dokumentacija (IDZ, DGD, PZI, PID) stane {span('projekt_paket')} {cite(*items['projekt_paket']['source_ids'])}.
+      {and_join(docs_makers)} {verb(docs_makers, 'navaja', 'navajata', 'navajajo')}, da sta DGD in PZI vključena v ceno hiše; Jelovica ju ovrednoti na do 15.000 € {cite(*cost['docs_included']['source_ids'])}.
+      Projekt izvedenih del (PID) stane okoli petino DGD, {span('pid_dokument')} {cite('marh-cenik')}.</p>
+    <p>Posebej plačate geodetski načrt ({span('geodetski_nacrt')}) {cite(*items['geodetski_nacrt']['source_ids'])}, geološko-geomehansko poročilo s sondažnim izkopom ({span('geolosko_porocilo')}, na zahtevnem terenu lahko precej več) {cite('mm-geomeh')},
+      mnenja in soglasja ({span('mnenja_soglasja')}), zakoličbo ({span('zakolicba')}) {cite(*items['zakolicba']['source_ids'])}, varnostni načrt ({span('varnostni_nacrt')}; koordinator za hišo pod 350 m² običajno ni potreben) {cite('projvarnost-vn')},
+      obvezni gradbeni nadzor ({span('gradbeni_nadzor')}, običajno 1,5–3 % vrednosti gradnje) {cite(*items['gradbeni_nadzor']['source_ids'])}, energetsko izkaznico ({span('energetska_izkaznica')}) {cite('mm-ei')}
+      in elaborat za vpis v kataster stavb ({span('kataster_stavb')}) {cite(*items['kataster_stavb']['source_ids'])}.</p>
+    <p>Upravna taksa za gradbeno dovoljenje je {comma(tx['base'])} € in {comma(tx['rate'] * 100)} % vrednosti objekta nad {eur(tx['above'])} ter {comma(tx['application'])} € za vlogo, za hišo za 250.000 € okoli {tax_250} {cite('netteblog-gd')};
+      mlade družine, ki rešujejo stanovanjsko vprašanje, so takse lahko oproščene. Za subvencijo Eko sklada potrebujete še izračun PHPP ({span('phpp')}) {cite('arhim-phpp')}.</p>
   </section>
   <section class="prose"><h2>Koliko stanejo priključki za hišo?</h2>
     <p>Za nov priključek na elektro omrežje plačate omrežnino za priključno moč: {eles_txt} €/kW brez DDV pri nizki napetosti (cenik ELES 2026) {cite('el-eles-2026')}.
-      Z DDV to znese {el(11)} za 11 kW, {el(17)} za 17 kW, kolikor običajno potrebuje hiša s toplotno črpalko, in {el(22)} za 22 kW. Izvedba priključka (kabel, merilna omarica) ni vključena.</p>
-    <p>Vodovodni priključek stane {span('prikljucek_voda')}, kanalizacijski {sewer} {cite('pr-mojmojster')}. Kjer javne kanalizacije ni, potrebujete malo komunalno čistilno napravo:
-      naprava za 4–6 PE stane okoli {span('mkcn')} brez izkopa in vgradnje {cite('pr-merkur-mkcn')}; številne občine jo sofinancirajo. Vsi priključki skupaj po oceni stanejo {span('prikljucki_skupaj')} {cite('gh-primerjam-2025')}.</p>
+      Z DDV to znese {el(11)} za 11 kW, {el(17)} za 17 kW, kolikor običajno potrebuje hiša s toplotno črpalko, in {el(22)} za 22 kW.
+      Izvedbo priključka (projekt in soglasje, priključno-merilna omarica, kabel, izkop) plača investitor; stane {span('prikljucek_elektrika_izvedba')}, običajno okoli {eur(items['prikljucek_elektrika_izvedba']['typical'])} {cite(*items['prikljucek_elektrika_izvedba']['source_ids'])}.</p>
+    <p>Vodovodni priključek z jaškom, vodomerom, montažo, geodetskim posnetkom in izkopom stane {span('prikljucek_voda')} {cite(*items['prikljucek_voda']['source_ids'])}, kanalizacijski {sewer} {cite(*items['prikljucek_kanalizacija']['source_ids'])}.
+      Kjer javne kanalizacije ni, potrebujete malo komunalno čistilno napravo: vgrajena stane {span('mkcn')}, od tega naprava okoli 5.700 €, izkop, vgradnja in ponikovalnica pa 2.000–4.000 € {cite(*items['mkcn']['source_ids'])}.
+      Občinske subvencije (npr. Koper 40 %, največ 1.500 €) so večinoma namenjene obstoječim stavbam, zato jih kalkulator ne odšteje. Telekomunikacijski priključek stane okoli {span('prikljucek_telekom')}.
+      Vsi priključki skupaj stanejo {span('prikljucki_skupaj')}, brez javne kanalizacije z MKČN {eur(pr['offgrid']['min'])} – {eur(pr['offgrid']['max'])}.</p>
   </section>
   <section class="prose"><h2>Koliko stane temeljna plošča?</h2>
     <p>Toplotno izolirana temeljna plošča, kakršno zahtevajo proizvajalci montažnih hiš (podložni beton, dva sloja XPS, hidroizolacija, armatura in beton), stane {slab_lo}–{slab_hi} € na m² bruto površine plošče {cite('tp-mojmojster-2026')}; to je seštevek cen posameznih del (plošča, XPS, hidroizolacija, podložni beton, instalacije pod ploščo).
@@ -1056,8 +1084,10 @@ def costs_page():
       Površino plošče oceni kot tloris pritličja (neto površina, deljena s številom etaž) in 15 % za stene.</p>
   </section>
   <section class="prose"><h2>Koliko stanejo zemeljska dela in zunanja ureditev?</h2>
-    <p>Izkop in zemeljska dela stanejo okoli {eur(items['zemeljska_dela']['typical'])} na lahkem terenu, na skali pa več kot {eur(mx)} {cite('gh-omisli-2026')}.
-      Zunanja ureditev (dovoz, tlakovanje, zelenice) stane {span('zunanja_ureditev')}; asfaltiranje približno 400 m² dovoza okoli 4.000 € {cite('gh-omisli-2026')}. Za ograje zanesljivega slovenskega podatka nismo našli.</p>
+    <p>Izkop in zemeljska dela stanejo na lahkem terenu {eur(ze['easy']['min'])} – {eur(ze['easy']['max'])} (običajno okoli {eur(ze['typical'])}), na zahtevnem terenu (skala, naklon) {eur(ze['hard']['min'])} ali več {cite(*ze['source_ids'])}.
+      Za tloris okoli 140 m² se to sestavi tako: izkop okoli 1.200 €, odvoz in deponija 1.000–1.500 €, tamponsko nasutje 2.100–2.500 €, izkopi za priključke okoli 1.400 €, geotekstil in utrjevanje okoli 400 €, vse brez DDV.</p>
+    <p>Zunanja ureditev stane {span('zunanja_ureditev')}, običajno okoli {eur(items['zunanja_ureditev']['typical'])} {cite(*items['zunanja_ureditev']['source_ids'])}. Osnovna ureditev (60 m² asfalta, 20 m² terase, 80 m panelne ograje po okoli 50 € na meter,
+      300 m² zelenice in ponikovalnica za meteorno vodo) stane okoli 10.000 €, lepše urejena okolica 20.000–25.000 €.</p>
   </section>
   <section class="prose"><h2>Subvencija Eko sklada za novogradnjo</h2>
     <p>Eko sklad po javnem pozivu 105SUB-sNESOB23 subvencionira skoraj ničenergijske hiše (sNES+): {', '.join(str(r) for r in t_rates[:-1])} ali {t_rates[-1]} € na m² neto ogrevane površine,
@@ -1073,9 +1103,9 @@ def costs_page():
       Večina tržnih cen v tem kalkulatorju ne navaja, ali vključujejo DDV.</p>
   </section>
   <section class="prose"><h2>Viri</h2><ol class="viri">{viri_html}</ol>
-    <p class="credit-line">Vsi viri so bili pregledani {checked}. Komunalni prispevek je najmanj natančna številka: odloki ga računajo od bruto površine, ki jo ocenimo kot 1,2 × neto,
-      cone, faktorji za stanovanjske hiše in olajšave pa znesek spremenijo. Tržne cene (dokumentacija, priključki, plošča, zemeljska dela, zunanja ureditev) so z gradbenih portalov z neznanim vzorcem; uporabite jih kot razpon, ne kot ponudbo.
-      Noben aktualen vir ne pove, kateri proizvajalci imajo projektno dokumentacijo v ceni. Pri elektriki je upoštevana le omrežnina za priključno moč. Cen priključkov za optiko in plin ter vgradnje MKČN nismo našli.</p>
+    <p class="credit-line">Vsi viri so bili pregledani {checked}. Okvirne cene z gradbenih portalov so se pri preverjanju izkazale za prenizke ali nepopolne, zato kalkulator, kjer je mogoče, uporablja cenike posameznih del in dejanske ponudbe.
+      Komunalni prispevek je najmanj natančna številka: odloki ga računajo od bruto površine, ki jo ocenimo kot 1,2 × neto, cone, faktorji za stanovanjske hiše, indeksacija in olajšave pa znesek spremenijo.
+      Večina tržnih cen ne navaja, ali vključujejo DDV; uporabite jih kot razpon, ne kot ponudbo. Izvedba elektro priključka in telekomunikacijski priključek sta groba ocena; cene plinskega priključka nismo našli.</p>
   </section>
   <div class="actions">
     <a class="btn glow" href="{SITE}#kviz">Poiščite hišo, ki vam pristaja <span class="arrow">→</span></a>
