@@ -1,0 +1,320 @@
+[
+ {
+  "id": "marles",
+  "show_houses": [
+   {
+    "name": "Marles vzorčne hiše in razstavni salon (Marles cona)",
+    "address": "Limbuška cesta 2",
+    "town": "2341 Limbuš",
+    "hours": "Delavniki 7.30–15.30; ogled vzorčnih hiš ob predhodnem dogovoru",
+    "open_days": [
+     "Dan odprtih vrat: sobota, 24. 10. 2026, 10.00–14.00 (individualna hiša, okolica Maribora; prijava na meet.marles.com/sl/dan-odprtih-vrat)"
+    ],
+    "url": "https://www.marles.com/novice/marles-razstavno-svetovalni-center"
+   }
+  ],
+  "build_time": {
+   "text": "Okvirno: načrtovanje 1–3 mesece, dokumentacija 2–6 mesecev, proizvodnja ~2 meseca, teren in temeljna plošča ~3 mesece, montaža hiše ~2 tedna, obrtniška dela 4–6 mesecev, predaja ~1 mesec. Vselitev z dokončano notranjostjo je v nekaterih primerih mogoča približno 5 mesecev od začetka montaže.",
+   "url": "https://www.marles.com/pot-do-novega-doma"
+  },
+  "warranty": {
+   "text": "Garancijski rok ni naveden; primopredajni zapisnik označuje začetek garancijske dobe.",
+   "url": "https://www.marles.com/potek-montazne-gradnje"
+  },
+  "turnkey_scope": {
+   "text": "Paket »Ključ v roke« zajema projektno in delavniško dokumentacijo z dovoljenji, konstrukcijo, okna, vrata, senčila, streho, slikopleskarska dela, talne obloge, ogrevanje, prezračevanje, elektro in sanitarne instalacije, keramiko, notranje stopnice in vrata. Izključitve niso navedene.",
+   "url": "https://www.marles.com/faze-gradnje-in-paketi-izvedbe"
+  },
+  "quote": {
+   "form_url": "https://www.marles.com/povprasevanje",
+   "phone": "+386 2 429 45 00 (Maribor); 08 205 28 51 (Ljubljana)"
+  },
+  "delivery_area": {
+   "text": "Slovenija ni izrecno omejena; stran omenja globalni doseg, podružnico v Avstriji (Marles Fertighaus GmbH, 2003) in projekte v Nemčiji, Albaniji.",
+   "url": "https://www.marles.com/zgodovina-podjetja"
+  },
+  "founded": {
+   "year": 1899,
+   "url": "https://www.marles.com/zgodovina-podjetja"
+  },
+  "checked": "2026-10-19"
+ },
+ {
+  "id": "jelovica",
+  "show_houses": [
+   {
+    "name": "Stalna vzorčna hiša ni navedena; dnevi odprtih vrat (Zgornja Besnica, individualna hiša)",
+    "address": "ni navedeno",
+    "town": "Zgornja Besnica",
+    "hours": "ni navedeno",
+    "open_days": [
+     "10. 10. 2026 (že minil; prijava obvezna)",
+     "Nadaljnji termini niso objavljeni"
+    ],
+    "url": "https://jelovica-hise.com/dnevi-odprtih-vrat/"
+   }
+  ],
+  "build_time": {
+   "text": "Po pridobitvi gradbenega dovoljenja priprava in proizvodnja do 90 dni, izvedba na ključ do 180 dni (skupaj ~270 dni). Montaža: hiša dobi končno obliko v nekaj dneh. Paket Basic do 90 dni, Medium do 120, Final do 180 dni.",
+   "url": "https://jelovica-hise.com/strokovno/postopek-gradnje-lesene-montazne-hise/"
+  },
+  "warranty": {
+   "text": "ni navedeno",
+   "url": "https://jelovica-hise.com/strokovno/postopek-gradnje-lesene-montazne-hise/"
+  },
+  "turnkey_scope": {
+   "text": "Final: hiša pripravljena za vselitev (slikopleskarska dela, talne obloge, notranja vrata, sanitarna oprema, ogrevanje, prezračevanje). Ni vključeno: temeljna plošča in priprava gradbišča (investitor) ter opremljanje, selitev in ureditev okolice.",
+   "url": "https://jelovica-hise.com/strokovno/postopek-gradnje-lesene-montazne-hise/"
+  },
+  "quote": {
+   "form_url": "https://jelovica-hise.com/povprasevanje/",
+   "phone": "ni navedeno"
+  },
+  "delivery_area": {
+   "text": "Tudi tujina: delež izvoza je presegel 80 % (Švica, Nemčija, ZDA, Luksemburg, Irak).",
+   "url": "https://jelovica-hise.com/o-nas/"
+  },
+  "founded": {
+   "year": null,
+   "url": "https://jelovica-hise.com/o-nas/",
+   "note": "Leto ustanovitve ni navedeno; zgodovina od 1905, Jelovica Škofja Loka 1955"
+  },
+  "checked": "2026-10-19"
+ },
+ {
+  "id": "lumar",
+  "show_houses": [
+   {
+    "name": "Vzorčna hiša Dunaj",
+    "address": "ni navedeno",
+    "town": "ni navedeno",
+    "hours": "ni navedeno",
+    "open_days": [],
+    "url": "https://www.lumar.si/dozivetja/vzorcne-hise"
+   },
+   {
+    "name": "Vzorčna Aktivna hiša Dragomelj",
+    "address": "ni navedeno",
+    "town": "Dragomelj",
+    "hours": "ni navedeno",
+    "open_days": [],
+    "url": "https://www.lumar.si/dozivetja/vzorcne-hise"
+   }
+  ],
+  "build_time": {
+   "text": "Finaliziran objekt: približno 6 mesecev od začetka montaže, odvisno od zahtevnosti objekta.",
+   "url": "https://www.lumar.si"
+  },
+  "warranty": {
+   "text": "35 let za konstrukcijsko stabilnost, 10 let za solidnost izdelave, vsaj 2 leti za vgrajene industrijske izdelke, opremo in naprave.",
+   "url": "https://www.lumar.si/podpora-strankam-in-servis"
+  },
+  "turnkey_scope": {
+   "text": "ni navedeno",
+   "url": "https://www.lumar.si/o-podjetju/kdo-smo"
+  },
+  "quote": {
+   "form_url": "https://lp.lumar.si/povprasevanje-splosno",
+   "phone": "+386 2 421 67 50"
+  },
+  "delivery_area": {
+   "text": "Tudi tujina: »preko 2.850 objektov na različnih evropskih trgih«, vstop v Italijo 2003 in Francijo 2009.",
+   "url": "https://www.lumar.si/o-podjetju/kdo-smo"
+  },
+  "founded": {
+   "year": 1993,
+   "url": "https://www.lumar.si/o-podjetju/kdo-smo"
+  },
+  "checked": "2026-10-19"
+ },
+ {
+  "id": "rihter",
+  "show_houses": [
+   {
+    "name": "Skoraj nič energijska hiša 126 (dan odprtih vrat)",
+    "address": "naslov se pošlje prijavljenim po e-pošti",
+    "town": "Notranje Gorice",
+    "hours": "Pet 6. 11. 2026 14.00–18.00; sob 7. 11. 2026 9.00–14.00",
+    "open_days": [
+     "6. 11. 2026 14.00–18.00",
+     "7. 11. 2026 9.00–14.00 (prijava do 5. 11.)"
+    ],
+    "url": "https://www.rihter.si/dan-odprtih-vrat-notranje-gorice-2/"
+   }
+  ],
+  "build_time": {
+   "text": "Do 4. gradbene faze 2–3 mesece; hiša na ključ v šestih mesecih od pričetka montaže (do 120 dni gradbena faza, do 135 dni delni ključ, do 180 dni polni ključ). Montaža elementov z žerjavom običajno približno 2 dni.",
+   "url": "https://www.rihter.si/rihter/potek-gradnje/"
+  },
+  "warranty": {
+   "text": "35 let garancije na konstrukcijo in 3 leta na izvedbo.",
+   "url": "https://www.rihter.si/rihter/najpogostejsa-vprasanja-in-nasveti/"
+  },
+  "turnkey_scope": {
+   "text": "Hiša na ključ vključuje vse razen notranje opreme, svetil in zunanjih vodov. Zemeljska dela, temelji in talna plošča ali klet so večinoma na kupcu (možno prek podizvajalcev).",
+   "url": "https://www.rihter.si/rihter/najpogostejsa-vprasanja-in-nasveti/"
+  },
+  "quote": {
+   "form_url": "https://www.rihter.si/povprasevanje/",
+   "phone": "+386 3 839 04 30"
+  },
+  "delivery_area": {
+   "text": "Tudi tujina: aktivni v Italiji, Franciji, Švici, Nemčiji, Avstriji in na Hrvaškem.",
+   "url": "https://www.rihter.si/rihter/o-podjetju/"
+  },
+  "founded": {
+   "year": 1990,
+   "url": "https://www.rihter.si/rihter/o-podjetju/"
+  },
+  "checked": "2026-10-19"
+ },
+ {
+  "id": "noah",
+  "show_houses": [],
+  "build_time": {
+   "text": "Uradni rok ni naveden; v mnenjih strank omenjeno ~5 do 6 mesecev za hišo na ključ.",
+   "url": "https://www.noah.si"
+  },
+  "warranty": {
+   "text": "30-letna garancija za konstrukcijsko stabilnost vsakega objekta; za druge dele ni navedeno.",
+   "url": "https://www.noah.si/sl/garancije"
+  },
+  "turnkey_scope": {
+   "text": "ni navedeno",
+   "url": "https://www.noah.si/sl/o-nas"
+  },
+  "quote": {
+   "form_url": "https://www.noah.si/sl/inquiry",
+   "phone": "08 20 573 93"
+  },
+  "delivery_area": {
+   "text": "ni navedeno",
+   "url": "https://www.noah.si/sl/o-nas"
+  },
+  "founded": {
+   "year": null,
+   "url": "https://www.noah.si/sl/o-nas"
+  },
+  "note": "Vzorčna hiša ni navedena; sedež Meznaričeva ulica 7, Maribor, pon–pet 7–15 ali po dogovoru (https://www.noah.si/sl/kontakt); virtualni sprehodi https://www.noah.si/sl/virtualni-sprehodi",
+  "checked": "2026-10-19"
+ },
+ {
+  "id": "riko",
+  "show_houses": [],
+  "build_time": {
+   "text": "Rok ni naveden; montaža na terenu »izredno hitra«, možna tudi pozimi.",
+   "url": "https://www.riko-hise.si/sl/ponudba/zakaj-riko-hise/"
+  },
+  "warranty": {
+   "text": "30-letna garancija na konstrukcijo in 2-letna garancija za skrite napake ob predaji; za vgrajeno opremo velja garancija proizvajalca.",
+   "url": "https://www.riko-hise.si/sl/ponudba/zakaj-riko-hise/"
+  },
+  "turnkey_scope": {
+   "text": "Izvedba »na ključ« vključuje estrihe, elektro in vodovodno instalacijo, ogrevanje, stikala in vtičnice, sanitarno opremo, talne obloge, slikopleskarska dela, notranja vrata in stopnice; izključitve niso navedene. Nižje izvedbe (navzven zaključen objekt, delni ključ) teh del ne vključujejo.",
+   "url": "https://www.riko-hise.si/sl/ponudba/storitve/izvedba/"
+  },
+  "quote": {
+   "form_url": null,
+   "phone": "+386 1 8372 610; +386 1 8372 611"
+  },
+  "delivery_area": {
+   "text": "Ni opredeljeno; omenjeni projekti v Sloveniji, Italiji, Veliki Britaniji, Rusiji.",
+   "url": "https://www.riko-hise.si/sl/o-nas/"
+  },
+  "founded": {
+   "year": 1997,
+   "url": "https://www.riko-hise.si/sl/o-nas/"
+  },
+  "note": "Obrazec za povpraševanje ni najden; kontakt https://www.riko-hise.si/sl/o-nas/kontakti/; sedež Lepovče 23, Ribnica",
+  "checked": "2026-10-19"
+ },
+ {
+  "id": "kager",
+  "show_houses": [
+   {
+    "name": "Dokončana hiša KAGER VITA NOVA (dan odprtih vrat)",
+    "address": "ni navedeno",
+    "town": "Mirna",
+    "hours": "17. 10. 2026, 10.00–16.00",
+    "open_days": [
+     "17. 10. 2026 (že minil); drugi termini niso objavljeni"
+    ],
+    "url": "https://kager.si/dan-odprtih-vrat/"
+   }
+  ],
+  "build_time": {
+   "text": "Od pravnomočnega gradbenega dovoljenja do začetka montaže 3 do 4 mesece; montaža 3–4 tedne; faza »Ključ Kager« 7–8 mesecev od zaključka montaže.",
+   "url": "https://kager.si/faze-gradnje-kager-hise/"
+  },
+  "warranty": {
+   "text": "30 let jamstva za konstrukcijo in 3 leta za morebitne skrite napake ob predaji.",
+   "url": "https://kager.si/garancija/"
+  },
+  "turnkey_scope": {
+   "text": "Delni ključ: vodovod, ogrevanje, prezračevanje, hlajenje, grobe elektroinštalacije, estrih. Final ključ: mavčno-kartonske plošče, slikopleskarska dela, fina elektro, stopnice, notranja vrata, sanitarna oprema, keramika, parket. Investitor pred montažo zagotovi teren, temeljno ploščo, priključke; izključitve niso izrecno navedene.",
+   "url": "https://kager.si/faze-gradnje-kager-hise/"
+  },
+  "quote": {
+   "form_url": "https://kager.si/configurator",
+   "phone": "+386 2 788 93 10"
+  },
+  "delivery_area": {
+   "text": "Tudi tujina: Avstrija, Švica, Italija, Nemčija, Ukrajina.",
+   "url": "https://kager.si/zgodovina-kager-hise/"
+  },
+  "founded": {
+   "year": 1989,
+   "url": "https://kager.si/zgodovina-kager-hise/"
+  },
+  "checked": "2026-10-19"
+ },
+ {
+  "id": "ziher",
+  "show_houses": [
+   {
+    "name": "Dan odprtih vrat: individualna pasivna hiša na ključ (Zreče)",
+    "address": "ni navedeno",
+    "town": "Zreče",
+    "hours": "12.00 in 13.00 termina; konec ni naveden",
+    "open_days": [
+     "17. 10. 2026 (že minil, prijave zaprte)"
+    ],
+    "url": "https://ziher-hise.si/dan-odprtih-vrat-v-zrecah/"
+   },
+   {
+    "name": "Žiher Studio (svetovalni studio, ne vzorčna hiša)",
+    "address": "Stegne 11c",
+    "town": "1000 Ljubljana",
+    "hours": "Ogled po predhodnem dogovoru",
+    "open_days": [],
+    "url": "https://ziher-hise.si/kontakt/"
+   }
+  ],
+  "build_time": {
+   "text": "ni navedeno",
+   "url": "https://ziher-hise.si/potek-in-faze-gradnje/"
+  },
+  "warranty": {
+   "text": "30 let garancije (omenjeno kot ključna prednost); podrobnosti niso navedene.",
+   "url": "https://ziher-hise.si"
+  },
+  "turnkey_scope": {
+   "text": "Faza I: lupina, notranje stene, strop, streha, okna, vrata, fasada. Faza II: elektro, prezračevanje, vodovod, sanitarna oprema, estrihi, slikopleskarska dela, talno gretje, toplotna črpalka. Faza III: keramika, tla, notranja vrata, čiščenje, predaja. Temeljno ploščo običajno izvede investitor; nekaj postavk le na zahtevo.",
+   "url": "https://ziher-hise.si/potek-in-faze-gradnje/"
+  },
+  "quote": {
+   "form_url": "https://ziher-hise.si/kontakt/",
+   "phone": "+386 41 417 069"
+  },
+  "delivery_area": {
+   "text": "Ni opredeljeno; svetovalka za hrvaški trg in hrvaška različica spletne strani.",
+   "url": "https://ziher-hise.si/kontakt/"
+  },
+  "founded": {
+   "year": null,
+   "url": "https://ziher-hise.si/o-podjetju/",
+   "note": "Navedeno le »več kot 40 let«"
+  },
+  "checked": "2026-10-19"
+ }
+]

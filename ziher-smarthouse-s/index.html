@@ -95,12 +95,18 @@ footer nav a:hover { color: var(--ink); }
 .head h1 { font-size: clamp(36px, 6vw, 72px); margin-top: 12px; }
 .head .prov { color: var(--mist); margin-top: 10px; }
 .photo { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); aspect-ratio: 600 / 315; }
+.photo picture { display: contents; }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
 @media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
 .specs dt { font-size: 11px; }
 .na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
-abbr[title] { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+.price .est { display: block; font: 500 12px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
+abbr[data-tip] { position: relative; text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; border-radius: 3px; }
+abbr[data-tip]:hover::after, abbr[data-tip]:focus::after { content: attr(data-tip); position: absolute; left: 0; top: calc(100% + 6px); z-index: 40;
+  width: max-content; max-width: 300px; padding: 8px 12px; border-radius: 10px; background: var(--slate); box-shadow: 0 0 0 1px var(--line), 0 10px 30px rgba(0,0,0,.55);
+  color: var(--ink); font: 400 13px/1.45 var(--font-body); letter-spacing: 0; text-transform: none; white-space: normal; text-align: left; pointer-events: none; }
+@media (max-width: 640px) { abbr[data-tip]:hover::after, abbr[data-tip]:focus::after { position: fixed; left: 16px; right: 16px; top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: auto; max-width: none; z-index: 60; } }
 sub { font-size: max(12px, .75em); }
 .gloss { border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); padding: 14px 18px; color: #c9d3e6; font-size: 14px; max-width: 60em; }
 .gloss summary { cursor: pointer; color: var(--ink); font-weight: 600; }
@@ -152,7 +158,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     <div class="eyebrow crumbs"><a href="../">Hišni vodič</a> / <a href="../#katalog">Katalog</a> / <a href="../ziher/">Žiher hiše</a></div>
     <div class="head">
       <div><h1 class="display">Žiher hiše SmartHouse S</h1><div class="prov">Montažna hiša · Žiher hiše</div></div>
-      <div class="price"><b>87.990 €</b><span>osnovni model SmartHouse z DDV</span></div>
+      <div class="price"><b>87.990 €</b><span>osnovni model SmartHouse z DDV<br>osnovni paket, ne <abbr tabindex="0" data-tip="vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje" aria-describedby="gl-na-kljuc">na ključ</abbr></span></div>
     </div>
   </div>
   <dl class="specs"><div><dt>Etaže</dt><dd>pritličje</dd></div><div><dt>Površina</dt><dd>49 m²</dd></div><div><dt>Spalnice</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Kopalnice</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Streha</dt><dd><span class="na">ni podatka</span></dd></div></dl>
@@ -161,7 +167,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     <a class="btn line" href="https://www.smarthouse-slovenia.com/hisa-s" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
   </div>
   
-  <div class="lede"><p>Žiher hiše SmartHouse S je pritlična montažna hiša s površino 49 m² proizvajalca Žiher hiše. Arhitekturni slog: moderna.</p><p>Cena po podatkih proizvajalca: 87.990 € – osnovni model SmartHouse z DDV. Opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
+  <div class="lede"><p>Žiher hiše SmartHouse S je pritlična montažna hiša s površino 49 m² proizvajalca Žiher hiše. Arhitekturni slog: moderen.</p><p>Cena po podatkih proizvajalca: 87.990 € – osnovni model SmartHouse z DDV. Opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
   <section><h2>Tloris</h2><div class="plans"><a href="../img/tloris/ziher-smarthouse-s-1.jpg"><img src="../img/tloris/thumb/ziher-smarthouse-s-1.jpg" width="600" height="387" alt="Tloris pritličja – Žiher hiše SmartHouse S, 49 m²" loading="lazy"></a></div><p class="credit-line">Tloris: Žiher hiše, <a href="https://www.smarthouse-slovenia.com/hisa-s" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a> · <a href="../tlorisi-montaznih-his/">Vsi tlorisi</a></p></section>
   <div class="two">
     <section class="maker-info"><h2>O proizvajalcu Žiher hiše</h2><p>Družinsko podjetje iz Gorišnice z več kot 40 leti izkušenj in lastno žago. Ponuja tudi manjše hiše SmartHouse s fiksno ceno.</p><p><a href="https://ziher-hise.si" target="_blank" rel="noopener">ziher-hise.si ↗</a></p></section>
@@ -169,8 +175,9 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   </div>
   <section><h2>Podobne hiše drugih proizvajalcev</h2><div class="sim"><a href="../marles-fresh-mdlr-49-s/"><div class="pic"><img src="../img/thumb/marles-fresh-mdlr-49-s.jpg" width="320" height="168" alt="" loading="lazy"></div><span><b>Marles Fresh MDLR 49 S</b>49 m² · pritličje · cena na povpraševanje</span></a><a href="../noah-mini-60/"><div class="pic"><img src="../img/thumb/noah-mini-60.jpg" width="320" height="180" alt="" loading="lazy"></div><span><b>NOAH MINI 60</b>60 m² · pritličje · 130.552 €</span></a><a href="../rihter-hisa-087/"><div class="pic"><img src="../img/thumb/rihter-hisa-087.jpg" width="320" height="197" alt="" loading="lazy"></div><span><b>Rihter Hiša 087</b>87 m² · pritličje · 166.300 €</span></a><a href="../riko-minima-s/"><div class="pic"><img src="../img/thumb/riko-minima-l.jpg" width="320" height="124" alt="" loading="lazy"></div><span><b>Riko hiše Minima S</b>78 m² · — · cena na povpraševanje</span></a></div></section>
   <section><h2>Druge hiše proizvajalca Žiher hiše</h2><ul class="siblings"><li><a href="../ziher-vivat-70/">Vivat 70</a></li><li><a href="../ziher-vivat-80/">Vivat 80</a></li><li><a href="../ziher-vivat-90/">Vivat 90</a></li><li><a href="../ziher-petovia-90/">Petovia 90</a></li><li><a href="../ziher-petovia-115/">Petovia 115</a></li><li><a href="../ziher-livia/">Livia</a></li><li><a href="../ziher-cubus-atrium/">Cubus Atrium</a></li><li><a href="../ziher-smart-107/">Smart 107</a></li><li><a href="../ziher-smart-120/">Smart 120</a></li><li><a href="../ziher-smart-140/">Smart 140</a></li><li><a href="../ziher-cubus-classic/">Cubus Classic</a></li><li><a href="../ziher-romula/">Romula</a></li><li><a href="../ziher-celeia/">Celeia</a></li><li><a href="../ziher-aurora/">Aurora</a></li><li><a href="../ziher-smarthouse-m/">SmartHouse M</a></li><li><a href="../ziher-smarthouse-l/">SmartHouse L</a></li></ul></section>
+<details class="gloss"><summary>Kaj pomenijo izrazi na tej strani?</summary><dl><div><dt>na ključ</dt><dd id="gl-na-kljuc">vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje</dd></div></dl></details>
 </main>
-<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../cena-montazne-hise/">Cene montažnih hiš</a><a href="../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../majhne-montazne-hise/">Majhne hiše</a><a href="../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../komunalni-prispevek/">Komunalni prispevek</a><a href="../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../tlorisi-montaznih-his/">Tlorisi</a><a href="../primerjava/">Primerjava</a></nav></div></footer>
+<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../cena-montazne-hise/">Cene montažnih hiš</a><a href="../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../majhne-montazne-hise/">Majhne hiše</a><a href="../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../komunalni-prispevek/">Komunalni prispevek</a><a href="../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../tlorisi-montaznih-his/">Tlorisi</a><a href="../primerjava/">Primerjava</a><a href="../kje-si-ogledati-montazne-hise/">Kje si ogledati hiše</a><a href="../o-vodicu/">O vodiču</a></nav></div></footer>
 <script src="../compare.js"></script>
 </body>
 </html>

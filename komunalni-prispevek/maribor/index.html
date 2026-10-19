@@ -95,12 +95,18 @@ footer nav a:hover { color: var(--ink); }
 .head h1 { font-size: clamp(36px, 6vw, 72px); margin-top: 12px; }
 .head .prov { color: var(--mist); margin-top: 10px; }
 .photo { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); aspect-ratio: 600 / 315; }
+.photo picture { display: contents; }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
 @media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
 .specs dt { font-size: 11px; }
 .na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
-abbr[title] { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+.price .est { display: block; font: 500 12px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
+abbr[data-tip] { position: relative; text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; border-radius: 3px; }
+abbr[data-tip]:hover::after, abbr[data-tip]:focus::after { content: attr(data-tip); position: absolute; left: 0; top: calc(100% + 6px); z-index: 40;
+  width: max-content; max-width: 300px; padding: 8px 12px; border-radius: 10px; background: var(--slate); box-shadow: 0 0 0 1px var(--line), 0 10px 30px rgba(0,0,0,.55);
+  color: var(--ink); font: 400 13px/1.45 var(--font-body); letter-spacing: 0; text-transform: none; white-space: normal; text-align: left; pointer-events: none; }
+@media (max-width: 640px) { abbr[data-tip]:hover::after, abbr[data-tip]:focus::after { position: fixed; left: 16px; right: 16px; top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: auto; max-width: none; z-index: 60; } }
 sub { font-size: max(12px, .75em); }
 .gloss { border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); padding: 14px 18px; color: #c9d3e6; font-size: 14px; max-width: 60em; }
 .gloss summary { cursor: pointer; color: var(--ink); font-weight: 600; }
@@ -159,6 +165,20 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 .tbl .hth img { width: 72px; height: auto; border-radius: 8px; flex: none; background: var(--slate); }
 .points { margin: 0; padding-left: 20px; color: #c9d3e6; display: grid; gap: 10px; max-width: 48em; }
 .points b { color: var(--ink); }
+.tbl .grp th { font: 500 12px/1.3 var(--font-data); letter-spacing: .1em; text-transform: uppercase; color: var(--glow); white-space: normal; padding-top: 18px; }
+/* N-5: on phones every static table becomes a stack of cards; each cell's data-label (from its column head) is shown above the value */
+@media (max-width: 640px) {
+  .tbl.cards, .tbl.cards tbody, .tbl.cards tfoot { display: block; }
+  .tbl.cards thead { display: none; }
+  .tbl.cards tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 16px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .tbl.cards tbody:last-child tr:last-child, .tbl.cards tfoot tr { border-bottom: 0; }
+  .tbl.cards tr > * { display: block; padding: 0; border: 0; min-width: 0; max-width: none; white-space: normal; text-align: left; }
+  .tbl.cards tr > :first-child, .tbl.cards .stage, .tbl.cards [colspan], .tbl.cards td:not([data-label]) { grid-column: 1 / -1; }
+  .tbl.cards td:first-child, .tbl.cards .stage, .tbl.cards .n small { min-width: 0; max-width: none; }
+  .tbl.cards tbody th { white-space: normal; font-size: 16px; }
+  .tbl.cards [data-label]::before { content: attr(data-label); display: block; margin-bottom: 3px; font: 500 11px/1.3 var(--font-data); letter-spacing: .1em; text-transform: uppercase; color: var(--mist); }
+  .tbl.cards .grp th { padding-top: 4px; }
+}
 
 .page > * { min-width: 0; }
 .calc { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
@@ -199,7 +219,6 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   .stotal[hidden] { display: none; }
   .stotal small { display: block; font: 500 11px/1.2 var(--font-data); letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
   .stotal .go { color: var(--glow); font-size: 14px; white-space: nowrap; }
-  body.has-tray .stotal { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
   .calc { padding-bottom: 72px; }
 }
 .lines td small { display: block; font-size: 12px; color: var(--mist); white-space: nowrap; margin-top: 4px; }
@@ -227,20 +246,21 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 <main class="wrap page">
   <div>
     <div class="eyebrow crumbs"><a href="../../">Hišni vodič</a> / <a href="../../komunalni-prispevek/">Komunalni prispevek</a> / Maribor</div>
-    <div class="head"><div><h1 class="display">Komunalni prispevek Maribor 2026</h1><div class="prov">Parcela 600 m², hiša 180 m² <abbr title="bruto tlorisna površina: površina vseh etaž, merjena po zunanjih merah sten">BTP</abbr></div></div></div>
+    <div class="head"><div><h1 class="display">Komunalni prispevek Maribor 2026</h1><div class="prov">Parcela 600 m², hiša 180 m² <abbr tabindex="0" data-tip="bruto tlorisna površina: površina vseh etaž, merjena po zunanjih merah sten" aria-describedby="gl-btp">BTP</abbr></div></div></div>
   </div>
   <div class="total"><span class="eyebrow">Komunalni prispevek za primer</span><b>15.217 € – 16.542 €</b><p>Zanesljivost: zelo okvirno. Spremembo odloka smo povzeli po novicah, ker uradno besedilo ni bilo dosegljivo, faktor namembnosti za hiše pa ni potrjen, zato navajamo razpon.</p></div>
-  <div class="lede"><p>Izračun po občinskem odloku (sprejet 2019, spremenjen 2024) <a href="#vir-kp-mb-news">[1]</a><a href="#vir-kp-vsevem">[2]</a><a href="#vir-kp-vsevem-mb">[3]</a>: <abbr title="delež parcele v izračunu komunalnega prispevka">Dpo</abbr> 0,5 in <abbr title="delež površine objekta v izračunu komunalnega prispevka">Dto</abbr> 0,5, faktor namembnosti <abbr title="faktor namembnosti: utež za vrsto stavbe, za stanovanjske hiše jo določi odlok">Fn</abbr> 0,7 ali 1,0, prispevna stopnja 100 % za vso opremo. Za primerjavo: vsevem.si za 200 m² BTP z vso komunalno opremo izračuna 10.832 € <a href="#vir-kp-vsevem">[2]</a>.</p></div>
+  <div class="lede"><p>Izračun po občinskem odloku (sprejet 2019, spremenjen 2024) <a href="#vir-kp-mb-news">[1]</a><a href="#vir-kp-vsevem">[2]</a><a href="#vir-kp-vsevem-mb">[3]</a>: <abbr tabindex="0" data-tip="delež parcele v izračunu komunalnega prispevka" aria-describedby="gl-dpo">Dpo</abbr> 0,5 in <abbr tabindex="0" data-tip="delež površine objekta v izračunu komunalnega prispevka" aria-describedby="gl-dto">Dto</abbr> 0,5, faktor namembnosti <abbr tabindex="0" data-tip="faktor namembnosti: utež za vrsto stavbe, za stanovanjske hiše jo določi odlok" aria-describedby="gl-fn">Fn</abbr> 0,7 ali 1,0, prispevna stopnja 100 % za vso opremo. Za primerjavo: vsevem.si za 200 m² BTP z vso komunalno opremo izračuna 10.832 € <a href="#vir-kp-vsevem">[2]</a>.</p></div>
   <section class="prose"><h2>Izračun po korakih</h2>
-    <p>Za parcelo 600 m² in 180 m² BTP s Fn 0,7 se za vsako vrsto opreme izračuna (600 × <abbr title="cena komunalne opreme na m² parcele, določi jo občinski odlok">Cpo</abbr> × 0,5 + 180 × <abbr title="cena komunalne opreme na m² bruto tlorisne površine, določi jo občinski odlok">Cto</abbr> × 0,5 × 0,7) × <abbr title="prispevna stopnja zavezanca: delež stroškov komunalne opreme, ki ga plača investitor">psz</abbr> <a href="#vir-kp-vsevem-mb">[3]</a><a href="#vir-kp-mb-news">[1]</a>.
+    <p>Za parcelo 600 m² in 180 m² BTP s Fn 0,7 se za vsako vrsto opreme izračuna (600 × <abbr tabindex="0" data-tip="cena komunalne opreme na m² parcele, določi jo občinski odlok" aria-describedby="gl-cpo">Cpo</abbr> × 0,5 + 180 × <abbr tabindex="0" data-tip="cena komunalne opreme na m² bruto tlorisne površine, določi jo občinski odlok" aria-describedby="gl-cto">Cto</abbr> × 0,5 × 0,7) × <abbr tabindex="0" data-tip="prispevna stopnja zavezanca: delež stroškov komunalne opreme, ki ga plača investitor" aria-describedby="gl-psz">psz</abbr> <a href="#vir-kp-vsevem-mb">[3]</a><a href="#vir-kp-mb-news">[1]</a>.
       Za ceste:</p>
     <p class="formula">(600 × 24,00 × 0,5 + 180 × 30,01 × 0,5 × 0,7) × 100 % = 9.090,63 €</p>
-    <div class="scroll"><table class="tbl"><thead><tr><th scope="col">Oprema</th><th scope="col">Cpo (€/m²)</th><th scope="col">Cto (€/m²)</th><th scope="col">psz</th><th scope="col">Znesek</th></tr></thead><tbody><tr><th scope="row">ceste</th><td class="n">24,00</td><td class="n">30,01</td><td class="n">100 %</td><td class="n">9.090,63 €</td></tr><tr><th scope="row">vodovod</th><td class="n">6,11</td><td class="n">7,05</td><td class="n">100 %</td><td class="n">2.277,15 €</td></tr><tr><th scope="row">kanalizacija</th><td class="n">9,61</td><td class="n">10,01</td><td class="n">100 %</td><td class="n">3.513,63 €</td></tr><tr><th scope="row">javne površine</th><td class="n">0,70</td><td class="n">2,00</td><td class="n">100 %</td><td class="n">336,00 €</td></tr></tbody>
-      <tfoot><tr><th scope="row" colspan="4">Skupaj</th><td class="n">15.217 €</td></tr></tfoot></table></div>
+    <div class="scroll"><table class="tbl cards"><thead><tr><th scope="col">Oprema</th><th scope="col">Cpo (€/m²)</th><th scope="col">Cto (€/m²)</th><th scope="col">psz</th><th scope="col">Znesek</th></tr></thead><tbody><tr><th scope="row">ceste</th><td class="n" data-label="Cpo (€/m²)">24,00</td><td class="n" data-label="Cto (€/m²)">30,01</td><td class="n" data-label="psz">100 %</td><td class="n" data-label="Znesek">9.090,63 €</td></tr><tr><th scope="row">vodovod</th><td class="n" data-label="Cpo (€/m²)">6,11</td><td class="n" data-label="Cto (€/m²)">7,05</td><td class="n" data-label="psz">100 %</td><td class="n" data-label="Znesek">2.277,15 €</td></tr><tr><th scope="row">kanalizacija</th><td class="n" data-label="Cpo (€/m²)">9,61</td><td class="n" data-label="Cto (€/m²)">10,01</td><td class="n" data-label="psz">100 %</td><td class="n" data-label="Znesek">3.513,63 €</td></tr><tr><th scope="row">javne površine</th><td class="n" data-label="Cpo (€/m²)">0,70</td><td class="n" data-label="Cto (€/m²)">2,00</td><td class="n" data-label="psz">100 %</td><td class="n" data-label="Znesek">336,00 €</td></tr></tbody>
+      <tfoot><tr><th scope="row" colspan="4">Skupaj</th><td class="n" data-label="Znesek">15.217 €</td></tr></tfoot></table></div>
     <p>Z drugimi faktorji namembnosti znaša prispevek 16.542 € (Fn 1,0).</p>
   </section>
   <section class="prose"><h2>Preverite znesek na občini</h2>
-    <p>To je ocena za tipičen primer. Dejanska odmera je odvisna od velikosti parcele in hiše, priključkov, cone in morebitnih sprememb odloka.
+    <p>To je ocena za tipičen primer. Kalkulator stroškov jo po formuli iz odloka preračuna za hišo, ki jo izberete, in za velikost vaše parcele.
+      Dejanska odmera je odvisna od velikosti parcele in hiše, priključkov, cone in morebitnih sprememb odloka.
       Pred nakupom parcele vprašajte občino, koliko bo znašal komunalni prispevek za to parcelo in hišo.</p>
   </section>
   <div class="actions">
@@ -249,9 +269,9 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   </div>
   <section><h2>Komunalni prispevek v drugih občinah</h2><ul class="siblings"><li><a href="../../komunalni-prispevek/brezice/">Brežice</a> · 4.901 €</li><li><a href="../../komunalni-prispevek/celje/">Celje</a> · 14.229 €</li><li><a href="../../komunalni-prispevek/domzale/">Domžale</a> · 13.861 €</li><li><a href="../../komunalni-prispevek/grosuplje/">Grosuplje</a> · 22.873 €</li><li><a href="../../komunalni-prispevek/kamnik/">Kamnik</a> · 9.535 €</li><li><a href="../../komunalni-prispevek/koper/">Koper</a> · 22.426 € – 28.075 €</li><li><a href="../../komunalni-prispevek/kranj/">Kranj</a> · 14.010 €</li><li><a href="../../komunalni-prispevek/krsko/">Krško</a> · 5.765 €</li><li><a href="../../komunalni-prispevek/ljubljana/">Ljubljana</a> · 18.755 €</li><li><a href="../../komunalni-prispevek/murska-sobota/">Murska Sobota</a> · 9.234 €</li><li><a href="../../komunalni-prispevek/novo-mesto/">Novo mesto</a> · 11.042 €</li><li><a href="../../komunalni-prispevek/ptuj/">Ptuj</a> · 6.930 €</li><li><a href="../../komunalni-prispevek/skofja-loka/">Škofja Loka</a> · 9.003 €</li></ul></section>
   <section class="prose"><h2>Viri</h2><ol class="viri"><li id="vir-kp-mb-news"><a href="https://mariborinfo.com/novica/lokalno/mariborcane-caka-nova-financna-obremenitev-obcina-pa-si-obeta-dodatni-milijon/232381" target="_blank" rel="noopener">Mariborčane čaka nova finančna obremenitev</a> <span>· Mariborinfo</span></li><li id="vir-kp-vsevem"><a href="https://vsevem.si/komunalni-prispevek/" target="_blank" rel="noopener">Kalkulator komunalnega prispevka po občinah</a> <span>· Vsevem.si</span></li><li id="vir-kp-vsevem-mb"><a href="https://vsevem.si/komunalni-prispevek/maribor/" target="_blank" rel="noopener">Komunalni prispevek Maribor</a> <span>· Vsevem.si</span></li></ol></section>
-<details class="gloss"><summary>Kaj pomenijo izrazi na tej strani?</summary><dl><div><dt>BTP</dt><dd>bruto tlorisna površina: površina vseh etaž, merjena po zunanjih merah sten</dd></div><div><dt>psz</dt><dd>prispevna stopnja zavezanca: delež stroškov komunalne opreme, ki ga plača investitor</dd></div><div><dt>Cpo</dt><dd>cena komunalne opreme na m² parcele, določi jo občinski odlok</dd></div><div><dt>Cto</dt><dd>cena komunalne opreme na m² bruto tlorisne površine, določi jo občinski odlok</dd></div><div><dt>Dpo</dt><dd>delež parcele v izračunu komunalnega prispevka</dd></div><div><dt>Dto</dt><dd>delež površine objekta v izračunu komunalnega prispevka</dd></div><div><dt>Fn</dt><dd>faktor namembnosti: utež za vrsto stavbe, za stanovanjske hiše jo določi odlok</dd></div></dl></details>
+<details class="gloss"><summary>Kaj pomenijo izrazi na tej strani?</summary><dl><div><dt>BTP</dt><dd id="gl-btp">bruto tlorisna površina: površina vseh etaž, merjena po zunanjih merah sten</dd></div><div><dt>psz</dt><dd id="gl-psz">prispevna stopnja zavezanca: delež stroškov komunalne opreme, ki ga plača investitor</dd></div><div><dt>Cpo</dt><dd id="gl-cpo">cena komunalne opreme na m² parcele, določi jo občinski odlok</dd></div><div><dt>Cto</dt><dd id="gl-cto">cena komunalne opreme na m² bruto tlorisne površine, določi jo občinski odlok</dd></div><div><dt>Dpo</dt><dd id="gl-dpo">delež parcele v izračunu komunalnega prispevka</dd></div><div><dt>Dto</dt><dd id="gl-dto">delež površine objekta v izračunu komunalnega prispevka</dd></div><div><dt>Fn</dt><dd id="gl-fn">faktor namembnosti: utež za vrsto stavbe, za stanovanjske hiše jo določi odlok</dd></div></dl></details>
 </main>
-<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../../cena-montazne-hise/">Cene montažnih hiš</a><a href="../../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../../majhne-montazne-hise/">Majhne hiše</a><a href="../../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../../komunalni-prispevek/">Komunalni prispevek</a><a href="../../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../../tlorisi-montaznih-his/">Tlorisi</a><a href="../../primerjava/">Primerjava</a></nav></div></footer>
+<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../../cena-montazne-hise/">Cene montažnih hiš</a><a href="../../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../../majhne-montazne-hise/">Majhne hiše</a><a href="../../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../../komunalni-prispevek/">Komunalni prispevek</a><a href="../../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../../tlorisi-montaznih-his/">Tlorisi</a><a href="../../primerjava/">Primerjava</a><a href="../../kje-si-ogledati-montazne-hise/">Kje si ogledati hiše</a><a href="../../o-vodicu/">O vodiču</a></nav></div></footer>
 <script src="../../compare.js"></script>
 </body>
 </html>
