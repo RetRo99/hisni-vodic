@@ -50,6 +50,11 @@ def eur(n):
     return f'{n:,}'.replace(',', '.') + ' €'
 
 
+def nb(page_html):
+    """S-6: a non-breaking space between a number and m² or €, also in inline JS (' m²', `${x} m²`), so they never wrap apart."""
+    return re.sub(r"([\d}']) (m²|€)", '\\1\u00a0\\2', page_html)
+
+
 models = [(p, m) for p in data['providers'] for m in p['models']]
 for p, m in models:
     m['slug'] = slugify(p['id'] + '-' + m['name'])
@@ -335,6 +340,9 @@ FOOT = (f'<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in po
         f'<a href="../{COSTS}/">Stroški gradnje</a><a href="../{KP}/">Komunalni prispevek</a><a href="../{EKO}/">Subvencija Eko sklada</a><a href="../{PLANS}/">Tlorisi</a><a href="../{COMPARE}/">Primerjava</a><a href="../{SHOW}/">Kje si ogledati hiše</a><a href="../{ABOUT}/">O vodiču</a></nav></div></footer>\n<script src="../compare.js"></script>')
 
 
+TOUCH_ICON = '' if 'apple-touch-icon' in HEAD_END else '<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n'
+
+
 def head(title, og_title, desc, url, image, ld):
     ld_json = json.dumps(ld, ensure_ascii=False).replace('</', '<\\/')
     return f'''<!doctype html>
@@ -354,7 +362,7 @@ def head(title, og_title, desc, url, image, ld):
 <meta property="og:image" content="{image}">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{ld_json}</script>
-{HEAD_END}</head>'''
+{TOUCH_ICON}{HEAD_END}</head>'''
 
 
 NA = '<span class="na">ni podatka</span>'
@@ -483,7 +491,7 @@ def page(p, m):
     if price:
         ld['offers'] = {'@type': 'Offer', 'price': m['price_eur'], 'priceCurrency': 'EUR', 'url': url}
     cell = lambda k, v: f'<div><dt>{k}</dt><dd>{v}</dd></div>'
-    siblings = [o for o in p['models'] if o is not m]
+    siblings = sorted((o for o in p['models'] if o is not m), key=lambda o: (o['area_m2'] or 10 ** 4, o['name']))
     photo = figure(img, name, p['name'])
     maker_link, facts_html = maker_bits(p)
     sim = similar(p, m)
@@ -715,7 +723,7 @@ def guide():
     Mediana primerljive cene je <b>{med_m2}</b> bivalne površine.</p>
     <p>Proizvajalci navajajo cene za različne pakete, zato je v tabeli za vsakega navedeno, kaj cena vključuje. {len(apart)} cen je že zmanjšanih za subvencijo ali popust
     ali velja za osnovni paket; teh ne razvrščamo med druge, navedene so posebej.</p></div>
-  <section><h2>Cene po proizvajalcih</h2><div class="scroll"><table class="tbl">{thead('Proizvajalec', 'Hiš s ceno', 'Cena od', 'Cena do', 'Primerljiva na m² (mediana)', 'Kaj cena vključuje')}<tbody>{''.join(rows)}</tbody></table></div></section>
+  <section><h2>Cene po proizvajalcih</h2><div class="scroll"><table class="tbl">{thead('Proizvajalec', 'Hiš s ceno', 'Cena proizvajalca od', 'Cena do', 'Primerljiva na m² (mediana)', 'Kaj cena vključuje')}<tbody>{''.join(rows)}</tbody></table></div></section>
   <section><h2>Cena glede na velikost</h2><div class="scroll"><table class="tbl">{thead('Površina', 'Primerljivih hiš', 'Najnižja primerljiva', 'Mediana primerljive', 'Mediana na m²')}<tbody>{''.join(bands)}</tbody></table></div>
     <p class="basis">Samo primerljive cene ({len(comparable)} hiš).</p></section>
   <section><h2>Najcenejše montažne hiše</h2><div class="scroll"><table class="tbl">{thead('Hiša', 'Površina', 'Cena proizvajalca', 'Primerljiva cena', 'Primerljiva na m²')}<tbody>{cheapest}</tbody></table></div>
@@ -931,7 +939,7 @@ COMPARE_JS = r'''
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   // by hand: sl-SI number formatting leaves 4-digit numbers ungrouped (1655), the rest of the site writes 1.655
-  const eur = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' €';
+  const eur = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '\u00a0€';
   const NA = '<span class="na">ni podatka</span>';
   const perM2 = h => h.cmp && h.area ? Math.round(h.cmp / h.area) : null;
   const fromHash = decodeURIComponent(location.hash.slice(1)).split(',').filter(s => bySlug[s]).slice(0, 3);
@@ -1472,7 +1480,10 @@ def viri():
             title = cells[1]
             for a, b in VIRI_SL.items():
                 title = title.replace(a, b)
-            out.append({'id': cells[0], 'title': title, 'url': cells[2], 'publisher': re.sub(r'\s*\(.*?\)', '', cells[3])})
+            # a second URL in the cell is a mirror (PISRS for uradni-list.si), linked after the publisher
+            url, *mirrors = cells[2].split()
+            also = ''.join(f' · <a href="{esc(u)}" target="_blank" rel="noopener">{re.sub(r"^https?://(www\.)?([^/]+).*", r"\2", u)} ↗</a>' for u in mirrors)
+            out.append({'id': cells[0], 'title': title, 'url': url, 'also': also, 'publisher': re.sub(r'\s*\(.*?\)', '', cells[3])})
     return out
 
 
@@ -1571,7 +1582,7 @@ def costs_page():
     plain = sorted((h for h in houses if not h['sub']), key=lambda h: h['price'])
     default = plain[len(plain) // 2]['slug']  # a mid-priced house whose price is not already cut by a subsidy
     house_opts = ''.join(f'<optgroup label="{esc(p["name"])}">' + ''.join(
-        f'<option value="{m["slug"]}"{" selected" if m["slug"] == default else ""}>{esc(m["name"])} · {eur(m["price_eur"])}{" · " + price_tag(m) if price_tag(m) else ""}</option>'
+        f'<option value="{m["slug"]}"{" selected" if m["slug"] == default else ""}>{esc(m["name"])} · {num_sl(m["area_m2"])} m² · {eur(m["price_eur"])}{" · " + price_tag(m) if price_tag(m) else ""}</option>'
         for m in sorted((m for m in p['models'] if m['price_eur'] and m['area_m2']), key=lambda m: (m['area_m2'], m['name']))) + '</optgroup>' for p in data['providers'] if any(m['price_eur'] and m['area_m2'] for m in p['models'])) + \
         '<option value="lastna">Lastna ponudba</option>'
 
@@ -1600,7 +1611,7 @@ def costs_page():
     h1 = 'Koliko stane gradnja montažne hiše?'
     ld = {'@context': 'https://schema.org', '@type': 'Article', 'headline': h1, 'description': desc, 'inLanguage': 'sl', 'url': url,
           'dateModified': cost['as_of'], 'image': SITE + 'img/og/stroski.jpg', 'author': {'@type': 'Organization', 'name': 'Hišni vodič', 'url': SITE}}
-    viri_html = ''.join(f'<li id="vir-{s["id"]}"><a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["title"])}</a> <span>· {esc(s["publisher"])}</span></li>' for s in sources)
+    viri_html = ''.join(f'<li id="vir-{s["id"]}"><a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["title"])}</a> <span>· {esc(s["publisher"])}{s["also"]}</span></li>' for s in sources)
     sewer = span('prikljucek_kanalizacija')
     y, mo, d = cost['as_of'].split('-')
     checked = f'{int(d)}. {int(mo)}. {y}'
@@ -1784,7 +1795,7 @@ def citer():
 
     def listing():
         return '<ol class="viri">' + ''.join(
-            f'<li id="vir-{i}"><a href="{esc(by_id[i]["url"])}" target="_blank" rel="noopener">{esc(by_id[i]["title"])}</a> <span>· {esc(by_id[i]["publisher"])}</span></li>'
+            f'<li id="vir-{i}"><a href="{esc(by_id[i]["url"])}" target="_blank" rel="noopener">{esc(by_id[i]["title"])}</a> <span>· {esc(by_id[i]["publisher"])}{by_id[i]["also"]}</span></li>'
             for i in order) + '</ol>'
     return cite, listing
 
@@ -2003,7 +2014,28 @@ def eko_page():
     desc = (f'Eko sklad za novo skoraj ničenergijsko hišo (sNES+) da {low}–{top} € na m², za največ {e["max_area_m2"]} m², torej do {eur(e["max_eur"])}. '
             'Pogoji, omejitve, primer izračuna in katere cene subvencijo že upoštevajo.')
     verb = lambda names, one, two, many: one if len(names) == 1 else two if len(names) == 2 else many
-    return f'''{head(f'{h1}: koliko in pod katerimi pogoji · Hišni vodič', h1, desc, url, SITE + 'img/og/eko.jpg', article_ld(h1, desc, url, 'img/og/eko.jpg')).replace('</head>', '<style>' + GUIDE_CSS + '.tbl th small { display: block; font-weight: 400; color: var(--mist); font-size: 12.5px; }</style></head>')}
+    # N-21: the example house plus comparable houses at the area quintiles (different sizes and prices); JS recomputes the example in place
+    by_area = sorted(((q, o) for q, o in models if o['price_eur'] and o['area_m2'] and ok(o)), key=lambda qo: (qo[1]['area_m2'], qo[1]['name']))
+    picks = {o['slug']: (q, o) for q, o in [by_area[round(i * (len(by_area) - 1) / 4)] for i in range(5)] + [(p, m)]}
+    try_opts = ''.join(f'<option value="{o["slug"]}" data-a="{o["area_m2"]}" data-p="{o["price_eur"]}"{" selected" if o is m else ""}>'
+                       f'{esc(q["name"])} {esc(o["name"])} · {round(o["area_m2"])} m² · {eur(o["price_eur"])}</option>'
+                       for q, o in sorted(picks.values(), key=lambda qo: qo[1]['area_m2']))
+    try_js = ('<script>(() => {\n  const s = document.getElementById("eko-h"), out = document.getElementById("eko-out"), T = ' + str(top) + ', L = ' + str(low) +
+              ', A = ' + str(e['max_area_m2']) + ', M = ' + str(e['max_eur']) + ''';
+  const eur = n => String(Math.round(n)).replace(/\\B(?=(\\d{3})+(?!\\d))/g, '.') + '\\u00a0€';
+  const show = () => {
+    const o = s.selectedOptions[0], a = +o.dataset.a, p = +o.dataset.p, cap = Math.round(0.15 * p), get = r => Math.min(r * Math.min(a, A), M, cap);
+    out.innerHTML = `${o.textContent.split(' · ')[0]}: subvencija se računa za ${Math.round(Math.min(a, A))} m². Meja 15 % cene je ${eur(cap)}. `
+      + `Dobite <b>${eur(get(T))}</b> pri ${T} €/m²` + (get(T) === cap ? ' (omejeno na 15 % cene)' : get(T) === M ? ' (najvišji znesek)' : '')
+      + ` oziroma <b>${eur(get(L))}</b> pri ${L} €/m².`;
+  };
+  s.addEventListener('change', show); show();
+})();</script>''')
+    return f'''{head(f'{h1}: koliko in pod katerimi pogoji · Hišni vodič', h1, desc, url, SITE + 'img/og/eko.jpg', article_ld(h1, desc, url, 'img/og/eko.jpg')).replace('</head>', '<style>' + GUIDE_CSS + '.tbl th small { display: block; font-weight: 400; color: var(--mist); font-size: 12.5px; }'
+    '.eko-try { margin-top: 18px; padding: 16px 18px; border-radius: var(--r); background: var(--dusk); box-shadow: 0 0 0 1px var(--line); }'
+    '.eko-try label { display: grid; gap: 8px; color: var(--mist); font-size: 15px; }'
+    '.eko-try select { font: inherit; font-size: 16px; color: var(--ink); background: var(--slate); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }'
+    '.eko-try p { margin: 12px 0 0; }</style></head>')}
 <body>
 {BAR}
 <main class="wrap page">
@@ -2024,6 +2056,8 @@ def eko_page():
       pri {top} €/m² je to {eur(top * e['max_area_m2'])}, pri {low} €/m² {eur(low * e['max_area_m2'])}. Meja 15 % cene je {eur(cap15)}{', zato je subvencija omejena nanjo' if ex(top) == cap15 else ' in pri tej hiši ne omejuje'}: dobite
       {eur(ex(top))} oziroma {eur(ex(low))}. Pri {top} €/m² meja 15 % odloči le pri hiši, ki stane manj kot okoli {eur(round(top / 0.15))} na m²;
       med {len(priced)} hišami v vodiču z objavljeno ceno brez subvencije {f'je takih {binds}' if binds else 'ni nobene take'}.</p>
+    <div class="eko-try"><label for="eko-h">Primer za drugo hišo iz vodiča<select id="eko-h">{try_opts}</select></label><p id="eko-out" aria-live="polite"></p></div>
+    {try_js}
     <p><a href="../{COSTS}/#snes=1&amp;h={m['slug']}">Izračunajte celotne stroške te hiše s subvencijo</a> ali v kalkulatorju izberite svojo hišo.</p>
   </section>
   <section class="prose"><h2>Pogoji za subvencijo</h2>
@@ -2138,7 +2172,7 @@ def show_page():
     abroad = [(p['name'], sh['town']) for p in data['providers'] for sh in (INFO.get(p['id']) or {}).get('show_houses') or [] if sh.get('abroad')]
     h1 = 'Kje si ogledati montažne hiše'
     desc = (f'Vzorčne hiše, razstavni saloni in dnevi odprtih vrat slovenskih proizvajalcev montažnih hiš: naslov, odpiralni čas in povezava. '
-            f'Stalno vzorčno hišo ali salon navaja {len(makers_with)} od {len(INFO)} proizvajalcev.')
+            f'Stalno vzorčno hišo ali salon {plural(len(makers_with) % 100, "navaja", "navajata", "navajajo", "navaja")} {len(makers_with)} od {len(INFO)} proizvajalcev.')
     ld = {'@context': 'https://schema.org', '@type': 'WebPage', 'name': h1, 'url': url, 'description': desc, 'inLanguage': 'sl'}
     return f'''{head(f'{h1}: vzorčne hiše in dnevi odprtih vrat · Hišni vodič', h1, desc, url, SITE + 'img/og/vzorcne.jpg', ld).replace('</head>', '<style>' + SHOW_CSS + '</style></head>')}
 <body>
@@ -2255,7 +2289,7 @@ def moved(new):
 
 def write(folder, html_):
     os.makedirs(folder, exist_ok=True)
-    open(os.path.join(folder, 'index.html'), 'w', encoding='utf-8').write(gloss(card_labels(html_)))
+    open(os.path.join(folder, 'index.html'), 'w', encoding='utf-8').write(nb(gloss(card_labels(html_))))
 
 
 # shortcut: pages of models removed from the JSON are not deleted; delete their folders by hand.
@@ -2324,7 +2358,7 @@ def home_faq():
 
 
 src = re.sub(r'(<meta (?:name="description"|property="og:description") content="Primerjajte cene in lastnosti )\d+( tipskih montažnih hiš)', lambda mo: mo.group(1) + str(len(models)) + mo.group(2), src)
-src = re.sub(r'(<!-- faq -->).*?(<!-- /faq -->)', lambda mo: mo.group(1) + home_faq() + mo.group(2), src, flags=re.S)
+src = re.sub(r'(<!-- faq -->).*?(<!-- /faq -->)', lambda mo: mo.group(1) + nb(home_faq()) + mo.group(2), src, flags=re.S)
 open('index.html', 'w', encoding='utf-8').write(src)
 
 locs = [SITE, SITE + GUIDE + '/', SITE + PLANS + '/', SITE + CHEAP + '/', SITE + SMALL + '/', SITE + COSTS + '/', SITE + KP + '/'] + [f"{SITE}{KP}/{slugify(mu['obcina'])}/" for mu in KPD['municipalities']] + [SITE + EKO + '/', SITE + SHOW + '/', SITE + ABOUT + '/'] + [SITE + p['id'] + '/' for p in data['providers']] + [SITE + s + '/' for s in slugs]
