@@ -41,12 +41,13 @@
     '.cmp-th button { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; border-radius: 50%; border: 0; padding: 0; background: var(--ink); color: var(--night); font: 700 15px/1 var(--font-body, sans-serif); cursor: pointer; }' +
     '.cmp-th button::after { content: ""; position: absolute; inset: -10px; }' +
     '.cmp-tray .cmp-clear { font: inherit; font-size: 13px; border: 0; background: none; color: var(--mist); cursor: pointer; padding: 12px 8px; }' +
+    '.cmp-tray .cmp-hide { font: inherit; font-size: 13px; border: 0; background: none; color: var(--mist); cursor: pointer; padding: 12px 8px; text-decoration: underline; text-underline-offset: 3px; }' +
     '.cmp-msg { flex: 1 1 100%; order: -1; margin: 0; padding: 2px 4px 0; font-size: 13px; color: var(--glow); }' +
     '.cmp-msg[hidden] { display: none; }' +
     // phones: one row (thumbs, Primerjaj, Počisti), at most 64 px tall
     '@media (max-width: 480px) { .cmp-tray { padding: 8px 8px 8px 12px; gap: 6px 8px; width: calc(100% - 32px); }' +
     ' .cmp-tray .cmp-n { display: none; } .cmp-thumbs { flex: 1; min-width: 0; gap: 6px; } .cmp-th { width: 42px; height: 32px; }' +
-    ' .cmp-tray .btn { padding: 10px 14px; } .cmp-tray .cmp-clear { padding: 12px 4px; } }' +
+    ' .cmp-tray .btn { padding: 10px 14px; } .cmp-tray .cmp-clear, .cmp-tray .cmp-hide { padding: 12px 4px; } }' +
     // desktop: a compact bar in the bottom-right corner, clear of centred form inputs
     '@media (min-width: 1024px) { .cmp-tray { left: auto; right: 24px; transform: none; width: auto; max-width: 460px; flex-wrap: nowrap; padding: 8px 8px 8px 12px; gap: 10px; }' +
     ' .cmp-tray .cmp-n { flex: 1 1 auto; line-height: 1.2; } .cmp-th { width: 44px; height: 32px; } .cmp-tray .cmp-n small { display: none; } .cmp-tray .btn { padding: 10px 16px; } .cmp-msg { position: absolute; bottom: 100%; right: 0; width: 100%; margin-bottom: 8px; padding: 8px 12px; border-radius: 12px; background: var(--dusk); box-shadow: 0 0 0 1px var(--line); } }';
@@ -58,6 +59,15 @@
   tray.setAttribute('aria-label', 'Primerjava hiš');
   document.body.appendChild(tray);
   var onComparePage = document.body.getAttribute('data-page') === 'compare';
+  // the calculator has its own sticky total at the bottom; the tray would cover it
+  var noTray = onComparePage || document.body.getAttribute('data-page') === 'costs' || !!document.querySelector('[data-sticky-bottom]');
+  // "skrij": hidden for this session, back as soon as a house is added
+  var HIDE = 'hise-compare-hidden', userHid = false;
+  try { userHid = sessionStorage.getItem(HIDE) === '1'; } catch (e) {}
+  function setHid(v) { userHid = v; try { if (v) sessionStorage.setItem(HIDE, '1'); else sessionStorage.removeItem(HIDE); } catch (e) {} }
+  // hidden while the quiz is on screen, so it does not cover the answer tiles
+  var inQuiz = false, quiz = document.getElementById('kviz');
+  if (quiz && window.IntersectionObserver) new IntersectionObserver(function (es) { inQuiz = es[es.length - 1].isIntersecting; refresh(); }).observe(quiz);
 
   // a bar stuck to the bottom of the screen (marked [data-sticky-bottom], e.g. the calculator total): sit the tray above it
   function place() {
@@ -92,7 +102,7 @@
       b.classList.toggle('full', !on && picks.length >= MAX);
     }
     var n = picks.length;
-    tray.hidden = !n || onComparePage;
+    tray.hidden = !n || noTray || userHid || inQuiz;
     document.body.classList.toggle('has-tray', !tray.hidden);
     tray.innerHTML = '<p class="cmp-msg" role="status"' + (note ? '' : ' hidden') + '>' + esc(note) + '</p>' +
       '<div class="cmp-thumbs">' + picks.map(function (s) {
@@ -102,7 +112,8 @@
       '<span class="cmp-n"><b>' + n + '</b> ' + (n === 1 ? 'hiša' : n === 2 ? 'hiši' : 'hiše') + ' v primerjavi' +
       (n < MAX ? '<small> · dodate lahko še ' + (MAX - n) + '</small>' : '<small> · največ ' + MAX + '</small>') + '</span>' +
       '<a class="btn glow" href="/primerjava/#' + picks.join(',') + '">Primerjaj <span class="arrow">→</span></a>' +
-      '<button type="button" class="cmp-clear">Počisti</button>';
+      '<button type="button" class="cmp-clear">Počisti</button>' +
+      '<button type="button" class="cmp-hide" aria-label="Skrij vrstico s primerjavo">skrij</button>';
     place();
   }
 
@@ -123,6 +134,7 @@
       var box = b.closest('tr, .alt');
       if (!on) names[s] = { n: nameOf(b), x: box && !box.querySelector('img') ? 1 : 0 };
       picks = on ? picks.filter(function (x) { return x !== s; }) : picks.concat(s).slice(0, MAX);
+      if (!on) setHid(false);
       note = '';
       save(); refresh();
       track('compare-toggle', { house: s, on: !on });
@@ -131,6 +143,7 @@
     var rm = t.closest('.cmp-rm');
     if (rm) { var r = rm.getAttribute('data-rm'); picks = picks.filter(function (x) { return x !== r; }); note = ''; save(); refresh(); track('compare-toggle', { house: r, on: false }); return; }
     if (t.closest('.cmp-clear')) { picks = []; note = ''; save(); refresh(); }
+    if (t.closest('.cmp-hide')) { setHid(true); refresh(); }
   });
   tray.addEventListener('error', function (e) {
     var s = e.target.getAttribute && e.target.getAttribute('data-s');
