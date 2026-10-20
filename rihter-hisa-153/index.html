@@ -87,7 +87,13 @@ footer nav a { color: var(--mist); text-underline-offset: 3px; display: inline-f
 footer nav a:hover { color: var(--ink); }
 .bar { position: static; }
 .mark { color: var(--ink); text-decoration: none; white-space: nowrap; }
-@media (max-width: 420px) { .bar nav { gap: 12px; font-size: 13px; } }
+@media (max-width: 420px) {  /* five nav links and the wordmark in 343 px */
+  .bar .wrap { gap: 10px; }
+  .bar .mark { font-size: 13px; font-stretch: 100%; letter-spacing: 0; gap: 8px; }
+  .bar .mark svg { width: 22px; height: 22px; }
+  .bar nav { gap: 8px; font-size: 13px; }
+}
+@media (max-width: 370px) { .bar nav { gap: 6px; font-size: 12px; } }
 .page { display: grid; gap: 28px; padding-block: 8px 64px; }
 .crumbs a { color: var(--mist); text-decoration: none; }
 .crumbs a:hover { color: var(--ink); }
@@ -100,6 +106,14 @@ footer nav a:hover { color: var(--ink); }
 .photo figcaption { position: absolute; left: 12px; top: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(10,18,32,.78); font: 500 11px/1 var(--font-data); letter-spacing: .12em; text-transform: uppercase; }
 @media (min-width: 900px) { .photo { aspect-ratio: auto; height: min(56vh, 634px); } }
 .specs dt { font-size: 11px; }
+@media (max-width: 640px) {
+  /* M-1: the primary action full width, the others two to a row, the maker link as plain text, so the photo stays near the fold */
+  .actions.hact { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: dense; gap: 8px; }
+  .actions.hact .btn { justify-content: center; text-align: center; padding: 12px 14px; font-size: 14px; min-height: 48px; }
+  .actions.hact .btn.glow { order: -1; grid-column: 1 / -1; font-size: 16px; }
+  .actions.hact .ask { grid-column: 1 / -1; }
+  .actions.hact .btn.mk { grid-column: 1 / -1; min-height: 44px; padding: 8px 4px; background: none; box-shadow: none; backdrop-filter: none; color: var(--mist); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+}
 .na { color: var(--mist); font: 400 14px/1.2 var(--font-body); }
 .price .est { display: block; font: 500 12px/1.3 var(--font-data); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
 abbr[data-tip] { position: relative; text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; border-radius: 3px; }
@@ -151,7 +165,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
 <body>
 <div class="bar"><div class="wrap">
   <a class="mark" href="../"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 15 16 5l12 10" stroke="#eef2f9" stroke-width="2.4" stroke-linejoin="round"/><rect x="8" y="15" width="16" height="12" stroke="#eef2f9" stroke-width="2.4"/><rect x="13" y="19" width="6" height="8" fill="#ffc477"/></svg>Hišni vodič</a>
-  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a><a href="../tlorisi-montaznih-his/">Tlorisi</a></nav>
+  <nav><a href="../#kviz">Kviz</a><a href="../#katalog">Katalog</a><a href="../cena-montazne-hise/">Cene</a><a href="../koliko-stane-gradnja-hise/">Stroški</a><a href="../tlorisi-montaznih-his/">Tlorisi</a></nav>
 </div></div>
 <main class="wrap page">
   <div>
@@ -162,12 +176,12 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
     </div>
   </div>
   <dl class="specs"><div><dt>Etaže</dt><dd>z mansardo</dd></div><div><dt>Površina</dt><dd>153 m²</dd></div><div><dt>Sobe</dt><dd>5</dd></div><div><dt>Kopalnice</dt><dd><span class="na">ni podatka</span></dd></div><div><dt>Streha</dt><dd>dvokapna</dd></div></dl>
-  <div class="actions">
+  <div class="actions hact">
     <a class="btn glow" href="../koliko-stane-gradnja-hise/#h=rihter-hisa-153">Izračunaj celotne stroške gradnje <span class="arrow">→</span></a><button type="button" class="btn line cmp" data-slug="rihter-hisa-153" data-name="Rihter Hiša 153" aria-label="Dodaj Rihter Hiša 153 v primerjavo">+ Primerjaj</button><a class="btn line" href="https://hisomer.si/#kviz">Ali vam pristaja? Rešite kviz</a>
-    <a class="btn line" href="https://www.rihter.si/house/hisa-153/" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
+    <a class="btn line mk" href="https://www.rihter.si/house/hisa-153/" target="_blank" rel="noopener">Podrobnosti pri proizvajalcu ↗</a>
   </div>
   <figure class="photo"><picture><source media="(min-width: 641px)" srcset="../img/rihter-hisa-153.jpg 720w, ../img/large/rihter-hisa-153.jpg 800w" sizes="(min-width: 1240px) 1208px, 100vw"><img src="../img/rihter-hisa-153.jpg" width="720" height="443" alt="Rihter Hiša 153"></picture><figcaption>Foto: Rihter</figcaption></figure>
-  <div class="lede"><p>Rihter Hiša 153 je montažna hiša z mansardo s površino 153 m² proizvajalca Rihter. Ima 5 sob. Streha je dvokapna. Arhitekturni slog: klasičen.</p><p>Cena po podatkih proizvajalca: 275.820 € – na ključ, sistem sten Optimal, z 9,5 % DDV, brez temeljne plošče (cenik na strani hiše, oktober 2026). Opomba: navedeno je število sob (spalnice niso navedene). Opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
+  <div class="lede"><p>Rihter Hiša 153 je montažna hiša z mansardo s površino 153 m² proizvajalca Rihter. Ima 5 sob. Streha je dvokapna. Arhitekturni slog: klasičen.</p><p>Cena po podatkih proizvajalca: 275.820 € – na ključ, sistem sten Optimal, z 9,5 % DDV, brez temeljne plošče (cenik na strani hiše, oktober 2026). Opis in aktualno ponudbo si oglejte pri proizvajalcu. <a href="../cena-montazne-hise/">Primerjajte cene vseh proizvajalcev</a>.</p></div>
   <section><h2>Tloris</h2><div class="plans"><a href="../img/tloris/rihter-hisa-153-1.jpg"><img src="../img/tloris/thumb/rihter-hisa-153-1.jpg" width="600" height="324" alt="Tloris pritličja – Rihter Hiša 153, 153 m²" loading="lazy"></a><a href="../img/tloris/rihter-hisa-153-2.jpg"><img src="../img/tloris/thumb/rihter-hisa-153-2.jpg" width="600" height="324" alt="Tloris mansarde – Rihter Hiša 153, 153 m²" loading="lazy"></a></div><p class="credit-line">Tloris: Rihter, <a href="https://www.rihter.si/house/hisa-153/" target="_blank" rel="noopener">stran hiše pri proizvajalcu ↗</a> · <a href="../tlorisi-montaznih-his/">Vsi tlorisi</a></p></section>
   <div class="two">
     <section class="maker-info"><h2>O proizvajalcu Rihter</h2><p>Slovenski proizvajalec z obsežnim javnim katalogom tipskih hiš in izhodiščnimi cenami. Sistemi Optimal, Pasiv in Natura.</p><p><a href="https://www.rihter.si" target="_blank" rel="noopener">rihter.si ↗</a></p></section>
@@ -177,7 +191,7 @@ h2 { font: 700 22px/1.2 var(--font-display); font-stretch: 105%; margin: 0 0 12p
   <section><h2>Druge hiše proizvajalca Rihter</h2><ul class="siblings"><li><a href="../rihter-hisa-087/">Hiša 087</a></li><li><a href="../rihter-hisa-100/">Hiša 100</a></li><li><a href="../rihter-hisa-113-2/">Hiša 113/2</a></li><li><a href="../rihter-hisa-126/">Hiša 126</a></li><li><a href="../rihter-hisa-136/">Hiša 136</a></li><li><a href="../rihter-hisa-185/">Hiša 185</a></li><li><a href="../rihter-hisa-106/">Hiša 106</a></li><li><a href="../rihter-hisa-114-3/">Hiša 114/3</a></li><li><a href="../rihter-hisa-122/">Hiša 122</a></li><li><a href="../rihter-hisa-138/">Hiša 138</a></li><li><a href="../rihter-hisa-149/">Hiša 149</a></li><li><a href="../rihter-hisa-162/">Hiša 162</a></li><li><a href="../rihter-hisa-183/">Hiša 183</a></li><li><a href="../rihter-hisa-101/">Hiša 101</a></li><li><a href="../rihter-hisa-105-2/">Hiša 105/2</a></li><li><a href="../rihter-hisa-114-4/">Hiša 114/4</a></li><li><a href="../rihter-hisa-116/">Hiša 116</a></li><li><a href="../rihter-hisa-127/">Hiša 127</a></li><li><a href="../rihter-hisa-131/">Hiša 131</a></li><li><a href="../rihter-hisa-135-1/">Hiša 135/1</a></li><li><a href="../rihter-hisa-137-1/">Hiša 137/1</a></li><li><a href="../rihter-hisa-139-1/">Hiša 139/1</a></li><li><a href="../rihter-hisa-141/">Hiša 141</a></li><li><a href="../rihter-hisa-143-1/">Hiša 143/1</a></li><li><a href="../rihter-hisa-171/">Hiša 171</a></li><li><a href="../rihter-hisa-174/">Hiša 174</a></li><li><a href="../rihter-hisa-116-1/">Hiša 116/1</a></li><li><a href="../rihter-hisa-116-3/">Hiša 116/3</a></li><li><a href="../rihter-hisa-132/">Hiša 132</a></li><li><a href="../rihter-hisa-133/">Hiša 133</a></li><li><a href="../rihter-hisa-133-1/">Hiša 133/1</a></li><li><a href="../rihter-hisa-144-1/">Hiša 144/1</a></li><li><a href="../rihter-hisa-147/">Hiša 147</a></li><li><a href="../rihter-hisa-152/">Hiša 152</a></li><li><a href="../rihter-hisa-152-1/">Hiša 152/1</a></li><li><a href="../rihter-hisa-154/">Hiša 154</a></li><li><a href="../rihter-hisa-155-1/">Hiša 155/1</a></li><li><a href="../rihter-hisa-155/">Hiša 155</a></li><li><a href="../rihter-hisa-168/">Hiša 168</a></li><li><a href="../rihter-hisa-173/">Hiša 173</a></li><li><a href="../rihter-hisa-175-1/">Hiša 175/1</a></li></ul></section>
 <details class="gloss"><summary>Kaj pomenijo izrazi na tej strani?</summary><dl><div><dt>IV. faza</dt><dd id="gl-iv-faza">stopnja gradnje: zunaj dokončana hiša z delom notranjih del; natančen obseg je v popisu del proizvajalca</dd></div><div><dt>na ključ</dt><dd id="gl-na-kljuc">vseljiva hiša z instalacijami, tlaki, kopalnicami in ogrevanjem; obseg opreme se med proizvajalci razlikuje</dd></div></dl></details>
 </main>
-<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci.</p><nav aria-label="Vodiči"><a href="../cena-montazne-hise/">Cene montažnih hiš</a><a href="../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../majhne-montazne-hise/">Majhne hiše</a><a href="../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../komunalni-prispevek/">Komunalni prispevek</a><a href="../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../tlorisi-montaznih-his/">Tlorisi</a><a href="../primerjava/">Primerjava</a><a href="../kje-si-ogledati-montazne-hise/">Kje si ogledati hiše</a><a href="../o-vodicu/">O vodiču</a></nav></div></footer>
+<footer><div class="wrap"><p>Podatki so zbrani s spletnih strani in ponudbenih brošur proizvajalcev (oktober 2026). Cene so informativne; pred odločitvijo preverite aktualno ponudbo pri proizvajalcu. Hišni vodič ni povezan s proizvajalci. Napako sporočite na <a href="mailto:info@hisomer.si">info@hisomer.si</a>.</p><nav aria-label="Vodiči"><a href="../cena-montazne-hise/">Cene montažnih hiš</a><a href="../najcenejse-montazne-hise/">Najcenejše hiše</a><a href="../majhne-montazne-hise/">Majhne hiše</a><a href="../koliko-stane-gradnja-hise/">Stroški gradnje</a><a href="../komunalni-prispevek/">Komunalni prispevek</a><a href="../eko-sklad-subvencija-novogradnja/">Subvencija Eko sklada</a><a href="../tlorisi-montaznih-his/">Tlorisi</a><a href="../primerjava/">Primerjava</a><a href="../kje-si-ogledati-montazne-hise/">Kje si ogledati hiše</a><a href="../o-vodicu/">O vodiču</a></nav></div></footer>
 <script src="../compare.js"></script>
 </body>
 </html>

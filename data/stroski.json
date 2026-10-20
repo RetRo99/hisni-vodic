@@ -93,6 +93,11 @@
             }
           ],
           "not_included": "plinovod in vročevod (le če se hiša nanju priključi)"
+        },
+        "vsevem_basis": {
+          "fn": 1,
+          "extra": "plinovod in vročevod",
+          "_why": "Recomputed from kp-vsevem-lj coefficients: 31,747.78 needs all 7 items and Fn 1; the odlok Fn for 1110 is 0.7."
         }
       },
       {
@@ -151,6 +156,10 @@
               "psz": 1
             }
           ]
+        },
+        "vsevem_basis": {
+          "old": "prispevne stopnje pred spremembo odloka leta 2024",
+          "_why": "kp-vsevem-mb lists psz 50 % for roads and sewer, 70 % public areas; MUV 6/2024 deleted the psz article (kp-mb-news)."
         }
       },
       {
