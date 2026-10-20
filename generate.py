@@ -6,7 +6,7 @@ import collections, datetime, glob, html, json, os, re, shutil, statistics, stru
 
 SITE = 'https://hisomer.si/'
 CONTACT = 'info@hisomer.si'  # forwarded by Dynadot email forwarding
-OWNER = 'Vodič pripravlja Rok Retar kot neodvisen projekt, brez povezav s proizvajalci montažnih hiš.'
+OWNER = 'Vodič je neodvisen projekt, brez povezav s proizvajalci montažnih hiš.'
 FUNDING = 'Trenutno brez oglasov in provizij; proizvajalci za objavo ne plačujejo. Če se to spremeni, bo jasno označeno.'
 GUIDE = 'cena-montazne-hise'
 PLANS = 'tlorisi-montaznih-his'
