@@ -2132,7 +2132,7 @@ def show_page():
             (f'<div class="sh-grid">{cards}</div>' if cards else '<p class="none">Stalne vzorčne hiše ali salona proizvajalec ne navaja.</p>') +
             (f'<h3 class="eyebrow">Dnevi odprtih vrat</h3><ul class="days">{days}</ul>' if days else '<p class="none">Prihodnjih dni odprtih vrat proizvajalec trenutno ne objavlja.</p>') +
             note_html +
-            f'<p class="none"><a href="../{p["id"]}/#dejstva">Garancija, čas gradnje in povpraševanje pri {esc(p["name"])}</a> · preverjeno {ddate(info["checked"])}</p></section>')
+            f'<p class="none"><a href="../{p["id"]}/#dejstva">{esc(p["name"])}: garancija, čas gradnje in povpraševanje</a> · preverjeno {ddate(info["checked"])}</p></section>')
     makers_with = [p['name'] for p in data['providers'] if INFO.get(p['id']) and p not in without and p not in studio_only]
     studios = [p['name'] for p in studio_only]
     abroad = [(p['name'], sh['town']) for p in data['providers'] for sh in (INFO.get(p['id']) or {}).get('show_houses') or [] if sh.get('abroad')]
@@ -2323,6 +2323,7 @@ def home_faq():
             ''.join(f'<article><h3>{q}</h3>{a}</article>' for q, a in qa) + '</div>')
 
 
+src = re.sub(r'(<meta (?:name="description"|property="og:description") content="Primerjajte cene in lastnosti )\d+( tipskih montažnih hiš)', lambda mo: mo.group(1) + str(len(models)) + mo.group(2), src)
 src = re.sub(r'(<!-- faq -->).*?(<!-- /faq -->)', lambda mo: mo.group(1) + home_faq() + mo.group(2), src, flags=re.S)
 open('index.html', 'w', encoding='utf-8').write(src)
 
